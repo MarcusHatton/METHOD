@@ -92,7 +92,9 @@ void SerialSaveDataHDF5::writeDataSetDouble(const hid_t *group, const char *name
   }
 
   // Now create the buffer to store the data in
-  double buffer[buffer_size];
+  // double buffer[buffer_size];
+  // double *buffer = (double *) malloc(buffer_size*sizeof(double));
+  double * buffer = new double[buffer_size];
   int buffer_position(0);
 
   // Consider the efficiency of this! std::copy would probably be better but maybe the compiler
@@ -105,6 +107,8 @@ void SerialSaveDataHDF5::writeDataSetDouble(const hid_t *group, const char *name
     }
   }
   H5LTmake_dataset_double(*group, name, d->dims, lengths, buffer);
+
+  delete[] buffer;
 }
 
 
@@ -247,6 +251,16 @@ void SerialSaveDataHDF5::saveConsts()
   H5LTset_attribute_double(this->file, ".", "sigma", &d->sigma, 1);
   H5LTset_attribute_double(this->file, ".", "cp", &d->cp, 1);
   H5LTset_attribute_double(this->file, ".", "t", &d->t, 1);
+
+  // For each one of the optional simulation arguments, write it to disk
+  hid_t group = H5Gcreate(this->file, "Optional", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5LTset_attribute_int(group, ".", "nOptionalSimArgs", &d->nOptionalSimArgs, 1);
+  for(int i(0); i < d->nOptionalSimArgs; i++) {
+    string name = d->optionalSimArgNames[i];
+    double arg = d->optionalSimArgs[i];
+    H5LTset_attribute_double(group, ".", name.c_str(), &arg, 1);
+  }
+  H5Gclose(group);
 }
 
 

@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <iostream>
 #include <stdexcept>
+#include "wenoUpwinds.h"
 
 ToyQ::ToyQ() : Model()
 {
@@ -38,8 +39,8 @@ void ToyQ::sourceTermSingleCell(double *cons, double *prims, double *aux, double
   // printf("ToyQ model does not implement sourceTermSingleCell\n");
   // exit(1);
 
-  float kappa = this->data->gamma; // Quick hack to use existing variables
-  float tau_q = this->data->sigma;
+  float kappa = this->data->optionalSimArgs[0];
+  float tau_q = this->data->optionalSimArgs[1];
 
   source[0] = 0.0;
   for (int dir(0); dir < 3; dir++) {
@@ -52,10 +53,8 @@ void ToyQ::sourceTerm(double *cons, double *prims, double *aux, double *source)
   // Syntax
   Data * d(this->data);
 
-  float kappa = d->gamma; // Quick hack to use existing variables
-  float tau_q = d->sigma;
-
-//  printf("Calling source\n");
+  float kappa = d->optionalSimArgs[0]; 
+  float tau_q = d->optionalSimArgs[1];
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -78,7 +77,7 @@ void ToyQ::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
   for (int nvar(0); nvar < 4; nvar++) {
     prims[nvar] = cons[nvar];
   }
-  // Note that this freezes the auxilliary variables - they are noto computed in
+  // Note that this freezes the auxilliary variables - they are not computed in
   // this function as they are non-local.
 }
 
@@ -86,9 +85,6 @@ void ToyQ::getPrimitiveVars(double *cons, double *prims, double *aux)
 {
   // Syntax
   Data * d(this->data);
-
-//  printf("Calling getPrimVars %i %i %i %i %i %i\n",
-//         d->is, d->ie, d->js, d->je, d->ks, d->ke);
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -100,28 +96,31 @@ void ToyQ::getPrimitiveVars(double *cons, double *prims, double *aux)
     }
   }
 
-  for (int i(d->is+1); i < d->ie-1; i++) {
+  for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         aux[ID(0, i, j, k)] = (prims[ID(0, i+1, j, k)]-prims[ID(0, i-1, j, k)])/(2*d->dx);
       }
     }
   }
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js+1); j < d->je-1; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        aux[ID(1, i, j, k)] = (prims[ID(0, i, j+1, k)]-prims[ID(0, i, j-1, k)])/(2*d->dy);
+  if (d->dims > 1) {
+    for (int i(d->is); i < d->ie; i++) {
+      for (int j(d->js); j < d->je; j++) {
+        for (int k(d->ks); k < d->ke; k++) {
+          aux[ID(1, i, j, k)] = (prims[ID(0, i, j+1, k)]-prims[ID(0, i, j-1, k)])/(2*d->dy);
+        }
+      }
+    }
+    if (d->dims > 2) {
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {
+            aux[ID(2, i, j, k)] = (prims[ID(0, i, j, k+1)]-prims[ID(0, i, j, k-1)])/(2*d->dz);
+          }
+        }
       }
     }
   }
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks+1); k < d->ke-1; k++) {
-        aux[ID(2, i, j, k)] = (prims[ID(0, i, j, k+1)]-prims[ID(0, i, j, k-1)])/(2*d->dz);
-      }
-    }
-  }
-
 }
 
 void ToyQ::primsToAll(double *cons, double *prims, double *aux)
@@ -129,7 +128,7 @@ void ToyQ::primsToAll(double *cons, double *prims, double *aux)
   // Syntax
   Data * d(this->data);
 
-  printf("Calling primsToAll\n");
+  // printf("Calling primsToAll\n");
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
