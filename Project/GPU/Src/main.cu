@@ -1,18 +1,14 @@
 // Serial main
 #include "simData.h"
-#include "parallelCheckpointArgs.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "parallelInitFuncFromCheckpoint.h"
 #include "srmhd.h"
 #include "srrmhd.h"
 #include "boundaryConds.h"
-#include "parallelBoundaryConds.h"
 #include "rkSplit.h"
 #include "SSP2.h"
-#include "parallelSaveDataHDF5.h"
+#include "saveData.h"
 #include "fluxVectorSplitting.h"
-#include "serialEnv.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -28,10 +24,11 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
+  const double MU(1000);
   // Set up domain
   int Ng(4);
-  int nx(64);
-  int ny(16);
+  int nx(256);
+  int ny(512);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -39,16 +36,17 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(-1.5);
   double zmax(1.5);
-  //double endTime(0.0005);
-  double endTime(0.01);
+  double endTime(3.0);
   double cfl(0.1);
   double gamma(4.0/3.0);
-  double sigma(0);
+  double sigma(300);
+  double cp(1.0);
+  double mu1(-MU);
+  double mu2(MU);
+  int frameSkip(180);
   bool output(true);
   int safety(180);
-  int nxRanks(2);
-  int nyRanks(2);
-  int nzRanks(1);
+
 
   char * ptr(0);
   //! Overwrite any variables that have been passed in as main() arguments
@@ -58,58 +56,23 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  ParallelEnv env(&argc, &argv, nxRanks, nyRanks, nzRanks);
-
-  const char* filename = "data_t0.checkpoint.hdf5";
-
-  //ParallelCheckpointArgs checkpointArgs(filename, &env);
-  //checkpointArgs.endTime=endTime;
-
-  // Create an arg object that will contain all parameters needed by the simulation, that will be stored on the Data object.  
-  // ParallelCheckpointArgs sets those parameters that can be read from the restart file, while the chained setter functions 
-  // that follow can be used to set the additional variables that are not stored in the restart file, as well as override
-  // any other variables (should only need to overwrite endTime when starting from a restart file)
-/*
-  ParallelCheckpointArgs checkpointArgs = ParallelCheckpointArgs(filename, &env).sEndTime(endTime);
-
-  Data data = Data(checkpointArgs, &env);
-*/
-
-  const int nOptionalSimArgs = 1;
-  std::vector<double> optionalSimArgs = {100};
-  std::vector<std::string> optionalSimArgNames = {"seed"};
-
-  // Create an arg object that will contain all parameters needed by the simulation, that will be stored on the Data object.  
-  // The DataArgs constructor takes those parameters that are required rather than optional.
-  // The chained setter functions can be used to set any of the optional parameters. They can be used in any order and default
-  // values will be used for any parameters that are not set
-  DataArgs dataArgs = DataArgs(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime)
-        .sCfl(cfl).sNg(Ng).sGamma(gamma).sSigma(sigma)
-        .sOptionalSimArgs(optionalSimArgs, optionalSimArgNames, nOptionalSimArgs);
-  
-  Data data = Data(dataArgs, &env);
-
-  // Create a data object using the old interface
-  /*
-  Data data(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime, &env,
-            cfl, Ng, gamma, sigma);
-  */
+  Data data(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime,
+            cfl, Ng, gamma, sigma, cp, mu1, mu2, frameSkip);
 
   // Choose particulars of simulation
-  SRMHD model(&data);
+  SRRMHD model(&data);
 
   FVS fluxMethod(&data, &model);
 
-  ParallelFlow bcs(&data, &env);
+  Simulation sim(&data);
 
-  Simulation sim(&data, &env);
+  KHInstabilitySingleFluid init(&data, 1);
 
-  //KHInstabilitySingleFluid init(&data, 1);
-  ParallelCheckpointRestart init(&data, filename, &env);
+  Flow bcs(&data);
 
-  RK2 timeInt(&data, &model, &bcs, &fluxMethod);
+  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
 
-  ParallelSaveDataHDF5 save(&data, &env, "data_parallel", ParallelSaveDataHDF5::OUTPUT_ALL);
+  SaveData save(&data);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -117,7 +80,12 @@ int main(int argc, char *argv[]) {
   double startTime(omp_get_wtime());
 
   // Run until end time and save results
-  sim.evolve(output, safety);
+  // sim.evolve(output, safety);
+  sim.updateTime();
+  sim.updateTime();
+  sim.updateTime();
+  sim.updateTime();
+  sim.updateTime();
 
   double timeTaken(omp_get_wtime()- startTime);
 

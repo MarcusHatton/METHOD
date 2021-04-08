@@ -11,11 +11,6 @@ C2PArgs::C2PArgs(Data * data) : data(data)
   // Determine the memory required for one cell
   cellMem = (d->Ncons + d->Nprims + d->Naux) * sizeof(double);
 
-  // Number of values sent to getPrimitiveValues for initial guess. We allocate enough room for SRMHD, which
-  // requires more values than SRRMHD. 
-  //! TODO -- create separate object for SRRMHD, which only allocates the one value needed per cell
-  nGuessSRMHD = 5;
-
   tpb = d->tpb;
   bpg = d->bpg;
   streamWidth = tpb * bpg;
@@ -31,7 +26,7 @@ C2PArgs::C2PArgs(Data * data) : data(data)
   gpuErrchk( cudaHostAlloc((void **)&cons_h, d->Ncons * d->Ncells * sizeof(double), cudaHostAllocPortable) );
   gpuErrchk( cudaHostAlloc((void **)&prims_h, d->Nprims * d->Ncells * sizeof(double), cudaHostAllocPortable) );
   gpuErrchk( cudaHostAlloc((void **)&aux_h, d->Naux * d->Ncells * sizeof(double), cudaHostAllocPortable) );
-  gpuErrchk( cudaHostAlloc((void **)&guess_h, d->Ncells * nGuessSRMHD * sizeof(double), cudaHostAllocPortable) );
+  gpuErrchk( cudaHostAlloc((void **)&guess_h, d->Ncells * sizeof(double), cudaHostAllocPortable) );
 
 
 
@@ -39,7 +34,7 @@ C2PArgs::C2PArgs(Data * data) : data(data)
     gpuErrchk( cudaMalloc((void **)&cons_d[i], d->Ncons * streamWidth * sizeof(double)) );
     gpuErrchk( cudaMalloc((void **)&prims_d[i], d->Nprims * streamWidth * sizeof(double)) );
     gpuErrchk( cudaMalloc((void **)&aux_d[i], d->Naux * streamWidth * sizeof(double)) );
-    gpuErrchk( cudaMalloc((void **)&guess_d[i], nGuessSRMHD * streamWidth * sizeof(double)) );
+    gpuErrchk( cudaMalloc((void **)&guess_d[i], streamWidth * sizeof(double)) );
   }
 
   // Create streams

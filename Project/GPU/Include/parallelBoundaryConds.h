@@ -32,7 +32,6 @@ class ParallelBcs : public Bcs
     */
     ParallelBcs(Data *data, ParallelEnv *env) : Bcs(data), env(env)
     {
-
     }
 
     virtual ~ParallelBcs() { }     //!< Destructor

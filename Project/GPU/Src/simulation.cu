@@ -1,5 +1,4 @@
 #include "simulation.h"
-#include "platformEnv.h"
 #include "cudaErrorCheck.h"
 #include <cmath>
 #include <stdexcept>
@@ -8,7 +7,7 @@
 #define ID(variable, idx, jdx, kdx)  ((variable)*(d->Nx)*(d->Ny)*(d->Nz) + (idx)*(d->Ny)*(d->Nz) + (jdx)*(d->Nz) + (kdx))
 
 
-Simulation::Simulation(Data * data, PlatformEnv *env) : data(data), env(env)
+Simulation::Simulation(Data * data) : data(data)
 {
   // Simplify syntax
   Data * d;
@@ -17,10 +16,7 @@ Simulation::Simulation(Data * data, PlatformEnv *env) : data(data), env(env)
   // Allocate memory for state arrays
   int Ntot(d->Nx * d->Ny * d->Nz);
 
-  if (env->rank==0){
-      if (d->Ncons == 0) throw std::runtime_error("Must set model before constructing simulation");
-      if (d->bcsSet != 1) throw std::runtime_error("Must construct boundary condition class before implementing simulation. Need to set domain decomposition parameters including periodicity.");
-  }
+  if (d->Ncons == 0) throw std::runtime_error("Must set model before constructing simulation");
 
   gpuErrchk( cudaHostAlloc((void **)&d->cons,
                 sizeof(double) * Ntot * d->Ncons,
@@ -56,6 +52,7 @@ Simulation::Simulation(Data * data, PlatformEnv *env) : data(data), env(env)
   d->dy = (d->ymax - d->ymin) / d->ny;
   d->dz = (d->zmax - d->zmin) / d->nz;
   d->iters = 0;
+  d->t = 0;
   d->alphaX = 1.0;
   d->alphaY = 1.0;
   d->alphaZ = 1.0;
@@ -65,20 +62,17 @@ Simulation::Simulation(Data * data, PlatformEnv *env) : data(data), env(env)
   d->dt = (dtX < dtY && dtX < dtZ) ? dtX : ((dtY < dtZ) ? dtY : dtZ);
   d->memSet = 1;
 
-  int iOffset = (d->Nx - 2*d->Ng)*env->xRankId;
-  int jOffset = (d->Ny - 2*d->Ng)*env->yRankId;
-  int kOffset = (d->Nz - 2*d->Ng)*env->zRankId;
-
   // Set axes
   for (int i(0); i < d->Nx; i++) {
-    d->x[i] = d->xmin + (i + iOffset + 0.5 - d->Ng) * d->dx;
+    d->x[i] = d->xmin + (i + 0.5 - d->Ng) * d->dx;
   }
   for (int j(0); j < d->Ny; j++) {
-    d->y[j] = d->ymin + (j + jOffset + 0.5 - d->Ng) * d->dy;
+    d->y[j] = d->ymin + (j + 0.5 - d->Ng) * d->dy;
   }
   for (int k(0); k < d->Nz; k++) {
-    d->z[k] = d->zmin + (k + kOffset + 0.5 - d->Ng) * d->dz;
+    d->z[k] = d->zmin + (k + 0.5 - d->Ng) * d->dz;
   }
+
 }
 
 Simulation::~Simulation()
@@ -122,9 +116,7 @@ void Simulation::updateTime()
   // Syntax
   Data * d(this->data);
 
-  if (env->rank == 0){
-    printf("t = %f\n", d->t);
-  }
+  printf("t = %f\n", d->t);
 
   // Calculate the size of the next timestep
   double dtX(d->cfl * d->dx / (d->alphaX * sqrt(d->dims)));
@@ -155,7 +147,7 @@ void Simulation::evolve(bool output, int safety)
 
   // Save initial data
   if (output && save) {
-/*
+
       this->save->saveVar("rho", 11);
       this->save->saveVar("vx", 11);
       this->save->saveVar("vy", 11);
@@ -166,9 +158,8 @@ void Simulation::evolve(bool output, int safety)
       this->save->saveVar("Bz", 11);
       this->save->saveVar("Ex", 11);
       this->save->saveVar("Ey", 11);
-      this->save->saveVar("Ez", 11);  
-*/
-      }
+      this->save->saveVar("Ez", 11);  }
+
   while (d->t < d->endTime) {
 
     this->updateTime();
@@ -176,7 +167,7 @@ void Simulation::evolve(bool output, int safety)
     // Save data for animation
     if (output && save && d->iters%d->frameSkip==0) {
       // Save initial data
-/*
+
       this->save->saveVar("rho", 11);
       this->save->saveVar("vx", 11);
       this->save->saveVar("vy", 11);
@@ -188,12 +179,11 @@ void Simulation::evolve(bool output, int safety)
       this->save->saveVar("Ex", 11);
       this->save->saveVar("Ey", 11);
       this->save->saveVar("Ez", 11);
-      */
     }
 
     if (safety>0 && d->iters%safety==0) {
-      this->save->saveAll(true);
-      if (env->rank==0) printf("Data saved...\n");
+      this->save->saveAll();
+      printf("Data saved...\n");
     }
 
   }
@@ -201,7 +191,7 @@ void Simulation::evolve(bool output, int safety)
   // Save final state
   if (output && save) {
     // Save initial data
-/*
+
       this->save->saveVar("rho", 11);
       this->save->saveVar("vx", 11);
       this->save->saveVar("vy", 11);
@@ -213,11 +203,8 @@ void Simulation::evolve(bool output, int safety)
       this->save->saveVar("Ex", 11);
       this->save->saveVar("Ey", 11);
       this->save->saveVar("Ez", 11);
-      */
     }
 
-  if (env->rank == 0){
-    printf("\n");
-  }
+  printf("\n");
 
 }

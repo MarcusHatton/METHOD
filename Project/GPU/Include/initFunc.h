@@ -13,10 +13,9 @@ class InitialFunc
 {
   private:
 
+    Data * data; //!< Pointer to Data class containing global simulation data
 
   public:
-
-    Data * data; //!< Pointer to Data class containing global simulation data
 
     //! Constructor
     /*!

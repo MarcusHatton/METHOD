@@ -19,7 +19,6 @@ class SerialEnv : public PlatformEnv
 {
 	public:
 
-    // TODO -- no reason for this constructor to take nxRanks etc
     //! Constructor -- Initialize global MPI communicator
 		SerialEnv(int *argcP, char **argvP[], int nxRanks, int nyRanks, int nzRanks, int testing=0);
 

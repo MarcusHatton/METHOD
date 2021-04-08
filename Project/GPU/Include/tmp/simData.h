@@ -3,22 +3,12 @@
 
 #include <vector>
 #include <string>
+#include "platformEnv.h"
+#include "dataArgs.h"
 
-/*!
-  Currently (and possibly permanently) a very hacky way of keeping singleCell cons2prims function
-  general for the benefit of the IMEX integrator.
-  SCC2P is an external void function pointer that will be set inside the model constructor to
-  be the
-  __device__ void getPrimitiveVarsSingleCellParallel()
-  function. This way the IMEX integrator should be able to handle multiple models.
-  Note: the reason this is required is because CUDA does not allow host classes to contain global
-  or device member functions, and the integrator requires the member function of
-  the model during the rootfind to perform the C2P conversion and to get the source
-  vector.
-*/
-// __device__
-// extern void (*SCC2P)(double *, double *, double *, double, double);
-// extern void (*SCSource)();
+// Macro for getting array index
+#define ID(variable, idx, jdx, kdx) ((variable)*(d->Nx)*(d->Ny)*(d->Nz) + (idx)*(d->Ny)*(d->Nz) + (jdx)*(d->Nz) + (kdx))
+
 
 //! <b> Data object </b>
 /*!
@@ -52,7 +42,8 @@
   we wish to access, and \f$(i, j, k)\f$ corresond to the\f$ (x, y, z)\f$ coordinates of the
   cell we wish to access. Note: this includes ghost cells, so in practice these values
   can range from \f$ 0 \le (i,j,k) < (nx,ny,nz)+2 Ng \f$ or \f$0 \le (i,j,k) < (Nx,Ny,Nz) \f$
-  assuming we are working in 3D. <br>
+  assuming we are working in 3D. To speed up this method, however, we have defined
+  a macro in each file with the same functionality <br>
   For 2D simulations, k=0 at all times, and similarly j=0 for 1D simulations.
 */
 class Data
@@ -76,6 +67,7 @@ class Data
     sigma;                 //!< Resistivity
     int
     memSet,                //!< Indicator that memory has been allocated for state vectors
+    bcsSet,                //!< Indicator that boundary conditions have been created (before this information about the domain decomposition used in MPI version will not be correct).
     //@{
     Ncons, Nprims, Naux;   //!< Number of specified variables
     //@}
@@ -85,14 +77,19 @@ class Data
     mu1, mu2;              //!< Charge mass ratio of specified fluid species, q/m (for two fluid model)
     //@}
     int
-    frameSkip,             //!< Number of timesteps per file output
-    tpb,                   //!< Threads per block for GPU code
-    bpg;                   //!< Blocks per grid for GPU code
+    frameSkip;             //!< Number of timesteps per file output
+    int
+    reportItersPeriod;     //!< Period with which time step data is reported to screen during program execution
+    bool
+    functionalSigma;       //!< Are we using a functional (vs homogeneous) conductivity?
+    double
+    gam;                   //!< Exponent in the functional conductivity
     double
     //@{
     *cons, *prims, *aux,
     *f, *fnet,             //!< Pointer to specified work array
     *source,
+    *sourceExtension,
     //@}
     //@{
     *x, *y, *z;            //!< Specified coordinate location of the center of the compute cells (incl ghost cells)
@@ -101,15 +98,15 @@ class Data
     //@{
     alphaX, alphaY, alphaZ,//!< Max wave speed in specified direction. As we are evolving EM fields, this is always the speed of light.
     //@}
-    t,                     //!< Current time
+    t=-1,                  //!< Current time
     dt,                    //!< Width of current timestep
     //@{
     dx, dy, dz;            //!< Witdth of specified spatial step
     //@}
     int
-    iters,                 //!< Number of interations that have been completed
+    iters,                 //!< Number of iterations that have been completed
     //@{
-    Nx, Ny, Nz;            //!< Total number of compute cells in domain in the specified direction
+    Nx, Ny, Nz, Ntot;      //!< Total number of compute cells in domain in the specified direction
     //@}
     std::vector<std::string>
     //@{
@@ -119,12 +116,11 @@ class Data
     //@}
     int
     dims,                  //!< Number of dimensions of simulation
-    GPUcount;              //!< Number of NVIDIA devices detected
-    cudaDeviceProp
-    prop;                  //!< Properties of NVIDIA device (assuming all are same)
-    int
-    Ncells,                //!< Total number of computational cells in domain
-    Nstreams;              //!< Number of GPU streams for the fully paralellisable functions (time int, c2p, etc)
+    //@{
+    is, js, ks,
+    ie, je, ke;            //!< Cell IDs for interior grid points
+    //@}
+
 
     //! Element ID function
     /*!
@@ -140,6 +136,38 @@ class Data
     int id(int var, int i, int j, int k) {
       return var * this->Nx * this->Ny * this->Nz + i * this->Ny * this->Nz + j * this->Nz + k;
     }
+
+
+    //! General form of conductivity
+    /*!
+    @par
+      In general, the conductivity may depend upon the environment (e.g. density,
+    magnetic field strength etc.). This is the interface for calculating the
+    conductivity. REALLY, this should be made as its own class and passed to the
+    physics model, but I'm being lazy this once because thesis+timeline=reasons.
+    Maybe a task for the interested reader...?
+
+    @param[in] *cons pointer to conserved vector work array. Size is \f$N_{cons} \times N_x \times N_y \times N_z\f$ or \f$N_{cons}\f$ if any \f$i, j, k < 0\f$
+    @param[in] *prims pointer to primitive vector work array. Size is \f$N_{prims} \times N_x \times N_y \times N_z\f$ or \f$N_{cons}\f$ if any \f$i, j, k < 0\f$
+    @param[in] *aux pointer to auxilliary vector work array. Size is\f$N_{aux} \times N_x \times N_y \times N_z\f$ or \f$N_{cons}\f$ if any \f$i, j, k < 0\f$
+    @param i cell number in the x-direction, default is -1. If \f$i < 0\f$, cons, prims, and are for a single cell.
+    @param j cell number in the y-direction, default is -1. If \f$j < 0\f$, cons, prims, and are for a single cell.
+    @param k cell number in the z-direction, default is -1. If \f$k < 0\f$, cons, prims, and are for a single cell.
+    @return sig the value of the conductivity
+    */
+    double sigmaFunc(double * cons, double * prims, double * aux, int i=-1, int j=-1, int k=-1);
+
+    //! Initialiser
+    /*!  
+        @par
+        Allocates the memory required for the state arrays and sets the simulation
+      constants to the given values. Does not set initial state, thats done by
+      the initialFunc object. Called automatically from constructors after setting object vars.
+      This is separated from the constructor to avoid duplicated code between the two available
+      constructors for Data.
+     */
+     void initData(PlatformEnv *env);
+
 
     //! Constructor
     /*!
@@ -164,16 +192,37 @@ class Data
       @param cp time scale for divergence cleaning. cp = 1 / kappa
       @param mu1 charge mass ratio of species 1
       @param mu2 charge mass ratio of species 2
+      @param frameskip number of timesteps per file output
+      @param env environment object containing platform details eg MPI ranks
+      @param reportItersPeriod period with which time step data is reported to screen during program execution
     */
     Data(int nx, int ny, int nz,
          double xmin, double xmax,
          double ymin, double ymax,
          double zmin, double zmax,
-         double endTime, double cfl=0.5, int Ng=4,
-         double gamma=5.0/3.0, double sigma=1e3,
+         double endTime,
+ 	     PlatformEnv *env,
+         double cfl=0.5, int Ng=4,
+         double gamma=5.0/3.0,
+         double sigma=1e3,
          double cp=0.1,
          double mu1=-1.0e4, double mu2=1.0e4,
-         int frameskip=10);
+         int frameskip=10,
+         int reportItersPeriod=1,
+         bool funtionalSigma=false, double gam=12);
+
+    //! Constructor
+    /*!
+      @par
+        Allocates the memory required for the state arrays and sets the simulation
+      constants to the given values. Does not set initial state, thats done by
+      the initialFunc object.
+      @param args simulation arguments such as cfl, sigma etc, as read from checkpoint restart file
+      @param mu1 charge mass ratio of species 1
+      @param mu2 charge mass ratio of species 2
+    */
+    Data(CheckpointArgs args, PlatformEnv *env, double mu1=-1.0e4, double mu2=1.0e4,
+         int frameskip=10, int reportItersPeriod=1, int functionalSigma=false, double gam=12);
 
 };
 

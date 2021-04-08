@@ -7,15 +7,13 @@
 #include <cstdlib>
 #include <cstring>
 #include "simData.h"
-#include "platformEnv.h"
 
 using namespace std;
 
 //! <b> Class used to save simulation data </b>
 /*!
   @par
-    Abstract base class to allow for different output schemes in a parallel environment.
-  Class is initialized with the data that is to be saved. Saves the simulation
+    Class is initialized with the data that is to be saved. Saves the simulation
   data in the Data directory, located within the Project folder. All data is
   saved automatically, including all constant data (xmin, ymax, endTime etc) and
   and the values of all prims, aux and cons variables.
@@ -26,29 +24,34 @@ class SaveData
   public:
     Data * d; //!< Pointer to Data class containing global simulation data
 
+  private:
+
     int
     Nouts,         //!< Number of output files
     Ncount,        //!< Which user defined variable is this?
     test;          //!< Flags if we are running one of the given examples
 
+  public:
+
     //! Saves the conserved vector state
-    virtual void saveCons() = 0;
+    void saveCons();
 
     //! Saves the primitive vector state
-    virtual void savePrims() = 0;
+    void savePrims();
 
     //! Saves the auxiliary vector state
-    virtual void saveAux() = 0;
+    void saveAux();
 
     //! Saves the domain coordinates
-    virtual void saveDomain() = 0;
+    void saveDomain();
 
     //! Saves the constant data
-    virtual void saveConsts() = 0;
+    void saveConsts();
 
     char
     dir[50],   //!< String path to the directory in which to write files
-    app[50];   //!< String appendix to add to end of file names
+    app[10];   //!< String appendix to add to end of file names
+
 
     //! Constructor
     /*!
@@ -58,7 +61,7 @@ class SaveData
       in the Project folder.
 
       @param *data pointer to the Data class
-      @param test integer flagging if we are in the 'Examples' directory or not,
+      @param test integar flagging if we are in the 'Examples' directory or not,
       Only used for running the given examples, can ignore otherwise.
     */
     SaveData(Data * data, int test=0) : d(data), Nouts(0), Ncount(0), test(test)
@@ -70,7 +73,6 @@ class SaveData
       }
     }
 
-    virtual ~SaveData() { }     //!< Destructor
 
     //! Saves all cons, prims, aux and constant data
     /*!
@@ -80,17 +82,17 @@ class SaveData
 
       @param[in] timeSeries flags whether the saved data is final or transient
     */
-    virtual void saveAll(bool timeSeries=false) = 0;
+    void saveAll(bool timeSeries=false);
 
     //! Saves user specified variable
     /*!
       @par
         Function saves the data for the variable specified by the string `var`
 
-      @param[in] variable Defines the variable the user wants to save. Should match a variable label
+      @param[in] var Defines the variable the user wants to save. Should match a variable label
       @param[in] num number of user-specified variables to save in total (required for consistent numbering of files)
     */
-    virtual void saveVar(string variable, int num=1) = 0;
+    void saveVar(string variable, int num=1);
 
 };
 
