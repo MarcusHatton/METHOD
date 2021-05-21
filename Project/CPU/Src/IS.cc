@@ -276,18 +276,21 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         aux[ID(14, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(d->dx)
           - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])**2)*aux[ID(20, i, j, k)] );
         // 12
-        aux[ID(15, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(d->dx)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])**2)*aux[ID(20, i, j, k)] );
+        aux[ID(15, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(1, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(1, i-1, j, k)])/(2*d->dx)
+          + (aux[ID(3, i, j+1, k)]*prims[ID(0, i, j+1, k)] - aux[ID(3, i, j-1, k)]*prims[ID(0, i, j-1, k)])/(2*d->dy)
+          - (2/3)*((aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])*(aux[ID(3, i, j, k)]*prims[ID(1, i, j, k)]))*aux[ID(20, i, j, k)] );
         // 13
-        aux[ID(16, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(d->dx)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])**2)*aux[ID(20, i, j, k)] );
+        aux[ID(16, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(2, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(2, i-1, j, k)])/(2*d->dx)
+          + (aux[ID(3, i, j, k+1)]*prims[ID(0, i, j, k+1)] - aux[ID(3, i, j, k-1)]*prims[ID(0, i, j, k-1)])/(2*d->dz)
+          - (2/3)*((aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])*(aux[ID(3, i, j, k)]*prims[ID(2, i, j, k)]))*aux[ID(20, i, j, k)] );
         // 22
-        aux[ID(17, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(d->dx)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])**2)*aux[ID(20, i, j, k)] );
+        aux[ID(17, i, j, k)] = -2*eta*( (aux[ID(3, i, j+1, k)]*prims[ID(0, i, j+1, k)] - aux[ID(3, i, j-1, k)]*prims[ID(0, i, j-1, k)])/(d->dy)
+          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(1, i, j, k)])**2)*aux[ID(20, i, j, k)] );
         // 23
-        aux[ID(18, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(d->dx)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])**2)*aux[ID(20, i, j, k)] );
-        // 23
+        aux[ID(18, i, j, k)] = -2*eta*( (aux[ID(3, i, j+1, k)]*prims[ID(2, i, j+1, k)] - aux[ID(3, i, j-1, k)]*prims[ID(2, i, j-1, k)])/(2*d->dy)
+          + (aux[ID(3, i, j, k+1)]*prims[ID(1, i, j, k+1)] - aux[ID(3, i, j, k-1)]*prims[ID(1, i, j, k-1)])/(2*d->dz)
+          - (2/3)*((aux[ID(3, i, j, k)]*prims[ID(1, i, j, k)])*(aux[ID(3, i, j, k)]*prims[ID(2, i, j, k)]))*aux[ID(20, i, j, k)] );
+        // 33
         aux[ID(19, i, j, k)] = -2*eta*( (aux[ID(3, i, j, k+1)]*prims[ID(0, i, j, k+1)] - aux[ID(3, i, j, k-1)]*prims[ID(0, i, j, k-1)])/(d->dz)
           - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(2, i, j, k)])**2)*aux[ID(20, i, j, k)] );
       }
