@@ -6,18 +6,26 @@
 #include <stdexcept>
 #include "wenoUpwinds.h"
 
+// enums to save looking up numbering of C/P/As when using ID accessor.
+
+enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
+enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
+enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
+           pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, a0, a1, a2, a3 };  
+
+
 IS::IS() : Model()
 {
-  this->Ncons = 4;
-  this->Nprims = 4;
-  this->Naux = 3;
+  this->Ncons = ;
+  this->Nprims = ;
+  this->Naux = ;
 }
 
 IS::IS(Data * data) : Model(data)
 {
-  this->Ncons = (this->data)->Ncons = 4;
-  this->Nprims = (this->data)->Nprims = 4;
-  this->Naux = (this->data)->Naux = 3;
+  this->Ncons = (this->data)->Ncons = ;
+  this->Nprims = (this->data)->Nprims = ;
+  this->Naux = (this->data)->Naux = ;
 
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
@@ -48,7 +56,7 @@ IS::IS(Data * data) : Model(data)
   
   
   // 0
-  this->data->auxLabels.push_back("h");     this->data->auxLabels.push_back("T")     
+  this->data->auxLabels.push_back("h");     this->data->auxLabels.push_back("T");     
   this->data->auxLabels.push_back("e");     this->data->auxLabels.push_back("W");    
   // 4
   this->data->primsLabels.push_back("q0");    this->data->primsLabels.push_back("qv");
@@ -64,8 +72,9 @@ IS::IS(Data * data) : Model(data)
   this->data->primsLabels.push_back("pi13NS"); this->data->primsLabels.push_back("pi22NS");
   this->data->primsLabels.push_back("pi23NS"); this->data->primsLabels.push_back("pi33NS");
   // 20
-  this->data->auxLabels.push_back("Theta");  this->data->auxLabels.push_back("a");
-       
+  this->data->auxLabels.push_back("Theta");  this->data->auxLabels.push_back("a0");
+  this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
+  this->data->auxLabels.push_back("a3");    
 }
 
 IS::~IS()
@@ -94,16 +103,19 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   // Tau
   source[4] = 0.0;
   // Y1,2,3
-  for (int dir(0); dir < 3; dir++) {
-    source[5+dir] = (n / tau_q) * (aux[dir+4] - prims[dir+8]) 
-  }
+  source[5] = (n / tau_q) * (aux[q1NS] - prims[q1]);
+  source[6] = (n / tau_q) * (aux[q2NS] - prims[q2]);
+  source[7] = (n / tau_q) * (aux[q3NS] - prims[q3]);
   // U
-  source[8] = (n / tau_Pi) * (aux[7] - prims[11])
+  source[8] = (n / tau_Pi) * (aux[PiNS] - prims[Pi]);
   // Z11,12,13,22,23,33
-  for (int dir(0); dir < 6; dir++) {
-    source[9+dir] = (n / tau_pi) * (aux[dir+8] - prims[dir+12])
-  }
-
+  source[9] = (n / tau_pi) * (aux[pi11NS] - prims[pi11]);
+  source[10] = (n / tau_pi) * (aux[pi12NS] - prims[pi12]);
+  source[11] = (n / tau_pi) * (aux[pi13NS] - prims[pi13]);
+  source[12] = (n / tau_pi) * (aux[pi22NS] - prims[pi22);
+  source[13] = (n / tau_pi) * (aux[pi23NS] - prims[pi23]);
+  source[14] = (n / tau_pi) * (aux[pi33NS] - prims[pi33]);
+  
 }
 
 void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
@@ -122,40 +134,124 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         // D
-        source[ID(0, i, j, k)] = 0.0;
+        source[ID(D, i, j, k)] = 0.0;
         // S1,2,3
-        source[ID(1, i, j, k)] = 0.0;
-        source[ID(2, i, j, k)] = 0.0;
-        source[ID(3, i, j, k)] = 0.0;
+        source[ID(S1, i, j, k)] = 0.0;
+        source[ID(S2, i, j, k)] = 0.0;
+        source[ID(S3, i, j, k)] = 0.0;
         // Tau
-        source[ID(4, i, j, k)] = 0.0;
-        
+        source[ID(Tau, i, j, k)] = 0.0;
         // Y1,2,3
-        for (int dir(0); dir < 3; dir++) {
-          source[ID(5+dir, i, j, k)] = (n / tau_q) * (aux[ID(dir+4, i, j, k)] - prims[ID(dir+8, i, j, k)]) 
-        }
+        source[ID(Y1, i, j, k)] = (n / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q1, i, j, k)]);
+        source[ID(Y2, i, j, k)] = (n / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q2, i, j, k)]);
+        source[ID(Y3, i, j, k)] = (n / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q3, i, j, k)]);        
         // U
-        source[8] = (n / tau_Pi) * (aux[ID(7, i, j, k)] - prims[ID(11, i, j, k)])
+        source[ID(8, i, j, k)] = (n / tau_Pi) * (aux[ID(PiNS, i, j, k)] - prims[ID(Pi, i, j, k)]);
         // Z11,12,13,22,23,33
-        for (int dir(0); dir < 6; dir++) {
-          source[ID(9+dir] = (n / tau_pi) * (aux[ID(dir+8, i, j, k)] - prims[ID(dir+12, i, j, k)])
-        }
-        
+        source[ID(Z11, i, j, k)] = (n / tau_pi) * (aux[ID(pi11NS, i, j, k)] - prims[ID(pi11, i, j, k)]);
+        source[ID(Z12, i, j, k)] = (n / tau_pi) * (aux[ID(pi12NS, i, j, k)] - prims[ID(pi12, i, j, k)]);
+        source[ID(Z13, i, j, k)] = (n / tau_pi) * (aux[ID(pi13NS, i, j, k)] - prims[ID(pi13, i, j, k)]);
+        source[ID(Z22, i, j, k)] = (n / tau_pi) * (aux[ID(pi22NS, i, j, k)] - prims[ID(pi22, i, j, k)]); 
+        source[ID(Z23, i, j, k)] = (n / tau_pi) * (aux[ID(pi23NS, i, j, k)] - prims[ID(pi23, i, j, k)]);
+        source[ID(Z33, i, j, k)] = (n / tau_pi) * (aux[ID(pi33NS, i, j, k)] - prims[ID(pi33, i, j, k)]);                       
         
       }
     }
   }
 }
 
+//! Residual function to minimize in the format required by cminpack
+/*!
+    I know, its a horrible layout, alas we're stuck with it.
+
+    Parameters
+    ----------
+    p : pointer to struct
+      Struct contains additional arguments that are required (if any)
+    n : int
+      Size of system
+    x : pointer to double
+      The array containing the initial guess
+    fvec : pointer to double
+      The array containing the solution
+    iflag : int
+      Error flag
+*/
+int ISresidual(void *p, int n, const double *x, double *fvec, int iflag)
+{
+
+  // Retrieve additional arguments
+  Args * args = (Args*) p;
+
+  // Values must make sense
+  if (x[0] >= 1.0 || x[1] < 0) {
+    fvec[0] = fvec[1] = 1e6;
+    return 0;
+  }
+  double Bsq(args->Bsq);
+  double Ssq(args->Ssq);
+  double BS(args->BS);
+  double W(1 / sqrt(1 - x[0]));
+  double rho(args->D / W);
+  double h(x[1] / (rho * W * W));
+  double pr((h - 1) * rho * (args->g - 1) / args->g);
+  if (pr < 0 || rho < 0 || h < 0 || W < 1) {
+    fvec[0] = fvec[1] = 1e6;
+    return 0;
+  }
+  // Values should be OK
+  fvec[0] = (x[1] + Bsq) * (x[1] + Bsq) * x[0] - (2 * x[1] + Bsq) * BS * BS / (x[1] * x[1]) - Ssq;
+  fvec[1] = x[1] + Bsq - pr - Bsq / (2 * W * W) - BS * BS / (2 * x[1] * x[1]) - args->D - args->tau;
+
+  return 0;
+}
+
 void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
 
-  // printf("ToyQ model does not implement getPrimitiveVarsSingleCell\n");
-  // exit(1);
   // Y1-3,U,Z11-33
   for (int ndissvar(0); ndissvar < 10; nvar++) {
-    prims[ndissvar+8] = cons[ndissvar+5] / cons[0];
+    prims[q1+ndissvar] = cons[Y1+ndissvar] / cons[D];
   }
+
+  // Hybrd1 set-up
+  Args args;                          // Additional arguments structure
+  const int n(4);                     // Size of system
+  double sol[4];                      // Guess and solution vector
+  double res[4];                      // Residual/fvec vector
+  int info;                           // Rootfinder flag
+  const double tol = 1.4e-8;          // Tolerance of rootfinder
+  const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
+  double wa[lwa];                     // Work array
+
+  // Set additional args for rootfind
+  args.Tau_rf = cons[Tau];
+  arg.Pi_rf = prims[Pi];
+  
+
+  sol[0] = prims[p] + prims[Pi] + prims[n]*aux[W] - 2*aux[qv]*aux[W] - aux[pi00];
+  sol[1] = (prims[q1] + aux[qv]*prims[v1])*aux[W] + aux[pi01];
+  sol[2] = (prims[q2] + aux[qv]*prims[v2])*aux[W] + aux[pi02];
+  sol[3] = (prims[q3] + aux[qv]*prims[v3])*aux[W] + aux[pi03];
+
+  // Solve residual = 0
+  info = __cminpack_func__(hybrd1) (&SRMHDresidual, &args, n, sol, res,
+                                    tol, wa, lwa);
+  // If root find fails, add failed cell to the list
+  if (info!=1) {
+    //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
+    throw std::runtime_error("C2P could not converge.\n");
+  }
+  
+
+
+
+
+
+
+
+
+
   // Note that this freezes the auxilliary variables - they are not computed in
   // this function as they are non-local.
 }
@@ -180,7 +276,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        aux[ID(0, i, j, k)] = (prims[ID(0, i+1, j, k)]-prims[ID(0, i-1, j, k)])/(2*d->dx);
+        aux[ID(0, i, j, k)] = (prims[ID(v1, i+1, j, k)]-prims[ID(v1, i-1, j, k)])/(2*d->dx);
       }
     }
   }
@@ -188,7 +284,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     for (int i(d->is); i < d->ie; i++) {
       for (int j(d->js); j < d->je; j++) {
         for (int k(d->ks); k < d->ke; k++) {
-          aux[ID(1, i, j, k)] = (prims[ID(0, i, j+1, k)]-prims[ID(0, i, j-1, k)])/(2*d->dy);
+          aux[ID(1, i, j, k)] = (prims[ID(v1, i, j+1, k)]-prims[ID(v1, i, j-1, k)])/(2*d->dy);
         }
       }
     }
@@ -196,7 +292,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
-            aux[ID(2, i, j, k)] = (prims[ID(0, i, j, k+1)]-prims[ID(0, i, j, k-1)])/(2*d->dz);
+            aux[ID(2, i, j, k)] = (prims[ID(v1, i, j, k+1)]-prims[ID(v1, i, j, k-1)])/(2*d->dz);
           }
         }
       }
@@ -216,7 +312,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(3, i, j, k)] = 1 / ( 1 - (prims[ID(0, i, j, k)]**2 + prims[ID(1, i, j, k)]**2 + prims[ID(2, i, j, k)]**2) )**0.5;
+        aux[ID(W, i, j, k)] = 1 / ( 1 - (prims[ID(v1, i, j, k)]**2 + prims[ID(v2, i, j, k)]**2 + prims[ID(v3, i, j, k)]**2) )**0.5;
       }
     }
   }
@@ -225,7 +321,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(6, i, j, k)] = (prims[ID(6, i, j, k)] * prims[ID(0, i, j, k)]) + (prims[ID(7, i, j, k)] * prims[ID(0, i, j, k)]) + (prims[ID(8, i, j, k)] * prims[ID(0, i, j, k)]);
+        aux[ID(qv, i, j, k)] = (prims[ID(q1, i, j, k)] * prims[ID(v1, i, j, k)]) + (prims[ID(q2, i, j, k)] * prims[ID(v2, i, j, k)]) + (prims[ID(q3, i, j, k)] * prims[ID(v3, i, j, k)]);
       }
     }
   }
@@ -234,7 +330,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(6, i, j, k)] = prims[ID(10, i, j, k)] + prims[ID(13, i, j, k)] + prims[ID(15, i, j, k)];
+        aux[ID(pi00, i, j, k)] = prims[ID(pi11, i, j, k)] + prims[ID(pi22, i, j, k)] + prims[ID(pi33, i, j, k)];
       }
     }
   }
@@ -250,9 +346,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-          aux[ID(10, i, j, k)] = -kappa*aux[ID(1, i, j, k)] * ( (ln(aux[ID(1, i+1, j, k)]) - ln(aux[ID(1, i-1, j, k)]))/(2*d->dx) );
-          aux[ID(11, i, j, k)] = -kappa*aux[ID(1, i, j, k)] * ( (ln(aux[ID(1, i, j+1, k)]) - ln(aux[ID(1, i, j-1, k)]))/(2*d->dy) );
-          aux[ID(12, i, j, k)] = -kappa*aux[ID(1, i, j, k)] * ( (ln(aux[ID(1, i, j, k+1)]) - ln(aux[ID(1, i, j, k-1)]))/(2*d->dz) );
+          aux[ID(q1NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (ln(aux[ID(T, i+1, j, k)]) - ln(aux[ID(T, i-1, j, k)]))/(2*d->dx) );
+          aux[ID(q2NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (ln(aux[ID(T, i, j+1, k)]) - ln(aux[ID(T, i, j-1, k)]))/(2*d->dy) );
+          aux[ID(q3NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (ln(aux[ID(T, i, j, k+1)]) - ln(aux[ID(T, i, j, k-1)]))/(2*d->dz) );
       }
     }
   }  
@@ -260,11 +356,11 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(20, i, j, k)] = ( dtu0 + (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(2*d->dx) 
-          + (aux[ID(3, i, j+1, k)]*prims[ID(1, i, j+1, k)] - aux[ID(3, i, j, k)]*prims[ID(1, i, j-1, k)])/(2*d->dy)
-          + (aux[ID(3, i, j, k+1)]*prims[ID(2, i, j, k+1)] - aux[ID(3, i, j, k)]*prims[ID(2, i, j, k-1)])/(2*d->dz) );
+        aux[ID(Theta, i, j, k)] = ( dtu0 + (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(2*d->dx) 
+          + (aux[ID(W, i, j+1, k)]*prims[ID(v2, i, j+1, k)] - aux[ID(W, i, j, k)]*prims[ID(v2, i, j-1, k)])/(2*d->dy)
+          + (aux[ID(W, i, j, k+1)]*prims[ID(v3, i, j, k+1)] - aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k-1)])/(2*d->dz) );
         // Pi,NS = -zeta*Theta
-        aux[ID(13, i, j, k)] = -zeta * aux[ID(20, i, j, k)];
+        aux[ID(PiNS, i, j, k)] = -zeta * aux[ID(Theta, i, j, k)];
       }
     }
   }  
@@ -273,39 +369,37 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
         // 11
-        aux[ID(14, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(0, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(0, i-1, j, k)])/(d->dx)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])**2)*aux[ID(20, i, j, k)] );
+        aux[ID(pi11NS, i, j, k)] = -2*eta*( (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(d->dx)
+          - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)])**2)*aux[ID(Theta, i, j, k)] );
         // 12
-        aux[ID(15, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(1, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(1, i-1, j, k)])/(2*d->dx)
-          + (aux[ID(3, i, j+1, k)]*prims[ID(0, i, j+1, k)] - aux[ID(3, i, j-1, k)]*prims[ID(0, i, j-1, k)])/(2*d->dy)
-          - (2/3)*((aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])*(aux[ID(3, i, j, k)]*prims[ID(1, i, j, k)]))*aux[ID(20, i, j, k)] );
+        aux[ID(pi12NS, i, j, k)] = -2*eta*( (aux[ID(W, i+1, j, k)]*prims[ID(v2, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v2, i-1, j, k)])/(2*d->dx)
+          + (aux[ID(W, i, j+1, k)]*prims[ID(v1, i, j+1, k)] - aux[ID(W, i, j-1, k)]*prims[ID(v1, i, j-1, k)])/(2*d->dy)
+          - (2/3)*((aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v2, i, j, k)]))*aux[ID(Theta, i, j, k)] );
         // 13
-        aux[ID(16, i, j, k)] = -2*eta*( (aux[ID(3, i+1, j, k)]*prims[ID(2, i+1, j, k)] - aux[ID(3, i-1, j, k)]*prims[ID(2, i-1, j, k)])/(2*d->dx)
-          + (aux[ID(3, i, j, k+1)]*prims[ID(0, i, j, k+1)] - aux[ID(3, i, j, k-1)]*prims[ID(0, i, j, k-1)])/(2*d->dz)
-          - (2/3)*((aux[ID(3, i, j, k)]*prims[ID(0, i, j, k)])*(aux[ID(3, i, j, k)]*prims[ID(2, i, j, k)]))*aux[ID(20, i, j, k)] );
+        aux[ID(pi13NS, i, j, k)] = -2*eta*( (aux[ID(W, i+1, j, k)]*prims[ID(v3, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v3, i-1, j, k)])/(2*d->dx)
+          + (aux[ID(W, i, j, k+1)]*prims[ID(v1, i, j, k+1)] - aux[ID(W, i, j, k-1)]*prims[ID(v1, i, j, k-1)])/(2*d->dz)
+          - (2/3)*((aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k)]))*aux[ID(Theta, i, j, k)] );
         // 22
-        aux[ID(17, i, j, k)] = -2*eta*( (aux[ID(3, i, j+1, k)]*prims[ID(0, i, j+1, k)] - aux[ID(3, i, j-1, k)]*prims[ID(0, i, j-1, k)])/(d->dy)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(1, i, j, k)])**2)*aux[ID(20, i, j, k)] );
+        aux[ID(pi22NS, i, j, k)] = -2*eta*( (aux[ID(W, i, j+1, k)]*prims[ID(v1, i, j+1, k)] - aux[ID(W, i, j-1, k)]*prims[ID(v1, i, j-1, k)])/(d->dy)
+          - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v2, i, j, k)])**2)*aux[ID(Theta, i, j, k)] );
         // 23
-        aux[ID(18, i, j, k)] = -2*eta*( (aux[ID(3, i, j+1, k)]*prims[ID(2, i, j+1, k)] - aux[ID(3, i, j-1, k)]*prims[ID(2, i, j-1, k)])/(2*d->dy)
-          + (aux[ID(3, i, j, k+1)]*prims[ID(1, i, j, k+1)] - aux[ID(3, i, j, k-1)]*prims[ID(1, i, j, k-1)])/(2*d->dz)
-          - (2/3)*((aux[ID(3, i, j, k)]*prims[ID(1, i, j, k)])*(aux[ID(3, i, j, k)]*prims[ID(2, i, j, k)]))*aux[ID(20, i, j, k)] );
+        aux[ID(pi23NS, i, j, k)] = -2*eta*( (aux[ID(W, i, j+1, k)]*prims[ID(v3, i, j+1, k)] - aux[ID(W, i, j-1, k)]*prims[ID(v3, i, j-1, k)])/(2*d->dy)
+          + (aux[ID(W, i, j, k+1)]*prims[ID(v2, i, j, k+1)] - aux[ID(W, i, j, k-1)]*prims[ID(v2, i, j, k-1)])/(2*d->dz)
+          - (2/3)*((aux[ID(W, i, j, k)]*prims[ID(v2, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k)]))*aux[ID(Theta, i, j, k)] );
         // 33
-        aux[ID(19, i, j, k)] = -2*eta*( (aux[ID(3, i, j, k+1)]*prims[ID(0, i, j, k+1)] - aux[ID(3, i, j, k-1)]*prims[ID(0, i, j, k-1)])/(d->dz)
-          - (2/3)*(1 + (aux[ID(3, i, j, k)]*prims[ID(2, i, j, k)])**2)*aux[ID(20, i, j, k)] );
+        aux[ID(pi33NS, i, j, k)] = -2*eta*( (aux[ID(W, i, j, k+1)]*prims[ID(v1, i, j, k+1)] - aux[ID(W, i, j, k-1)]*prims[ID(v1, i, j, k-1)])/(d->dz)
+          - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k)])**2)*aux[ID(Theta, i, j, k)] );
       }
     }
   }  
-  
-  
 
   // pi^0_j
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
-         aux[ID(7, i, j, k)] = prims[ID(10, i, j, k)]*prims[ID(0, i, j, k)] + prims[ID(11, i, j, k)]*prims[ID(1, i, j, k)] + prims[ID(12, i, j, k)]*prims[ID(2, i, j, k)];
-         aux[ID(8, i, j, k)] = prims[ID(11, i, j, k)]*prims[ID(0, i, j, k)] + prims[ID(13, i, j, k)]*prims[ID(1, i, j, k)] + prims[ID(14, i, j, k)]*prims[ID(2, i, j, k)];
-         aux[ID(9, i, j, k)] = prims[ID(12, i, j, k)]*prims[ID(0, i, j, k)] + prims[ID(14, i, j, k)]*prims[ID(1, i, j, k)] + prims[ID(15, i, j, k)]*prims[ID(2, i, j, k)];
+      for (int k(0); k < d->Nz; k++) { // Minus signs here (?)
+         aux[ID(pi01, i, j, k)] = prims[ID(pi11, i, j, k)]*prims[ID(v1, i, j, k)] + prims[ID(pi12, i, j, k)]*prims[ID(v2, i, j, k)] + prims[ID(pi13, i, j, k)]*prims[ID(v3, i, j, k)];
+         aux[ID(pi02, i, j, k)] = prims[ID(pi12, i, j, k)]*prims[ID(v1, i, j, k)] + prims[ID(pi22, i, j, k)]*prims[ID(v2, i, j, k)] + prims[ID(pi23, i, j, k)]*prims[ID(v3, i, j, k)];
+         aux[ID(pi03, i, j, k)] = prims[ID(pi13, i, j, k)]*prims[ID(v1, i, j, k)] + prims[ID(pi23, i, j, k)]*prims[ID(v2, i, j, k)] + prims[ID(pi33, i, j, k)]*prims[ID(v3, i, j, k)];
       }
     }
   }
@@ -314,27 +408,32 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
         // D
-        cons[ID(0, i, j, k)] = prims[ID(6, i, j, k)] * prims[ID(6, i, j, k)];
+        cons[ID(D, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)];
         // S1,2,3
-        for (int nvar(0); nvar < 3; nvar++) {
-          cons[ID(nvar+1, i, j, k)] = (prims[ID(4, i, j, k)] + prims[ID(3, i, j, k)] + prims[ID(?, i, j, k)])Pi * prims[ID(6, i, j, k)]**2 * prims[ID(nvar, i, j, k)] 
-            + (prims[ID(nvar+7, i, j, k)] + aux[ID(6, i, j, k)] * prims[ID(nvar, i, j, k)]) * prims[ID(6, i, j, k)] + aux[ID(nvar+7, i, j, k)];
-        }
+        cons[ID(S1, i, j, k)] = (prims[ID(rho, i, j, k)] + prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)]) * aux[ID(W, i, j, k)]**2 * prims[ID(v1, i, j, k)] 
+          + (prims[ID(q1, i, j, k)] + aux[ID(qv, i, j, k)] * prims[ID(v1, i, j, k)]) * aux[ID(W, i, j, k)] + aux[ID(pi01, i, j, k)];
+        cons[ID(S2, i, j, k)] = (prims[ID(rho, i, j, k)] + prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)]) * aux[ID(W, i, j, k)]**2 * prims[ID(v2, i, j, k)] 
+          + (prims[ID(q2, i, j, k)] + aux[ID(qv, i, j, k)] * prims[ID(v2, i, j, k)]) * aux[ID(W, i, j, k)] + aux[ID(pi02, i, j, k)];
+        cons[ID(S3, i, j, k)] = (prims[ID(rho, i, j, k)] + prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)]) * aux[ID(W, i, j, k)]**2 * prims[ID(v3, i, j, k)] 
+          + (prims[ID(q3, i, j, k)] + aux[ID(qv, i, j, k)] * prims[ID(v3, i, j, k)]) * aux[ID(W, i, j, k)] + aux[ID(pi03, i, j, k)];
         // Tau
-        cons[ID(4, i, j, k)] = (prims[ID(4, i, j, k)] + prims[ID(3, i, j, k)] + prims[ID(?, i, j, k)]) * prims[ID(6, i, j, k)]**2 
-        - (prims[ID(3, i, j, k)] + prims[ID(?, i, j, k)]Pi + prims[ID(5, i, j, k)] * prims[ID(6, i, j, k)]) 
-        + 2*aux[ID(6, i, j, k)]*prims[ID(6, i, j, k)] + aux[ID(6, i, j, k)];
+        cons[ID(Tau, i, j, k)] = (prims[ID(rho, i, j, k)] + prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)]) * aux[ID(W, i, j, k)]**2 
+        - (prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)] + prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)]) 
+        + 2*aux[ID(qv, i, j, k)]*aux[ID(W, i, j, k)] + aux[ID(pi00, i, j, k)];
         // Y1-3
-        for (int nvar(0); nvar < 3; nvar++) {
-           cons[ID(5+nvar, i, j, k)] = prims[ID(5, i, j, k)] * prims[ID(6, i, j, k)] * prims[ID(nvar+7, i, j, k)];
-        }   
+        cons[ID(Y1, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(q1, i, j, k)];
+        cons[ID(Y2, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(q2, i, j, k)];
+        cons[ID(Y3, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(q3, i, j, k)];
         // U
-        cons[ID(8, i, j, k)] = prims[ID(5, i, j, k)] * prims[ID(6, i, j, k)] * prims[ID(10, i, j, k)];
+        cons[ID(U, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(Pi, i, j, k)];
         // Z11-33
-        for (int nvar(0); nvar < 6; nvar++) {
-           cons[ID(9+nvar, i, j, k)] = prims[ID(5, i, j, k)] * prims[ID(6, i, j, k)] * prims[ID(nvar+11, i, j, k)];
-        }      
-      }
+        cons[ID(Z11, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(pi11, i, j, k)];
+        cons[ID(Z12, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(pi12, i, j, k)]; 
+        cons[ID(Z13, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(pi13, i, j, k)];
+        cons[ID(Z22, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(pi22, i, j, k)];        
+        cons[ID(Z23, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(pi23, i, j, k)];
+        cons[ID(Z33, i, j, k)] = prims[ID(n, i, j, k)] * aux[ID(W, i, j, k)] * prims[ID(pi33, i, j, k)];
+      }  
     }
   }
 
@@ -343,7 +442,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(1); i < d->Nx-1; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(0, i, j, k)] = (prims[ID(0, i+1, j, k)]-prims[ID(0, i-1, j, k)])/(2*d->dx);
+        aux[ID(0, i, j, k)] = (prims[ID(v1, i+1, j, k)]-prims[ID(v1, i-1, j, k)])/(2*d->dx);
       }
     }
   }
@@ -351,7 +450,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(1); j < d->Ny-1; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(1, i, j, k)] = (prims[ID(0, i, j+1, k)]-prims[ID(0, i, j-1, k)])/(2*d->dy);
+        aux[ID(1, i, j, k)] = (prims[ID(v1, i, j+1, k)]-prims[ID(v1, i, j-1, k)])/(2*d->dy);
       }
     }
   }
@@ -359,7 +458,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(2, i, j, k)] = (prims[ID(0, i, j, k+1)]-prims[ID(0, i, j, k-1)])/(2*d->dz);
+        aux[ID(2, i, j, k)] = (prims[ID(v1, i, j, k+1)]-prims[ID(v1, i, j, k-1)])/(2*d->dz);
       }
     }
   }
@@ -376,19 +475,19 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
         // Dv
-        f[ID(0, i, j, k)] = cons[ID(0, i, j, k)]*prims[ID(dir, i, j, k)];
+        f[ID(0, i, j, k)] = cons[ID(D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
-        for (int nvar(1); nvar < 4; nvar++) {
-          f[ID(nvar, i, j, k)] = cons[ID(nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( prims[ID(dir+6, i, j, k)] * prims[ID(nvar-1, i, j, k)]  
-            - aux[ID(6, i, j, k)]*prims[ID(nvar-1, i, j, k)]*prims[ID(dir, i, j, k)] ) * aux[ID(3, i, j, k)] + prims[ID(nvar+dir+10, i, j, k)]pi_ij ; // need to add pi21,pi31,pi32 for this to work 
+        for (int nvar(0); nvar < 3; nvar++) {
+          f[ID(nvar+1, i, j, k)] = cons[ID(S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( prims[ID(q1+dir, i, j, k)] * prims[ID(v1+nvar, i, j, k)]  
+            - aux[ID(qv, i, j, k)]*prims[ID(v1+nvar, i, j, k)]*prims[ID(v1+dir, i, j, k)] ) * aux[ID(W, i, j, k)] + prims[ID(pi11+nvar+dir, i, j, k)]pi_ij ; // need to add pi21,pi31,pi32 for this to work 
           // (p+Pi)delta_ij
           if (dir == nvar-1) {
-            f[ID(nvar, i, j, k)] += (prims[ID(6, i, j, k)] + prims[ID(9, i, j, k)]);
+            f[ID(nvar, i, j, k)] += (prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)]);
           }
         }
-        // Tau*v + ...
-        f[ID(4, i, j, k)] = (cons[ID(4, i, j, k)] + prims[ID(3, i, j, k)]) * prims[ID(dir, i, j, k)] 
-          + (prims[ID(dir+6, i, j, k)] - aux[ID(6, i, j, k)]*prims[ID(dir, i, j, k)]) + aux[ID(7+dir, i, j, k)];
+        // (Tau+p)*v + ...
+        f[ID(4, i, j, k)] = (cons[ID(Tau, i, j, k)] + prims[ID(p, i, j, k)]) * prims[ID(dir, i, j, k)] 
+          + (prims[ID(q1+dir, i, j, k)] - aux[ID(qv, i, j, k)]*prims[ID(v1+dir, i, j, k)]) + aux[ID(pi01+dir, i, j, k)];
         // Y1-3,U,Z11-33 *v
         for (int nvar(5); nvar < 15; nvar++) {                
           f[ID(nvar, i, j, k)] = cons[ID(nvar, i, j, k)]*prims[ID(dir, i, j, k)];
@@ -456,7 +555,7 @@ void ToyQFunctional::sourceTerm(double *cons, double *prims, double *aux, double
         source[ID(0, i, j, k)] = 0.0;
         for (int dir(0); dir < 3; dir++) {
           source[ID(1+dir, i, j, k)] = -(kappa_of_T(cons[ID(0, i, j, k)], kappa_0) * aux[ID(dir, i, j, k)] +
-                                         prims[ID(1+dir, i, j, k)]) / tau_q_of_T(cons[ID(0, i, j, k)], tau_q_0);
+                                         prims[ID(v2+dir, i, j, k)]) / tau_q_of_T(cons[ID(0, i, j, k)], tau_q_0);
         }
       }
     }

@@ -268,6 +268,7 @@ void SRMHD::sourceTerm(double *cons, double *prims, double *aux, double *source)
 */
 int SRMHDresidual(void *p, int n, const double *x, double *fvec, int iflag)
 {
+
   // Retrieve additional arguments
   Args * args = (Args*) p;
 
