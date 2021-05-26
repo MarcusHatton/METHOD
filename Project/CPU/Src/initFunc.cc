@@ -1262,17 +1262,19 @@ IS_Shocktube_1D::IS_Shocktube_1D(Data * data) : InitialFunc(data)
 
         if ( d->x[i] < 0.5 ) {
           d->prims[ID(p, i, j, k)] = 10;
-          d->prims[ID(rho, i, j, k)] = 30;
+          d->prims[ID(n, i, j, k)] = 30;
           d->prims[ID(v1, i, j, k)] = 0.2;
-
-
         } else {
-          d->prims[ID(p, i, j, k)] = 0.1;
-          d->prims[ID(rho, i, j, k)] = 1;
+          d->prims[ID(p, i, j, k)] = 1.0;
+          d->prims[ID(n, i, j, k)] = 1.0;
           d->prims[ID(v1, i, j, k)] = -0.2;
-        }                  
-        
-        d->aux[ID(T, i, j, k)] = 1.0;
+        }
+
+        d->prims[ID(v2, i, j, k)] = 0;
+        d->prims[ID(v3, i, j, k)] = 0;
+        for (int nvar(0); nvar < 10; nvar++) {
+          d->prims[ID(q1+nvar, i, j, k)] = 0;
+        }
 
       }
     }

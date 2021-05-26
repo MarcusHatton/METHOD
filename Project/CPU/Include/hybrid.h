@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include "srrmhd.h"
+#include "IS.h"
 #include "srmhd.h"
 #include "REGIME.h"
 #include "flux.h"
@@ -56,6 +57,8 @@ class Hybrid : public Model
     SRMHD * idealModel;                         // Pointer to SRMHD model
 
     REGIME * subgridModel = NULL;               // Pointer to REGIME model
+    
+    IS * ISModel;
 
     int *mask;                                  // Flag: can we set REGIME source?
 

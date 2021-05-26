@@ -438,4 +438,17 @@ class Blob2dToyQ_CE : public InitialFunc
     virtual ~Blob2dToyQ_CE() { }     //!< Destructor
 };
 
+class IS_Shocktube_1D : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    IS_Shocktube_1D(Data * data);
+
+    virtual ~IS_Shocktube_1D() { }     //!< Destructor
+};
+
+
 #endif
