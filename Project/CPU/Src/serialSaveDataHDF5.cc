@@ -88,7 +88,7 @@ void SerialSaveDataHDF5::writeDataSetDouble(const hid_t *group, const char *name
   }
   if(d->dims > 2) {
     lengths[2] = d->ke - d->ks;
-    buffer_size = lengths[2];
+    buffer_size *= lengths[2];
   }
 
   // Now create the buffer to store the data in
@@ -96,6 +96,10 @@ void SerialSaveDataHDF5::writeDataSetDouble(const hid_t *group, const char *name
   // double *buffer = (double *) malloc(buffer_size*sizeof(double));
   double * buffer = new double[buffer_size];
   int buffer_position(0);
+
+//  std::cout << "Crashing here!" << std::endl;
+//  std::cout << *var << std::endl;
+//  std::cout << data[ID(*var, i, j, k)];
 
   // Consider the efficiency of this! std::copy would probably be better but maybe the compiler
   // will vectorise this. I prefer the consistency of a single set of loops over having 1 per dimension.

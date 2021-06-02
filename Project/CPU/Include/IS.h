@@ -155,9 +155,60 @@ class IS : public Model
     */
     void finalise(double *cons, double *prims, double *aux) { };
 
+    //! <b> Additional arguments for the IS residual function </b>
+    /*!
+      @par
+        The conservative to primitive transformation for the IS class requires an
+      N=2 dimensional nonlinear rootfind and thus requires the multi-dimensional Newton-
+      Secant solver of the Cminpack library, i.e. the function @e hybrd1. This function
+      can take additional arguments in the form of a void pointer to some data object,
+      and thus for the data required in the cons2prims solver, the additional data is
+      located in this Args data structure.
+    
+    */
+    typedef struct
+    {
+      double
+      D_rf,
+      S1_rf,
+      S2_rf,
+      S3_rf,
+      Tau_rf,
+      q1_rf,
+      q2_rf,
+      q3_rf,
+      Pi_rf,
+      pi11_rf,
+      pi12_rf,
+      pi13_rf,
+      pi22_rf,
+      pi23_rf,
+      pi33_rf,
+      gamma;
+      int i;
+    } Args;
+    
+    
+    //! <b> Stores data of the failed cons2prims rootfinder </b>
+    /*!
+      @par
+        When the cons2prims rootfinder fails, we can take note of the cell, continue
+      throughout the domain and come back to that failed cell, using the average of
+      the successfully completed surrounding cells as an initial estimate for the
+      solution of the failed cell. This struct holds the failed cells data, and thus
+      we can use a vector type to hold instances of this structure when an unknown
+      number of cells inevitably fail.
+    */
+    typedef struct
+    {
+      // Store coordinates of the failed cell
+      int
+      //@{
+      x, y, z;  //!< Cell number of failed C2P conversion
+      //@}
+    } Failed;
+
 };
-
-
 
 //! <b> Residual function for spectral analysis </b>
 /*!
@@ -181,56 +232,9 @@ int residual(void *p, int n, const double *x, double *fvec, int iflag);
 
 
 
-//! <b> Additional arguments for the IS residual function </b>
-/*!
-  @par
-    The conservative to primitive transformation for the IS class requires an
-  N=2 dimensional nonlinear rootfind and thus requires the multi-dimensional Newton-
-  Secant solver of the Cminpack library, i.e. the function @e hybrd1. This function
-  can take additional arguments in the form of a void pointer to some data object,
-  and thus for the data required in the cons2prims solver, the additional data is
-  located in this Args data structure.
 
-*/
-typedef struct
-{
-  double
-  D_rf,
-  S1_rf,
-  S2_rf,
-  S3_rf,
-  Tau_rf,
-  q1_rf,
-  q2_rf,
-  q3_rf,
-  Pi_rf,
-  pi11_rf,
-  pi12_rf,
-  pi13_rf,
-  pi22_rf,
-  pi23_rf,
-  pi33_rf;
-  int i;
-} IS_Args;
+  
 
 
-//! <b> Stores data of the failed cons2prims rootfinder </b>
-/*!
-  @par
-    When the cons2prims rootfinder fails, we can take note of the cell, continue
-  throughout the domain and come back to that failed cell, using the average of
-  the successfully completed surrounding cells as an initial estimate for the
-  solution of the failed cell. This struct holds the failed cells data, and thus
-  we can use a vector type to hold instances of this structure when an unknown
-  number of cells inevitably fail.
-*/
-typedef struct
-{
-  // Store coordinates of the failed cell
-  int
-  //@{
-  x, y, z;  //!< Cell number of failed C2P conversion
-  //@}
-} IS_Failed;
 
 #endif

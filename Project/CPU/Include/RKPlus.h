@@ -37,7 +37,10 @@ class RKPlus : public TimeIntegrator
   public:
 
     double * fluxCont; //!< Temporary work array to store numerical flux
-
+    double * orig_cons; //!< Temporary work array to store numerical flux
+    double * orig_prims; //!< Temporary work array to store numerical flux
+    double * orig_aux; //!< Temporary work array to store numerical flux
+    
     //! Constructor
     /*!
       Constructor requires simulation data and the flux and source functions
