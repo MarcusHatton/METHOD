@@ -64,9 +64,9 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
   Data * d(this->data);
 
   // New ones for time differential calcs
-  orig_cons  = new double[d->Ntot * d->Ncons](); // can be shortened to the number we need
-  orig_prims = new double[d->Ntot * d->Ncons]();
-  orig_aux   = new double[d->Ntot * d->Ncons]();
+//  orig_cons  = new double[d->Ntot * d->Ncons](); // can be shortened to the number we need
+//  orig_prims = new double[d->Ntot * d->Ncons]();
+  orig_aux   = new double[1](); // only 1 needed for now
 
   u1cons  = new double[d->Ntot * d->Ncons]();
   u1prims = new double[d->Ntot * d->Nprims]();
@@ -78,8 +78,8 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
 RK2B::~RK2B()
 {
   // Free arrays
-  delete orig_cons;
-  delete orig_prims;
+//  delete orig_cons;
+//  delete orig_prims;
   delete orig_aux; 
   
   delete u1cons;
