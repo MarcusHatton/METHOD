@@ -137,6 +137,8 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
 
+/* 
+
   // q_j,NS 10
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -145,9 +147,10 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
           aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
           aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
 
-//          printf("(%i, %i, %i) ijk\n", i, j, k);
-//          printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
-
+          if(aux[ID(q1NS, i, j, k)] < -10 || aux[ID(q1NS, i, j, k)] > 10) {
+            printf("(%i, %i, %i) ijk\n", i, j, k);
+            printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
+          }
 //          aux[ID(q1NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i+1, j, k)]) - log(aux[ID(T, i-1, j, k)]))/(2*d->dx) );
 //          aux[ID(q2NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j+1, k)]) - log(aux[ID(T, i, j-1, k)]))/(2*d->dy) );
 //          aux[ID(q3NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j, k+1)]) - log(aux[ID(T, i, j, k-1)]))/(2*d->dz) );
@@ -196,9 +199,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
     }
   }  
 
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+*/
+
+  for (int i(0); i < this->data->Nx; i++) {
+    for (int j(0); j < this->data->Ny; j++) {
+      for (int k(0); k < this->data->Nz; k++) {
         // D
         source[ID(D, i, j, k)] = 0.0;
         // S1,2,3
@@ -224,6 +229,7 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
       }
     }
   }
+
 }
 
 //! Residual function to minimize in the format required by cminpack
@@ -555,9 +561,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
   */
 
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
 
         // C2P Scheme as outlined in HP/FYR
         aux[ID(vsqrd, i, j, k)] = ((cons[ID(S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(S1, i, j, k)] - solution[ID(1, i, j, k)]) 
@@ -600,7 +606,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         
   // Recompute NS variables here? Let's try it
 
-/*
+
 
   double kappa = this->data->optionalSimArgs[0];
 //  double tau_q = this->data->optionalSimArgs[1];
@@ -616,10 +622,12 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
           aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
           aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
-
+          
+          /*
           printf("(%i, %i, %i) ijk\n", i, j, k);
           printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
-
+          printf("(%f, %f, %f, %f) \n", prims[ID(p, i+1, j, k)], prims[ID(n, i+1, j, k)], prims[ID(p, i-1, j, k)], prims[ID(n, i-1, j, k)]);
+          */
 //          aux[ID(q1NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i+1, j, k)]) - log(aux[ID(T, i-1, j, k)]))/(2*d->dx) );
 //          aux[ID(q2NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j+1, k)]) - log(aux[ID(T, i, j-1, k)]))/(2*d->dy) );
 //          aux[ID(q3NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j, k+1)]) - log(aux[ID(T, i, j, k-1)]))/(2*d->dz) );
@@ -668,7 +676,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     }
   }  
   
-*/
+
   
 }
 
