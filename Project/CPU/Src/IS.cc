@@ -265,11 +265,12 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
     return 0;
   }
   */
-
-  double vsqrd_rf = ((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((args->Tau_rf + x[0])*(args->Tau_rf + x[0]));
+  
+  double E_rf = args->Tau_rf + args->D_rf; 
+  double vsqrd_rf = ((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((E_rf + x[0])*(E_rf + x[0]));
   double W_rf(1 / sqrt(1 - vsqrd_rf));
   double n_rf(args->D_rf / W_rf);
-  double rho_plus_p_rf = (args->Tau_rf + x[0])/(W_rf*W_rf) - args->Pi_rf;
+  double rho_plus_p_rf = ((E_rf + x[0])/(W_rf*W_rf)) - args->Pi_rf;
   double v1_rf = (args->S1_rf - x[1])/((rho_plus_p_rf + args->Pi_rf)*W_rf*W_rf);
   double v2_rf = (args->S2_rf - x[2])/((rho_plus_p_rf + args->Pi_rf)*W_rf*W_rf);
   double v3_rf = (args->S3_rf - x[3])/((rho_plus_p_rf + args->Pi_rf)*W_rf*W_rf);
@@ -289,7 +290,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi02_rf = args->pi12_rf*v1_rf + args->pi22_rf*v2_rf + args->pi23_rf*v3_rf;
   double pi03_rf = args->pi13_rf*v1_rf + args->pi23_rf*v2_rf + args->pi33_rf*v3_rf;
 
-  fvec[0] = p_rf + args->Pi_rf + n_rf*W_rf - 2*qv_rf*W_rf - pi00_rf - x[0];
+  fvec[0] = p_rf + args->Pi_rf - 2*qv_rf*W_rf - pi00_rf - x[0];
   fvec[1] = (args->q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf - x[1];
   fvec[2] = (args->q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf - x[2];
   fvec[3] = (args->q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf - x[3];
@@ -346,7 +347,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.pi33_rf = aux[pi33];
   args.gamma = d->gamma;
   
-  sol[0] = prims[p] + prims[Pi] + prims[n]*aux[W] - 2*aux[qv]*aux[W] - aux[pi00];
+  sol[0] = prims[p] + prims[Pi] - 2*aux[qv]*aux[W] - aux[pi00];
   sol[1] = (prims[q1] + aux[qv]*prims[v1])*aux[W] + aux[pi01];
   sol[2] = (prims[q2] + aux[qv]*prims[v2])*aux[W] + aux[pi02];
   sol[3] = (prims[q3] + aux[qv]*prims[v3])*aux[W] + aux[pi03];
@@ -359,10 +360,10 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
     //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
     throw std::runtime_error("C2P could not converge.\n");
   }
-  aux[vsqrd] = ((cons[S1] - sol[1])*(cons[S1] - sol[1]) + (cons[S2] - sol[2])*(cons[S2] - sol[2]) + (cons[S3] - sol[3])*(cons[S3] - sol[3]))/((cons[Tau] + sol[0])*(cons[Tau] + sol[0]));
+  aux[vsqrd] = ((cons[S1] - sol[1])*(cons[S1] - sol[1]) + (cons[S2] - sol[2])*(cons[S2] - sol[2]) + (cons[S3] - sol[3])*(cons[S3] - sol[3]))/((cons[Tau] + cons[D] + sol[0])*(cons[Tau]  + cons[D] + sol[0]));
   aux[W] = 1 / (1-aux[vsqrd]);
   prims[n] = cons[D] / aux[W];
-  aux[rho_plus_p] = (cons[Tau] + sol[0])/(aux[W]*aux[W]) - prims[Pi];
+  aux[rho_plus_p] = (cons[Tau] + cons[D] + sol[0])/(aux[W]*aux[W]) - prims[Pi];
   prims[v1] = (cons[S1] - sol[1])/((aux[rho_plus_p] + prims[Pi])*aux[W]*aux[W]);
   prims[v2] = (cons[S2] - sol[2])/((aux[rho_plus_p] + prims[Pi])*aux[W]*aux[W]);  
   prims[v3] = (cons[S3] - sol[3])/((aux[rho_plus_p] + prims[Pi])*aux[W]*aux[W]);  
@@ -462,8 +463,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         args.pi33_rf = prims[ID(pi33, i, j, k)];
         args.gamma = d->gamma;
         
-        sol[0] = prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)] + prims[ID(n, i, j, k)]*aux[ID(W, i, j, k)] 
-                 - 2*aux[ID(qv, i, j, k)]*aux[ID(W, i, j, k)] - aux[ID(pi00, i, j, k)];
+        sol[0] = prims[ID(p, i, j, k)] + prims[ID(Pi, i, j, k)] - 2*aux[ID(qv, i, j, k)]*aux[ID(W, i, j, k)] - aux[ID(pi00, i, j, k)];
         sol[1] = (prims[ID(q1, i, j, k)] + aux[ID(qv, i, j, k)]*prims[ID(v1, i, j, k)])*aux[ID(W, i, j, k)] + aux[ID(pi01, i, j, k)];
         sol[2] = (prims[ID(q2, i, j, k)] + aux[ID(qv, i, j, k)]*prims[ID(v2, i, j, k)])*aux[ID(W, i, j, k)] + aux[ID(pi02, i, j, k)];
         sol[3] = (prims[ID(q3, i, j, k)] + aux[ID(qv, i, j, k)]*prims[ID(v3, i, j, k)])*aux[ID(W, i, j, k)] + aux[ID(pi03, i, j, k)];
@@ -570,7 +570,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(vsqrd, i, j, k)] = ((cons[ID(S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(S1, i, j, k)] - solution[ID(1, i, j, k)]) 
                                   + (cons[ID(S2, i, j, k)] - solution[ID(2, i, j, k)])*(cons[ID(S2, i, j, k)] - solution[ID(2, i, j, k)])
                                   + (cons[ID(S3, i, j, k)] - solution[ID(3, i, j, k)])*(cons[ID(S3, i, j, k)] - solution[ID(3, i, j, k)]))
-                                  /((cons[ID(Tau, i, j, k)] + solution[ID(0, i, j, k)])*(cons[ID(Tau, i, j, k)] + solution[ID(0, i, j, k)]));
+                                  /((cons[ID(Tau, i, j, k)] + cons[ID(D, i, j, k)] + solution[ID(0, i, j, k)])*(cons[ID(Tau, i, j, k)] + cons[ID(D, i, j, k)] + solution[ID(0, i, j, k)]));
         aux[ID(W, i, j, k)] = 1 / (1-aux[ID(vsqrd, i, j, k)]);
         prims[ID(n, i, j, k)] = cons[ID(D, i, j, k)] / aux[ID(W, i, j, k)];
         aux[ID(rho_plus_p, i, j, k)] = (cons[ID(Tau, i, j, k)] + solution[ID(0, i, j, k)])/(aux[ID(W, i, j, k)]*aux[ID(W, i, j, k)]) - prims[ID(Pi, i, j, k)];
