@@ -11,9 +11,10 @@ This is the human readable description of this models variables.
     D, Sx, Sy, Sz, tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33
   16 primitive variables:
     v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
-  26 auxiliary variables:
+  30 auxiliary variables:
     h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-    pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, a0, a1, a2, a3, vsqrd
+    pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
+    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p 
 */
 
 class IS : public Model

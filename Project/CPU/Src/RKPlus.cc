@@ -66,7 +66,7 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
   // New ones for time differential calcs
 //  orig_cons  = new double[d->Ntot * d->Ncons](); // can be shortened to the number we need
 //  orig_prims = new double[d->Ntot * d->Ncons]();
-  orig_aux   = new double[1](); // only 1 needed for now
+  orig_aux   = new double[d->Ntot](); // only 1 needed for now
 
   u1cons  = new double[d->Ntot * d->Ncons]();
   u1prims = new double[d->Ntot * d->Nprims]();

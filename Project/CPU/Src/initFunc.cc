@@ -1241,10 +1241,12 @@ Blob2dToyQ_CE::Blob2dToyQ_CE(Data * data) : InitialFunc(data)
   }
 }
 
+// Should match the enums in IS.cc
 enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
 enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
 enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-           pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, a0, a1, a2, a3, vsqrd }; 
+           pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
+           dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
 
 IS_Shocktube_1D::IS_Shocktube_1D(Data * data) : InitialFunc(data)
 {
@@ -1262,7 +1264,7 @@ IS_Shocktube_1D::IS_Shocktube_1D(Data * data) : InitialFunc(data)
 
         if ( d->x[i] < 0.5 ) {
           d->prims[ID(p, i, j, k)] = 10;
-          d->prims[ID(n, i, j, k)] = 30;
+          d->prims[ID(n, i, j, k)] = 10;
           d->prims[ID(v1, i, j, k)] = 0.2;
         } else {
           d->prims[ID(p, i, j, k)] = 1.0;

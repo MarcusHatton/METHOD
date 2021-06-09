@@ -130,11 +130,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   // Syntax
   Data * d(this->data);
 
-  double kappa = this->data->optionalSimArgs[0];
+//  double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
-  double zeta = this->data->optionalSimArgs[2];
+//  double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
-  double eta = this->data->optionalSimArgs[4];
+//  double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
 
 /* 
@@ -421,7 +421,11 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        
+  /*
+  for (int i(d->is -1); i < d->ie +1; i++) {
+    for (int j(d->js -1); j < d->je +1; j++) {
+      for (int k(d->ks -1); k < d->ke +1; k++) {
+  */      
         for (int ndissvar(0); ndissvar < 10; ndissvar++) {
           prims[ID(q1+ndissvar, i, j, k)] = cons[ID(Y1+ndissvar, i, j, k)] / cons[ID(D, i, j, k)];
         }
@@ -464,16 +468,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         sol[2] = (prims[ID(q2, i, j, k)] + aux[ID(qv, i, j, k)]*prims[ID(v2, i, j, k)])*aux[ID(W, i, j, k)] + aux[ID(pi02, i, j, k)];
         sol[3] = (prims[ID(q3, i, j, k)] + aux[ID(qv, i, j, k)]*prims[ID(v3, i, j, k)])*aux[ID(W, i, j, k)] + aux[ID(pi03, i, j, k)];
 
-        auto temp1 = prims[ID(q1, i, j, k)];
-        auto temp2 = prims[ID(v1, i, j, k)];
-
         // Solve residual = 0
         info = __cminpack_func__(hybrd1) (&ISresidual, &args, n, sol, res,
                                           tol, wa, lwa);
-
-        temp1 = prims[ID(q1, i, j, k)];
-        temp2 = prims[ID(v1, i, j, k)];
-        
 //        info = __cminpack_func__(hybrd) (&ISresidual, &args, n, sol, res,
 //                                          tol, maxfev, ml, mu, epsfcn, &diag[0], mode, factor, nprint, &nfev, &fjac[0][0], ldfjac, &r[0], lr, &qtf[0], &wa1[0], &wa2[0], &wa3[0], &wa4[0]);        
                                                                    
@@ -564,7 +561,11 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-
+/*
+  for (int i(d->is -1); i < d->ie +1; i++) {
+    for (int j(d->js -1); j < d->je +1; j++) {
+      for (int k(d->ks -1); k < d->ke +1; k++) {
+*/
         // C2P Scheme as outlined in HP/FYR
         aux[ID(vsqrd, i, j, k)] = ((cons[ID(S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(S1, i, j, k)] - solution[ID(1, i, j, k)]) 
                                   + (cons[ID(S2, i, j, k)] - solution[ID(2, i, j, k)])*(cons[ID(S2, i, j, k)] - solution[ID(2, i, j, k)])
@@ -616,41 +617,30 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 //  double tau_pi = this->data->optionalSimArgs[5];
         
   // q_j,NS 10
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-          aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
-          aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
-          aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
-          
-          /*
-          printf("(%i, %i, %i) ijk\n", i, j, k);
-          printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
-          printf("(%f, %f, %f, %f) \n", prims[ID(p, i+1, j, k)], prims[ID(n, i+1, j, k)], prims[ID(p, i-1, j, k)], prims[ID(n, i-1, j, k)]);
-          */
+  for (int i(d->is +1); i < d->ie -1; i++) {
+    for (int j(d->js +1); j < d->je -1; j++) {
+      for (int k(d->ks +1); k < d->ke -1; k++) {
+        aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
+        aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
+        aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
+        
+        /*
+        printf("(%i, %i, %i) ijk\n", i, j, k);
+        printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
+        printf("(%f, %f, %f, %f) \n", prims[ID(p, i+1, j, k)], prims[ID(n, i+1, j, k)], prims[ID(p, i-1, j, k)], prims[ID(n, i-1, j, k)]);
+        */
 //          aux[ID(q1NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i+1, j, k)]) - log(aux[ID(T, i-1, j, k)]))/(2*d->dx) );
 //          aux[ID(q2NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j+1, k)]) - log(aux[ID(T, i, j-1, k)]))/(2*d->dy) );
 //          aux[ID(q3NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j, k+1)]) - log(aux[ID(T, i, j, k-1)]))/(2*d->dz) );
-
-      }
-    }
-  }  
-  // Theta 20 then Pi,NS 13 
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+ 
+        // Theta 20 then Pi,NS 13 
         aux[ID(Theta, i, j, k)] = aux[ID(dWdt, i, j, k)] + (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(2*d->dx) 
           + (aux[ID(W, i, j+1, k)]*prims[ID(v2, i, j+1, k)] - aux[ID(W, i, j, k)]*prims[ID(v2, i, j-1, k)])/(2*d->dy)
           + (aux[ID(W, i, j, k+1)]*prims[ID(v3, i, j, k+1)] - aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k-1)])/(2*d->dz);
         // Pi,NS = -zeta*Theta
         aux[ID(PiNS, i, j, k)] = -zeta * aux[ID(Theta, i, j, k)];
-      }
-    }
-  }  
-  // pi^l_j,NS 14
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  
+        // pi^l_j,NS 14
         // 11
         aux[ID(pi11NS, i, j, k)] = -2*eta*( (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(d->dx)
           - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)]))*aux[ID(Theta, i, j, k)] );
@@ -702,6 +692,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         aux[ID(e, i, j, k)] = prims[ID(p, i, j, k)] / (prims[ID(n, i, j, k)]*(d->gamma-1));
         prims[ID(rho, i, j, k)] = prims[ID(n, i, j, k)]*(1+aux[ID(e, i, j, k)]);
         aux[ID(T, i, j, k)] = prims[ID(p, i, j, k)] / prims[ID(n, i, j, k)];
+        aux[ID(h, i, j, k)] = 1 + aux[ID(e, i, j, k)] + prims[ID(p, i, j, k)] / prims[ID(n, i, j, k)];
       }
     }
   }
@@ -714,9 +705,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
 //  double tau_pi = this->data->optionalSimArgs[5];
   
   // q_j,NS 10
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
+  for (int i(1); i < d->Nx-1; i++) {
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
           aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
           aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
           aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
@@ -724,9 +715,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     }
   }  
   // Theta 20 then Pi,NS 13 
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
+  for (int i(1); i < d->Nx-1; i++) {
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
         aux[ID(Theta, i, j, k)] = aux[ID(dWdt, i, j, k)] + (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(2*d->dx) 
           + (aux[ID(W, i, j+1, k)]*prims[ID(v2, i, j+1, k)] - aux[ID(W, i, j, k)]*prims[ID(v2, i, j-1, k)])/(2*d->dy)
           + (aux[ID(W, i, j, k+1)]*prims[ID(v3, i, j, k+1)] - aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k-1)])/(2*d->dz);
@@ -736,9 +727,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     }
   }  
   // pi^l_j,NS 14
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
+  for (int i(1); i < d->Nx-1; i++) {
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
         // 11
         aux[ID(pi11NS, i, j, k)] = -2*eta*( (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(d->dx)
           - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)]))*aux[ID(Theta, i, j, k)] );
