@@ -49,10 +49,10 @@ void FVS::fluxReconstruction(double * cons, double * prims, double * aux, double
   }
 
   // Free arrays
-  delete fplus;
-  delete fminus;
-  delete fplusrct;
-  delete fminusrct;
+  delete[] fplus;
+  delete[] fminus;
+  delete[] fplusrct;
+  delete[] fminusrct;
 }
 
 void FVS::F(double * cons, double * prims, double * aux, double * f, double * fnet)
