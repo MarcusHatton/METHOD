@@ -110,18 +110,18 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   // Tau
   source[4] = 0.0;
   // Y1,2,3
-  source[5] = (n / tau_q) * (aux[q1NS] - prims[q1]);
-  source[6] = (n / tau_q) * (aux[q2NS] - prims[q2]);
-  source[7] = (n / tau_q) * (aux[q3NS] - prims[q3]);
+  source[5] = (prims[n] / tau_q) * (aux[q1NS] - prims[q1]);
+  source[6] = (prims[n] / tau_q) * (aux[q2NS] - prims[q2]);
+  source[7] = (prims[n] / tau_q) * (aux[q3NS] - prims[q3]);
   // U
-  source[8] = (n / tau_Pi) * (aux[PiNS] - prims[Pi]);
+  source[8] = (prims[n] / tau_Pi) * (aux[PiNS] - prims[Pi]);
   // Z11,12,13,22,23,33
-  source[9] = (n / tau_pi) * (aux[pi11NS] - prims[pi11]);
-  source[10] = (n / tau_pi) * (aux[pi12NS] - prims[pi12]);
-  source[11] = (n / tau_pi) * (aux[pi13NS] - prims[pi13]);
-  source[12] = (n / tau_pi) * (aux[pi22NS] - prims[pi22]);
-  source[13] = (n / tau_pi) * (aux[pi23NS] - prims[pi23]);
-  source[14] = (n / tau_pi) * (aux[pi33NS] - prims[pi33]);
+  source[9] = (prims[n] / tau_pi) * (aux[pi11NS] - prims[pi11]);
+  source[10] = (prims[n] / tau_pi) * (aux[pi12NS] - prims[pi12]);
+  source[11] = (prims[n] / tau_pi) * (aux[pi13NS] - prims[pi13]);
+  source[12] = (prims[n] / tau_pi) * (aux[pi22NS] - prims[pi22]);
+  source[13] = (prims[n] / tau_pi) * (aux[pi23NS] - prims[pi23]);
+  source[14] = (prims[n] / tau_pi) * (aux[pi33NS] - prims[pi33]);
   
 }
 
@@ -213,18 +213,18 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         // Tau
         source[ID(Tau, i, j, k)] = 0.0;
         // Y1,2,3
-        source[ID(Y1, i, j, k)] = (n / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q1, i, j, k)]);
-        source[ID(Y2, i, j, k)] = (n / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q2, i, j, k)]);
-        source[ID(Y3, i, j, k)] = (n / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q3, i, j, k)]);        
+        source[ID(Y1, i, j, k)] = (prims[ID(n, i, j, k)] / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q1, i, j, k)]);
+        source[ID(Y2, i, j, k)] = (prims[ID(n, i, j, k)] / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q2, i, j, k)]);
+        source[ID(Y3, i, j, k)] = (prims[ID(n, i, j, k)] / tau_q) * (aux[ID(q1NS, i, j, k)] - prims[ID(q3, i, j, k)]);        
         // U
-        source[ID(U, i, j, k)] = (n / tau_Pi) * (aux[ID(PiNS, i, j, k)] - prims[ID(Pi, i, j, k)]);
+        source[ID(U, i, j, k)] = (prims[ID(n, i, j, k)] / tau_Pi) * (aux[ID(PiNS, i, j, k)] - prims[ID(Pi, i, j, k)]);
         // Z11,12,13,22,23,33
-        source[ID(Z11, i, j, k)] = (n / tau_pi) * (aux[ID(pi11NS, i, j, k)] - prims[ID(pi11, i, j, k)]);
-        source[ID(Z12, i, j, k)] = (n / tau_pi) * (aux[ID(pi12NS, i, j, k)] - prims[ID(pi12, i, j, k)]);
-        source[ID(Z13, i, j, k)] = (n / tau_pi) * (aux[ID(pi13NS, i, j, k)] - prims[ID(pi13, i, j, k)]);
-        source[ID(Z22, i, j, k)] = (n / tau_pi) * (aux[ID(pi22NS, i, j, k)] - prims[ID(pi22, i, j, k)]); 
-        source[ID(Z23, i, j, k)] = (n / tau_pi) * (aux[ID(pi23NS, i, j, k)] - prims[ID(pi23, i, j, k)]);
-        source[ID(Z33, i, j, k)] = (n / tau_pi) * (aux[ID(pi33NS, i, j, k)] - prims[ID(pi33, i, j, k)]);                       
+        source[ID(Z11, i, j, k)] = (prims[ID(n, i, j, k)] / tau_pi) * (aux[ID(pi11NS, i, j, k)] - prims[ID(pi11, i, j, k)]);
+        source[ID(Z12, i, j, k)] = (prims[ID(n, i, j, k)] / tau_pi) * (aux[ID(pi12NS, i, j, k)] - prims[ID(pi12, i, j, k)]);
+        source[ID(Z13, i, j, k)] = (prims[ID(n, i, j, k)] / tau_pi) * (aux[ID(pi13NS, i, j, k)] - prims[ID(pi13, i, j, k)]);
+        source[ID(Z22, i, j, k)] = (prims[ID(n, i, j, k)] / tau_pi) * (aux[ID(pi22NS, i, j, k)] - prims[ID(pi22, i, j, k)]); 
+        source[ID(Z23, i, j, k)] = (prims[ID(n, i, j, k)] / tau_pi) * (aux[ID(pi23NS, i, j, k)] - prims[ID(pi23, i, j, k)]);
+        source[ID(Z33, i, j, k)] = (prims[ID(n, i, j, k)] / tau_pi) * (aux[ID(pi33NS, i, j, k)] - prims[ID(pi33, i, j, k)]);                       
         
       }
     }
@@ -321,9 +321,9 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
 
   // Hybrd1 set-up
   Args args;                      // Additional arguments structure
-  const int n(4);                     // Size of system
-  double sol[4];                      // Guess and solution vector
-  double res[4];                      // Residual/fvec vector
+  const int sys_size(4);                     // Size of system
+  double sol[sys_size];                      // Guess and solution vector
+  double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
   const double tol = 1.4e-8;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
@@ -353,7 +353,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   sol[3] = (prims[q3] + aux[qv]*prims[v3])*aux[W] + aux[pi03];
 
   // Solve residual = 0
-  info = __cminpack_func__(hybrd1) (&ISresidual, &args, n, sol, res,
+  info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
                                     tol, wa, lwa);
   // If root find fails, add failed cell to the list
   if (info!=1) {
@@ -388,16 +388,16 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
   // Hybrd1 set-up
   Args args;                          // Additional arguments structure
-  const int n(4);                     // Size of system
-  double sol[4];                      // Guess and solution vector
-  double res[4];                      // Residual/fvec vector
+  const int sys_size(4);              // Size of system
+  double sol[sys_size];                      // Guess and solution vector
+  double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
   const double tol = 1.4e-8;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
   std::vector<Failed> fails;          // Vector of failed structs. Stores location of failed cons2prims cells.
   
-  /*
+  /* - fix n->sys_size if ever used
   int maxfev(50);
   int ml(n);
   int mu(n);
@@ -469,9 +469,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         sol[3] = (prims[ID(q3, i, j, k)] + aux[ID(qv, i, j, k)]*prims[ID(v3, i, j, k)])*aux[ID(W, i, j, k)] + aux[ID(pi03, i, j, k)];
 
         // Solve residual = 0
-        info = __cminpack_func__(hybrd1) (&ISresidual, &args, n, sol, res,
+        info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
                                           tol, wa, lwa);
-//        info = __cminpack_func__(hybrd) (&ISresidual, &args, n, sol, res,
+//        info = __cminpack_func__(hybrd) (&ISresidual, &args, sys_size, sol, res,
 //                                          tol, maxfev, ml, mu, epsfcn, &diag[0], mode, factor, nprint, &nfev, &fjac[0][0], ldfjac, &r[0], lr, &qtf[0], &wa1[0], &wa2[0], &wa3[0], &wa4[0]);        
                                                                    
         // If root find fails, add failed cell to the list
