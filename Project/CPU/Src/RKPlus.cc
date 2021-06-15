@@ -161,7 +161,6 @@ void RK2B::step(double * cons, double * prims, double * aux, double dt)
       } // End k-loop
     } // End j-loop
   } // End i-loop
-        
 
   stage1(cons, prims, aux, dt);
   finalise(u1cons, u1prims, u1aux);

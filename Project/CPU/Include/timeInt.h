@@ -116,6 +116,9 @@ class TimeIntegrator : public TimeIntegratorBase
     */
     void finalise(double * cons, double * prims, double * aux)
     {
+      // Apply BCs
+      this->bcs->apply(cons, prims, aux);
+    
       // Perfrom C2P
       try {
         this->model->getPrimitiveVars(cons, prims, aux);
