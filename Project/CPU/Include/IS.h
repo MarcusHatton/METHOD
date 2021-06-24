@@ -154,7 +154,10 @@ class IS : public Model
         Mostly, this probably wont be needed, but if there is any final steps to finish
       off a timestep, this can be done here.
     */
-    void finalise(double *cons, double *prims, double *aux) { };
+    void finalise(double *cons, double *prims, double *aux) { 
+//      -BCs call
+//      -calc derivatives
+      };
 
     //! <b> Additional arguments for the IS residual function </b>
     /*!
