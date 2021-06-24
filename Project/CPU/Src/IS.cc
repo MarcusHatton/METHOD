@@ -130,50 +130,38 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   // Syntax
   Data * d(this->data);
 
-//  double kappa = this->data->optionalSimArgs[0];
+  double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
-//  double zeta = this->data->optionalSimArgs[2];
+  double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
-//  double eta = this->data->optionalSimArgs[4];
+  double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
-
-/* 
-
+        
   // q_j,NS 10
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-          aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
-          aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
-          aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
+  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
+    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
+      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
 
-          if(aux[ID(q1NS, i, j, k)] < -10 || aux[ID(q1NS, i, j, k)] > 10) {
-            printf("(%i, %i, %i) ijk\n", i, j, k);
-            printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
-          }
+        aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
+        aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
+        aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
+        
+        //printf("(%i, %i, %i) ijk\n", i, j, k);
+        //printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
+        //printf("(%f, %f, %f, %f) \n", prims[ID(p, i+1, j, k)], prims[ID(n, i+1, j, k)], prims[ID(p, i-1, j, k)], prims[ID(n, i-1, j, k)]);
+        
 //          aux[ID(q1NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i+1, j, k)]) - log(aux[ID(T, i-1, j, k)]))/(2*d->dx) );
 //          aux[ID(q2NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j+1, k)]) - log(aux[ID(T, i, j-1, k)]))/(2*d->dy) );
 //          aux[ID(q3NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j, k+1)]) - log(aux[ID(T, i, j, k-1)]))/(2*d->dz) );
-
-      }
-    }
-  }  
-  // Theta 20 then Pi,NS 13 
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+ 
+        // Theta 20 then Pi,NS 13 
         aux[ID(Theta, i, j, k)] = aux[ID(dWdt, i, j, k)] + (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(2*d->dx) 
           + (aux[ID(W, i, j+1, k)]*prims[ID(v2, i, j+1, k)] - aux[ID(W, i, j, k)]*prims[ID(v2, i, j-1, k)])/(2*d->dy)
           + (aux[ID(W, i, j, k+1)]*prims[ID(v3, i, j, k+1)] - aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k-1)])/(2*d->dz);
         // Pi,NS = -zeta*Theta
         aux[ID(PiNS, i, j, k)] = -zeta * aux[ID(Theta, i, j, k)];
-      }
-    }
-  }  
-  // pi^l_j,NS 14
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  
+        // pi^l_j,NS 14
         // 11
         aux[ID(pi11NS, i, j, k)] = -2*eta*( (aux[ID(W, i+1, j, k)]*prims[ID(v1, i+1, j, k)] - aux[ID(W, i-1, j, k)]*prims[ID(v1, i-1, j, k)])/(d->dx)
           - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v1, i, j, k)]))*aux[ID(Theta, i, j, k)] );
@@ -197,9 +185,7 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
           - (2/3)*(1 + (aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k)])*(aux[ID(W, i, j, k)]*prims[ID(v3, i, j, k)]))*aux[ID(Theta, i, j, k)] );
       }
     }
-  }  
-
-*/
+  }   
 
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
@@ -607,7 +593,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         
   // Recompute NS variables here? Let's try it
 
-
+/*
 
   double kappa = this->data->optionalSimArgs[0];
 //  double tau_q = this->data->optionalSimArgs[1];
@@ -617,15 +603,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 //  double tau_pi = this->data->optionalSimArgs[5];
         
   // q_j,NS 10
-  /*
-  for (int i(d->is +1); i < d->ie -1; i++) {
-    for (int j(d->js +1); j < d->je -1; j++) {
-      for (int k(d->ks +1); k < d->ke -1; k++) {
-  
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {      
-  */    
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
       for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
@@ -634,11 +611,10 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
         aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );
         
-        /*
-        printf("(%i, %i, %i) ijk\n", i, j, k);
-        printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
-        printf("(%f, %f, %f, %f) \n", prims[ID(p, i+1, j, k)], prims[ID(n, i+1, j, k)], prims[ID(p, i-1, j, k)], prims[ID(n, i-1, j, k)]);
-        */
+        //printf("(%i, %i, %i) ijk\n", i, j, k);
+        //printf("(%f, %f, %f) \n", aux[ID(T, i+1, j, k)], aux[ID(T, i-1, j, k)], aux[ID(q1NS, i, j, k)]);
+        //printf("(%f, %f, %f, %f) \n", prims[ID(p, i+1, j, k)], prims[ID(n, i+1, j, k)], prims[ID(p, i-1, j, k)], prims[ID(n, i-1, j, k)]);
+        
 //          aux[ID(q1NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i+1, j, k)]) - log(aux[ID(T, i-1, j, k)]))/(2*d->dx) );
 //          aux[ID(q2NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j+1, k)]) - log(aux[ID(T, i, j-1, k)]))/(2*d->dy) );
 //          aux[ID(q3NS, i, j, k)] = -kappa*aux[ID(T, i, j, k)] * ( (log(aux[ID(T, i, j, k+1)]) - log(aux[ID(T, i, j, k-1)]))/(2*d->dz) );
@@ -675,8 +651,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
       }
     }
   }  
-  
 
+*/  
+  
   
 }
 
