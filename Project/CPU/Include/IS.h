@@ -31,9 +31,7 @@ class IS : public Model
 
     //! Parameterized constructor
     /*!
-      @par
-        Stores a pointer to the Data class for reference in its methods
-
+      @parm
       @param *data Pointer to Data class containing global simulation data
     */
     IS(Data * data);
@@ -217,7 +215,7 @@ class IS : public Model
 //! <b> Residual function for spectral analysis </b>
 /*!
   @par
-    IS requires N=2 rootfind, therefore need to implement the hybrd cminpack
+    IS requires N=4 rootfind, therefore need to implement the hybrd cminpack
   multiD Newton solver. Things may get ugly.
   @par
     Cant do anything about the arguments of this function, cminpack demands you
