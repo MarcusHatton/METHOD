@@ -325,7 +325,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1.4e-8;          // Tolerance of rootfinder
+  const double tol = 1.4e-7;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
 
@@ -392,7 +392,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1.4e-8;          // Tolerance of rootfinder
+  const double tol = 1.4e-7;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
   std::vector<Failed> fails;          // Vector of failed structs. Stores location of failed cons2prims cells.
@@ -621,11 +621,15 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   for (int i(d->is +1); i < d->ie -1; i++) {
     for (int j(d->js +1); j < d->je -1; j++) {
       for (int k(d->ks +1); k < d->ke -1; k++) {
-  */
+  
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {      
-      
+  */    
+  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
+    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
+      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
+
         aux[ID(q1NS, i, j, k)] = -kappa* ( (aux[ID(T, i+1, j, k)] - aux[ID(T, i-1, j, k)])/(2*d->dx) );
         aux[ID(q2NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j+1, k)] - aux[ID(T, i, j-1, k)])/(2*d->dy) );
         aux[ID(q3NS, i, j, k)] = -kappa* ( (aux[ID(T, i, j, k+1)] - aux[ID(T, i, j, k-1)])/(2*d->dz) );

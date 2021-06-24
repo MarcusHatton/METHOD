@@ -1248,31 +1248,40 @@ enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS,
            pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
            dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
 
-IS_Shocktube_1D::IS_Shocktube_1D(Data * data) : InitialFunc(data)
+IS_Shocktube_1D::IS_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
+  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
   
   // Limit checking
-  if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
-  if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
-  if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  if ((d->xmin != 0.0 || d->xmax != 1.0) && dir==0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  if ((d->ymin != 0.0 || d->ymax != 1.0) && dir==1) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  if ((d->ymin != 0.0 || d->ymax != 1.0) && dir==2) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
 
   for (int i(0); i<d->Nx; i++) {
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
-
-        if ( d->x[i] < 0.5 ) {
+        
+        if (dir == 0 && d->x[i] < 0.5 ) {
           d->prims[ID(p, i, j, k)] = 10;
           d->prims[ID(n, i, j, k)] = 10;
-          d->prims[ID(v1, i, j, k)] = 0.2;
+          d->prims[ID(v2, i, j, k)] = 0.2;
+        } else if (dir == 1 &&  d->y[j] < 0.5 ) {
+          d->prims[ID(p, i, j, k)] = 10;
+          d->prims[ID(n, i, j, k)] = 10;
+          d->prims[ID(v2, i, j, k)] = 0.2;
+        } else if (dir == 2 &&  d->z[k] < 0.5 ) {
+          d->prims[ID(p, i, j, k)] = 10;
+          d->prims[ID(n, i, j, k)] = 10;
+          d->prims[ID(v2, i, j, k)] = 0.2;
         } else {
           d->prims[ID(p, i, j, k)] = 1.0;
           d->prims[ID(n, i, j, k)] = 1.0;
-          d->prims[ID(v1, i, j, k)] = -0.2;
+          d->prims[ID(v2, i, j, k)] = -0.2;
         }
 
-        d->prims[ID(v2, i, j, k)] = 0;
+        d->prims[ID(v1, i, j, k)] = 0;
         d->prims[ID(v3, i, j, k)] = 0;
         for (int nvar(0); nvar < 10; nvar++) {
           d->prims[ID(q1+nvar, i, j, k)] = 0;
@@ -1284,9 +1293,91 @@ IS_Shocktube_1D::IS_Shocktube_1D(Data * data) : InitialFunc(data)
 
 }
 
+ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
 
+//  if (d->Nprims > 15) throw std::invalid_argument("Trying to implement a single fluid initial state on incorrect model.\n\tModel has wrong number of primitive variables to be single fluid model.");
+  if (d->gamma != 4.0/3.0) throw std::invalid_argument("Expected the index gamma = 4/3\n");
+  if (d->xmin != -0.5 || d->xmax != 0.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-0.5, 0.5]\n");
+  if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
 
+  double sig(0.1);
+  double vShear(0.5);
+  double A0(0.1);
+  double a(0.01);
+  double rho0(0.55);
+  double rho1(0.45);
 
+  double B0{0.1};
+
+  mag = false;
+
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) {
+
+        d->prims[ID(p, i, j, k)] = 1.0;
+
+        // Magnetic Fields
+        if (mag) d->prims[ID(7, i, j, k)] = B0;
+
+        if (d->y[j] > 0) {
+          d->prims[ID(n, i, j, k)] = rho0 + rho1 * tanh((d->y[j] - 0.5)/a);
+          d->prims[ID(v1, i, j, k)] = vShear * tanh((d->y[j] - 0.5)/a);
+          d->prims[ID(v2, i, j, k)] = A0 * vShear * sin(2*PI*d->x[i]) * (exp(-pow((d->y[j] - 0.5), 2)/(sig*sig)));
+
+        }
+        else {
+          d->prims[ID(n, i, j, k)] = rho0 - rho1 * tanh((d->y[j] + 0.5)/a);
+          d->prims[ID(v1, i, j, k)] = - vShear * tanh((d->y[j] + 0.5)/a);
+          d->prims[ID(v2, i, j, k)] = - A0 * vShear * sin(2*PI*d->x[i]) * (exp(-pow((d->y[j] + 0.5), 2)/(sig*sig)));
+        }
+
+        // If we have electric fields, set to the ideal values
+        for (int nvar(0); nvar < 10; nvar++) {
+          d->prims[ID(q1+nvar, i, j, k)] = 0;
+        }
+
+      }
+    }
+  }
+}
+
+Shocktube_Chab21::Shocktube_Chab21(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+
+  if (d->gamma != 4.0/3.0) throw std::invalid_argument("Expected the index gamma = 4/3\n");
+  if (d->xmin != -3.5 || d->xmax != 3.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-3.5, 3.5]\n");
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+
+        if ( d->x[i] < 0.0 ) {
+          d->prims[ID(p, i, j, k)] = 5.43;
+          d->prims[ID(n, i, j, k)] = 5.43/0.4;
+          d->prims[ID(v2, i, j, k)] = 0.0;
+        } else {
+          d->prims[ID(p, i, j, k)] = 0.33;
+          d->prims[ID(n, i, j, k)] = 0.33/0.2;
+          d->prims[ID(v2, i, j, k)] = 0.0;
+        }
+
+        d->prims[ID(v1, i, j, k)] = 0;
+        d->prims[ID(v3, i, j, k)] = 0;
+        for (int nvar(0); nvar < 10; nvar++) {
+          d->prims[ID(q1+nvar, i, j, k)] = 0;
+        }
+
+      }
+    }
+  }
+
+}
 
 
 
