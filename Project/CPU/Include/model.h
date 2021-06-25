@@ -130,7 +130,7 @@ class Model
       @param[in] *prims pointer to primitive vector work array. Size is \f$N_{prims} \times N_x \times N_y \times N_z\f$
       @param[in] *aux pointer to auxiliary vector work array. Size is \f$N_{aux} \times N_x \times N_y \times N_z\f$
     */
-    virtual void finalise(double *cons, double *prims, double *aux) { };
+    virtual void finalise(double *cons, double *prims, double *aux, bool final_step=false) { };
 
 };
 

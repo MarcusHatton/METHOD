@@ -445,10 +445,37 @@ class IS_Shocktube_1D : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    IS_Shocktube_1D(Data * data);
+    IS_Shocktube_1D(Data * data, int dir);
 
     virtual ~IS_Shocktube_1D() { }     //!< Destructor
 };
+
+class ISKHInstabilitySingleFluid : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    ISKHInstabilitySingleFluid(Data * data, int mag);
+
+    virtual ~ISKHInstabilitySingleFluid() { }     //!< Destructor
+};
+
+class Shocktube_Chab21 : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    Shocktube_Chab21(Data * data);
+
+    virtual ~Shocktube_Chab21() { }     //!< Destructor
+};
+
+
+
 
 
 #endif

@@ -71,7 +71,7 @@ class TimeIntegratorBase
       @param[in/out] *prims pointer to primitive vector work array. Size is \f$N_{prims}*N_x*N_y*N_z\f$
       @param[in/out] *aux pointer to auxiliary vector work array. Size is \f$N_{aux}*N_x*N_y*N_z\f$
     */
-    virtual void finalise(double * cons, double * prims, double * aux) = 0;
+    virtual void finalise(double * cons, double * prims, double * aux, bool final_step=false) = 0;
 
 };
 
@@ -114,10 +114,10 @@ class TimeIntegrator : public TimeIntegratorBase
       @param[in/out] *prims pointer to primitive vector work array. Size is \f$N_{prims}*N_x*N_y*N_z\f$
       @param[in/out] *aux pointer to auxiliary vector work array. Size is \f$N_{aux}*N_x*N_y*N_z\f$
     */
-    void finalise(double * cons, double * prims, double * aux)
+    void finalise(double * cons, double * prims, double * aux, bool final_step=false)
     {
-      // Apply BCs
-      this->bcs->apply(cons, prims, aux);
+//      // Apply BCs
+//      this->bcs->apply(cons, prims, aux);
     
       // Perfrom C2P
       try {
@@ -129,7 +129,7 @@ class TimeIntegrator : public TimeIntegratorBase
       }
 
       // Finalise via model
-      model->finalise(cons, prims, aux);
+      model->finalise(cons, prims, aux, final_step);
       // Apply BCs
       this->bcs->apply(cons, prims, aux);
     }

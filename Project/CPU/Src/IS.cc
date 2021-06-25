@@ -7,15 +7,6 @@
 #include <stdexcept>
 #include "wenoUpwinds.h"
 
-// enums to save looking up numbering of C/P/As when using ID accessor.
-
-enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
-enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
-enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-           pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-           dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
-
-
 IS::IS() : Model()
 {
   this->Ncons = 15;
@@ -31,6 +22,8 @@ IS::IS(Data * data) : Model(data)
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
+
+  prev_vars = (double *) malloc(sizeof(double)*1*data->Nx*data->Ny*data->Nz);
 
   smartGuesses = 0;
   
@@ -280,8 +273,6 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   fvec[1] = (args->q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf - x[1];
   fvec[2] = (args->q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf - x[2];
   fvec[3] = (args->q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf - x[3];
-
-//  printf("fvec[0]");
 
   return 0;
 }
@@ -672,6 +663,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
                                   + prims[ID(v2, i, j, k)]*prims[ID(v2, i, j, k)] 
                                   + prims[ID(v3, i, j, k)]*prims[ID(v3, i, j, k)];
         aux[ID(W, i, j, k)] = 1 / sqrt( 1 - aux[ID(vsqrd, i, j, k)] );
+        prev_vars[ID(0, i, j, k)] = aux[ID(W, i, j, k)]; // Set here for time-differencing
         aux[ID(qv, i, j, k)] = (prims[ID(q1, i, j, k)] * prims[ID(v1, i, j, k)]) + (prims[ID(q2, i, j, k)] * prims[ID(v2, i, j, k)]) 
                                + (prims[ID(q3, i, j, k)] * prims[ID(v3, i, j, k)]);
         aux[ID(pi00, i, j, k)] = prims[ID(pi11, i, j, k)] + prims[ID(pi22, i, j, k)] + prims[ID(pi33, i, j, k)];

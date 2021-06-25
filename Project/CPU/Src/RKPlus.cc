@@ -66,7 +66,7 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
   // New ones for time differential calcs
 //  orig_cons  = new double[d->Ntot * d->Ncons](); // can be shortened to the number we need
 //  orig_prims = new double[d->Ntot * d->Ncons]();
-  orig_aux   = new double[d->Ntot](); // only 1 needed for now
+//  orig_aux   = new double[d->Ntot](); // only 1 needed for now
 
   u1cons  = new double[d->Ntot * d->Ncons]();
   u1prims = new double[d->Ntot * d->Nprims]();
@@ -80,7 +80,7 @@ RK2B::~RK2B()
   // Free arrays
 //  delete orig_cons;
 //  delete orig_prims;
-  delete orig_aux; 
+//  delete orig_aux; 
   
   delete u1cons;
   delete u1prims;
@@ -150,7 +150,8 @@ void RK2B::step(double * cons, double * prims, double * aux, double dt)
 {
   // Get timestep
   if (dt <= 0) (dt=data->dt);
-  
+
+/*  No longer needed - time deriv calcs moved to model
   Data * d(this->data);
 
   for (int i(d->is); i < d->ie; i++) {
@@ -161,13 +162,14 @@ void RK2B::step(double * cons, double * prims, double * aux, double dt)
       } // End k-loop
     } // End j-loop
   } // End i-loop
-
+*/
   stage1(cons, prims, aux, dt);
   finalise(u1cons, u1prims, u1aux);
 
   stage2(cons, prims, aux, dt);
-  finalise(cons, prims, aux);
+  finalise(cons, prims, aux, true);
 
+/*
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
@@ -176,6 +178,7 @@ void RK2B::step(double * cons, double * prims, double * aux, double dt)
       } // End k-loop
     } // End j-loop
   } // End i-loop
+*/
 
 }
 

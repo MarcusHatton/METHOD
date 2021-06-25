@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(50);
-  int ny(20);
-  int nz(20);
+  int nx(100);
+  int ny(3);
+  int nz(3);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
@@ -55,7 +55,8 @@ int main(int argc, char *argv[]) {
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
-  const std::vector<double> toy_params { {5.0e-2, 2.0e-1, 2.0e-1, 2.0e-1, 0, 2.0e-1} };
+  data_args.gamma = 5.0/3.0;
+  const std::vector<double> toy_params           { {5.0e-2, 5.0e-2,  1.0e-15, 5.0e-2,  1.0e-15, 5.0e-2} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -69,20 +70,22 @@ int main(int argc, char *argv[]) {
 
   FVS fluxMethod(&data, &weno, &model);
 
-  // Outflow bcs(&data);
-  Periodic bcs(&data);
+  Outflow bcs(&data);
+  // Periodic bcs(&data);
 
   Simulation sim(&data, &env);
 
-  IS_Shocktube_1D init(&data);
+  IS_Shocktube_1D init(&data, 0); //direction given by second arg (int)
   // Blob2dToyQ init(&data);
+  //ISKHInstabilitySingleFluid init(&data, 1);
+  //Shocktube_Chab21 init(&data);  
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "3d/data_1em2_serial0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -91,7 +94,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "3d/data_1em2_serial"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

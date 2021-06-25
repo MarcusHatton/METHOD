@@ -22,10 +22,20 @@ class IS : public Model
 
   public:
 
+    // enums to save looking up numbering of C/P/As when using ID accessor.
+    
+    enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
+    enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
+    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
+               pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
+               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
+
+
     int smartGuesses;     //!< Number of smart guess required
 
     double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
 
+    double * prev_vars;
 
     IS();     //!< Default constructor
 
@@ -152,8 +162,27 @@ class IS : public Model
         Mostly, this probably wont be needed, but if there is any final steps to finish
       off a timestep, this can be done here.
     */
-    void finalise(double *cons, double *prims, double *aux) { 
-//      -BCs call
+    void finalise(double *cons, double *prims, double *aux, bool final_step=false) { 
+
+      //printf("final_step: %d", final_step);
+      if (!final_step) return;
+
+      Data * d(this->data);
+
+      // Get timestep
+      double dt=d->dt;
+      //printf("dt: %.17g", dt);
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {
+            // dW/dt \equiv du0/dt
+            aux[ID(dWdt, i, j, k)] = (aux[ID(W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
+            //if (aux[ID(W, i, j, k)] != prev_vars[ID(0, i, j, k)]) { printf("W: %.17g, prevW: %.17g, dWdt: %.17g \n", aux[ID(W, i, j, k)], prev_vars[ID(0, i, j, k)], aux[ID(dWdt, i, j, k)]); }
+            prev_vars[ID(0, i, j, k)] = aux[ID(W, i, j, k)]; // Update previous value
+          } // End k-loop
+        } // End j-loop
+      } // End i-loop
+
 //      -calc derivatives
       };
 
