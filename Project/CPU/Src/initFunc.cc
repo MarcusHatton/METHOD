@@ -1379,7 +1379,40 @@ Shocktube_Chab21::Shocktube_Chab21(Data * data) : InitialFunc(data)
 
 }
 
+IS_C2PStressTest::IS_C2PStressTest(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  srand (time(NULL));
 
+  d->gamma=4.0/3.0 + (rand() % 10)/27; // between 4/3 and 5/3
+
+  /*
+  if (d->gamma != 3.0/2.0) throw std::invalid_argument("Expected the index gamma = 4/3\n");
+  if (d->xmin != -3.5 || d->xmax != 3.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-3.5, 3.5]\n");
+  if (d->ymin != -3.5 || d->ymax != 3.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-3.5, 3.5]\n");
+  if (d->zmin != -3.5 || d->zmax != 3.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-3.5, 3.5]\n");
+  */
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+
+          d->prims[ID(p, i, j, k)] = rand() % 20;
+          d->prims[ID(n, i, j, k)] = rand() % 30;
+          d->prims[ID(v1, i, j, k)] = (rand() % 10) / 50;
+          d->prims[ID(v2, i, j, k)] = (rand() % 10) / -50;
+          d->prims[ID(v3, i, j, k)] = (rand() % 10) / 100;
+
+        for (int nvar(0); nvar < 10; nvar++) {
+          d->prims[ID(q1+nvar, i, j, k)] = 0;
+        }
+
+      }
+    }
+  }
+
+}
 
 
 

@@ -474,6 +474,17 @@ class Shocktube_Chab21 : public InitialFunc
     virtual ~Shocktube_Chab21() { }     //!< Destructor
 };
 
+class IS_C2PStressTest : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    IS_C2PStressTest(Data * data);
+
+    virtual ~IS_C2PStressTest() { }     //!< Destructor
+};
 
 
 
