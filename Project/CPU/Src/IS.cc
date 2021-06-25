@@ -277,6 +277,57 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   return 0;
 }
 
+int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
+{
+
+//  Data * d(this->data);
+  
+  // Retrieve additional arguments
+  IS::Args * args = (IS::Args*) ptr;
+
+  // Values must make sense
+  // Think this should be taken out for now - need new sensible values
+  /*
+  if (x[0] >= 1.0 || x[1] < 0) {
+    fvec[0] = fvec[1] = 1e6;
+    return 0;
+  }
+  */
+  
+  double vsqrd_rf = x[0]*x[0]*((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((args->D_rf])*(args->D_rf));
+  double W_rf(1 / sqrt(1 - vsqrd_rf));
+  double n_rf(args->D_rf / W_rf);
+  double v1_rf = x[0]*(args->S1_rf - x[1])/args->D_rf;
+  double v2_rf = x[0]*(args->S2_rf - x[2])/args->D_rf;
+  double v3_rf = x[0]*(args->S3_rf - x[3])/args->D_rf;
+  double pi00_rf = args->pi11_rf + args->pi22_rf + args->pi33_rf;
+  double qv_rf = args->q1_rf*v1_rf + args->q2_rf*v2_rf + args->q3_rf*v3_rf;
+  double p_rf = args->D_rf(1/x[0] -1) - args->Pi_rf + 2*qv_rf*W_rf + pi00_rf - args->Tau_rf;
+  double rho_rf = n_rf + p_rf/(args->gamma-1);
+  double H_rf = 1 + (p_rf*(args->gamma/(args->gamma-1)) + args->Pi_rf)/n_rf;
+
+  // Values should be sensible    
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 0 || v1_rf >= 1 || v2_rf >= 1 || v3_rf >= 1) {
+    printf("EEK");
+    fvec[0] = fvec[1] = 1e6;
+    return 0;
+  }
+  
+  double pi01_rf = args->pi11_rf*v1_rf + args->pi12_rf*v2_rf + args->pi13_rf*v3_rf; // dbl check sign on orthogonality relation
+  double pi02_rf = args->pi12_rf*v1_rf + args->pi22_rf*v2_rf + args->pi23_rf*v3_rf;
+  double pi03_rf = args->pi13_rf*v1_rf + args->pi23_rf*v2_rf + args->pi33_rf*v3_rf;
+
+  fvec[0] = 1/(W_rf*H_rf) - x[0];
+  fvec[1] = (args->q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf - x[1];
+  fvec[2] = (args->q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf - x[2];
+  fvec[3] = (args->q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf - x[3];
+
+  return 0;
+}
+
+
+
+
 void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
 
