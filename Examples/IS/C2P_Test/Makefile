@@ -2,12 +2,12 @@
 # and links for main.cc
 
 # Compiler
-CC = mpic++
-##CC = g++
+#CC = mpic++
+CC = g++
 
 USE_MPI = 0
 USE_OMP = 0
-USE_HDF = 1
+USE_HDF = 0
 
 PROJECT_TYPE = CPU
 
@@ -40,8 +40,7 @@ SRCS = simulation.cc \
 			 simData.cc \
 			 boundaryConds.cc
 
-SERIAL_SRCS = serialSaveData.cc \
-			  serialEnv.cc
+SERIAL_SRCS = serialEnv.cc
 
 ifeq ($(USE_HDF), 1)
     SERIAL_SRCS += serialSaveDataHDF5.cc
