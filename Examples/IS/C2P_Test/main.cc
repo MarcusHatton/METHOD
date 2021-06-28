@@ -13,11 +13,11 @@ int main(int argc, char *argv[]) {
 
   // Set up domain
   int Ng(4);
-  int nx(99);
-  int ny(73);
-  int nz(5);
-  double xmin(-0.5);
-  double xmax(0.5);
+  int nx(40);
+  int ny(40);
+  int nz(0);
+  double xmin(0.0);
+  double xmax(1.0);
   double ymin(-1.0);
   double ymax(1.0);
   double zmin(0.0);
@@ -46,8 +46,10 @@ int main(int argc, char *argv[]) {
   Simulation sim(&data, &env);
 
 //  IS_Shocktube_1D init(&data, 0);
+
 //  d->gamma = 4.0/3.0;
 //  ISKHInstabilitySingleFluid init(&data, 0);
+
   IS_C2PStressTest init(&data);
 
   model.primsToAll(data.cons, data.prims, data.aux);
