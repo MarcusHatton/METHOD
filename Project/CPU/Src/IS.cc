@@ -294,7 +294,7 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
   }
   */
   
-  double vsqrd_rf = x[0]*x[0]*((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((args->D_rf])*(args->D_rf));
+  double vsqrd_rf = x[0]*x[0]*((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((args->D_rf)*(args->D_rf));
   double W_rf(1 / sqrt(1 - vsqrd_rf));
   double n_rf(args->D_rf / W_rf);
   double v1_rf = x[0]*(args->S1_rf - x[1])/args->D_rf;
@@ -302,7 +302,7 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
   double v3_rf = x[0]*(args->S3_rf - x[3])/args->D_rf;
   double pi00_rf = args->pi11_rf + args->pi22_rf + args->pi33_rf;
   double qv_rf = args->q1_rf*v1_rf + args->q2_rf*v2_rf + args->q3_rf*v3_rf;
-  double p_rf = args->D_rf(1/x[0] -1) - args->Pi_rf + 2*qv_rf*W_rf + pi00_rf - args->Tau_rf;
+  double p_rf = args->D_rf*(1/x[0] -1) - args->Pi_rf + 2*qv_rf*W_rf + pi00_rf - args->Tau_rf;
   double rho_rf = n_rf + p_rf/(args->gamma-1);
   double H_rf = 1 + (p_rf*(args->gamma/(args->gamma-1)) + args->Pi_rf)/n_rf;
 
@@ -375,6 +375,47 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.pi33_rf = prims[Prims::pi33];
   args.gamma = d->gamma;
   
+  bool alternative_C2P = true;
+  
+  if (alternative_C2P) {
+  
+  sol[0] = 1/(aux[Aux::W]*(1 + (prims[Prims::p]*(d->gamma/(d->gamma-1)) + prims[Prims::Pi])/prims[Prims::n]));
+  sol[1] = (prims[Prims::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
+  sol[2] = (prims[Prims::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
+  sol[3] = (prims[Prims::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
+
+  // Solve residual = 0
+  info = __cminpack_func__(hybrd1) (&ISAlternativeResidual, &args, sys_size, sol, res,
+                                    tol, wa, lwa);
+  // If root find fails, add failed cell to the list
+  if (info!=1) {
+    //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
+    throw std::runtime_error("C2P could not converge.\n");
+  }
+  aux[Aux::vsqrd] = sol[0]*sol[0]*((args->S1_rf - sol[1])*(args->S1_rf - sol[1]) + (args->S2_rf - sol[2])*(args->S2_rf - sol[2]) 
+                    + (args->S3_rf - sol[3])*(args->S3_rf - sol[3]))/(cons[Cons::D])*(cons[Cons::D]);
+  aux[Aux::W] = (1 / sqrt(1 - aux[Aux::vsqrd]));
+  prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
+  prims[Prims::v1] = sol[0]*(cons[Cons::S1] - x[1])/cons[Cons::D];
+  prims[Prims::v2] = sol[0]*(cons[Cons::S2] - x[2])/cons[Cons::D];
+  prims[Prims::v3] = sol[0]*(cons[Cons::S3] - x[3])/cons[Cons::D];
+  aux[Aux::pi00] = prims[Prims::pi11] + prims[Prims::pi22] + prims[Prims::pi33]; // not sure we need this again here tbh
+  aux[Aux::qv] = prims[Prims::q1]*prims[Prims::v1] + prims[Prims::q2]*prims[Prims::v2] + prims[Prims::q3]*prims[Prims::v3];
+  prims[Prims::p] = cons[Cons::D]*(1/sol[0] -1) - prims[Prims::Pi] + 2*aux[Aux::qv]*aux[Aux::W] + aux[Aux::pi00] - cons[Cons::Tau];
+  prims[Prims::rho] = prims[Prims::n] + prims[Prims::p]/(d->gamma-1);
+
+  
+  // Repeating the ones here that depend on v1,v2,v3...
+  aux[Aux::pi01] = prims[Prims::pi11]*prims[Prims::v1] + prims[Prims::pi12]*prims[Prims::v2] + prims[Prims::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+  aux[Aux::pi02] = prims[Prims::pi12]*prims[Prims::v1] + prims[Prims::pi22]*prims[Prims::v2] + prims[Prims::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+  aux[Aux::pi03] = prims[Prims::pi13]*prims[Prims::v1] + prims[Prims::pi23]*prims[Prims::v2] + prims[Prims::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+        
+  aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
+  aux[Aux::T] = prims[Prims::p] / prims[Prims::n]; 
+    
+  
+  } else {
+  
   sol[0] = prims[Prims::p] + prims[Prims::Pi] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
   sol[1] = (prims[Prims::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
   sol[2] = (prims[Prims::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
@@ -388,7 +429,9 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
     //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
     throw std::runtime_error("C2P could not converge.\n");
   }
-  aux[Aux::vsqrd] = ((cons[Cons::S1] - sol[1])*(cons[Cons::S1] - sol[1]) + (cons[Cons::S2] - sol[2])*(cons[Cons::S2] - sol[2]) + (cons[Cons::S3] - sol[3])*(cons[Cons::S3] - sol[3]))/((cons[Cons::Tau] + cons[Cons::D] + sol[0])*(cons[Cons::Tau]  + cons[Cons::D] + sol[0]));
+  aux[Aux::vsqrd] = ((cons[Cons::S1] - sol[1])*(cons[Cons::S1] - sol[1]) + (cons[Cons::S2] - sol[2])*(cons[Cons::S2] - sol[2]) 
+                     + (cons[Cons::S3] - sol[3])*(cons[Cons::S3] - sol[3]))
+                     /((cons[Cons::Tau] + cons[Cons::D] + sol[0])*(cons[Cons::Tau]  + cons[Cons::D] + sol[0]));
   aux[Aux::W] = 1 / sqrt((1-aux[Aux::vsqrd]));
   prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
   aux[Aux::rho_plus_p] = (cons[Cons::Tau] + cons[Cons::D] + sol[0])/(aux[Aux::W]*aux[Aux::W]) - prims[Prims::Pi];
@@ -406,6 +449,8 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
         
   aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
   aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
+ 
+  }
    
 }
 
