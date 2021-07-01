@@ -46,9 +46,9 @@ int main(int argc, char *argv[]) {
   Simulation sim(&data, &env);
 
 //  IS_Shocktube_1D init(&data, 0);
-//  d->gamma = 4.0/3.0;
-//  ISKHInstabilitySingleFluid init(&data, 0);
-  IS_C2PStressTest init(&data);
+  d->gamma = 4.0/3.0;
+  ISKHInstabilitySingleFluid init(&data, 0);
+//  IS_C2PStressTest init(&data);
 
   model.primsToAll(data.cons, data.prims, data.aux);
 
