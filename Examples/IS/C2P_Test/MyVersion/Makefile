@@ -2,12 +2,12 @@
 # and links for main.cc
 
 # Compiler
-CC = mpic++
-##CC = g++
+#CC = mpic++
+CC = g++
 
 USE_MPI = 0
 USE_OMP = 0
-USE_HDF = 1
+USE_HDF = 0
 
 PROJECT_TYPE = CPU
 
@@ -31,27 +31,16 @@ ifeq ($(USE_OMP), 1)
 endif
 
 # C++ compiler flags
-CXXFLAGS = -Wall -std=c++11 -O3 $(OMP_FLAGS) -Wno-unknown-pragmas -g
+CXXFLAGS = -Wall -std=c++11 -O0 $(OMP_FLAGS) -Wno-unknown-pragmas -g
 
 # Sources
 SRCS = simulation.cc \
 			 IS.cc \
 			 initFunc.cc \
 			 simData.cc \
-			 wenoUpwinds.cc 				\
-			 weno.cc 								\
-			 RK2.cc \
-			 RKPlus.cc \
-			 rkSplit.cc \
-			 backRKArgs.cc \
-			 backwardsRK.cc \
-			 IMEX2Args.cc \
-			 SSP2.cc \
-			 boundaryConds.cc \
-			 fluxVectorSplitting.cc \
+			 boundaryConds.cc
 
-SERIAL_SRCS = serialSaveData.cc \
-			  serialEnv.cc
+SERIAL_SRCS = serialEnv.cc
 
 ifeq ($(USE_HDF), 1)
     SERIAL_SRCS += serialSaveDataHDF5.cc
@@ -151,58 +140,10 @@ simulation.o : $(MODULE_DIR)/simulation.cc	$(INC_DIR)/simulation.h $(INC_DIR)/mo
 main.o : ./main.cc $(INC_DIR)/simulation.h $(INC_DIR)/model.h $(INC_DIR)/simData.h $(INC_DIR)/initFunc.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR) $(CXXFLAGS)
 
-wenoUpwinds.o : $(MODULE_DIR)/wenoUpwinds.cc $(INC_DIR)/wenoUpwinds.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-weno.o : $(MODULE_DIR)/weno.cc $(INC_DIR)/weno.h $(INC_DIR)/wenoUpwinds.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-RK2.o : $(MODULE_DIR)/RK2.cc $(INC_DIR)/RK2.h
-		$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-RKPlus.o : $(MODULE_DIR)/RKPlus.cc $(INC_DIR)/RKPlus.h
-		$(CC)   $<      -c      $(CXXFLAGS) -I$(INC_DIR)
-
-rkSplit.o : $(MODULE_DIR)/rkSplit.cc $(INC_DIR)/rkSplit.h $(INC_DIR)/RK2.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-backRKArgs.o : $(MODULE_DIR)/backRKArgs.cc $(INC_DIR)/backRKArgs.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-backwardsRK.o : $(MODULE_DIR)/backwardsRK.cc $(INC_DIR)/backwardsRK.h $(INC_DIR)/backRKArgs.h $(RTFIND_INC_DIR)/cminpack.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
-
-IMEX2Args.o : $(MODULE_DIR)/IMEX2Args.cc $(INC_DIR)/IMEX2Args.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-SSP2.o : $(MODULE_DIR)/SSP2.cc $(INC_DIR)/SSP2.h $(RTFIND_INC_DIR)/cminpack.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
-
 boundaryConds.o : $(MODULE_DIR)/boundaryConds.cc $(INC_DIR)/boundaryConds.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-parallelBoundaryConds.o : $(MODULE_DIR)/parallelBoundaryConds.cc $(INC_DIR)/parallelBoundaryConds.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-serialSaveData.o : $(MODULE_DIR)/serialSaveData.cc $(INC_DIR)/serialSaveData.h
-	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
-
-serialSaveDataHDF5.o : $(MODULE_DIR)/serialSaveDataHDF5.cc $(INC_DIR)/serialSaveDataHDF5.h
-	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
-
-parallelSaveData.o : $(MODULE_DIR)/parallelSaveData.cc $(INC_DIR)/parallelSaveData.h
-	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
-
-parallelSaveDataHDF5.o : $(MODULE_DIR)/parallelSaveDataHDF5.cc $(INC_DIR)/parallelSaveDataHDF5.h
-	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
-
-fluxVectorSplitting.o : $(MODULE_DIR)/fluxVectorSplitting.cc $(INC_DIR)/fluxVectorSplitting.h $(INC_DIR)/weno.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
 serialEnv.o : $(MODULE_DIR)/serialEnv.cc $(INC_DIR)/serialEnv.h
-	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
-
-parallelEnv.o : $(MODULE_DIR)/parallelEnv.cc $(INC_DIR)/parallelEnv.h
 	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
 
 # Executable

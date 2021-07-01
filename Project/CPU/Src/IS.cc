@@ -258,7 +258,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 
   // Values should be sensible    
   if (p_rf < 0 || rho_rf < 0 || W_rf < 0 || v1_rf >= 1 || v2_rf >= 1 || v3_rf >= 1) {
-    printf("EEK");
+    //printf("EEK");
     fvec[0] = fvec[1] = 1e6;
     return 0;
   }
@@ -375,7 +375,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.pi33_rf = prims[Prims::pi33];
   args.gamma = d->gamma;
   
-  bool alternative_C2P = true;
+  bool alternative_C2P = false;
   
   if (alternative_C2P) {
   
@@ -393,7 +393,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
       throw std::runtime_error("C2P could not converge.\n");
     }
     aux[Aux::vsqrd] = sol[0]*sol[0]*((cons[Cons::S1] - sol[1])*(cons[Cons::S1] - sol[1]) + (cons[Cons::S2] - sol[2])*(cons[Cons::S2] - sol[2]) 
-                      + (cons[Cons::S3] - sol[3])*(cons[Cons::S3] - sol[3]))/(cons[Cons::D])*(cons[Cons::D]);
+                      + (cons[Cons::S3] - sol[3])*(cons[Cons::S3] - sol[3]))/(cons[Cons::D]*cons[Cons::D]);
     aux[Aux::W] = (1 / sqrt(1 - aux[Aux::vsqrd]));
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
     prims[Prims::v1] = sol[0]*(cons[Cons::S1] - sol[1])/cons[Cons::D];
@@ -490,7 +490,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa4[n];                     // Work array
   */
   
-  bool alternative_C2P = true;
+  bool alternative_C2P = false;
   
   // Y1-3,U,Z11-33
   for (int i(d->is); i < d->ie; i++) {
@@ -573,7 +573,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], prims[ID(Prims::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
           printf("(%f, %f, %f, %f) aux\n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
           printf("(%f, %f, %f, %f) cons\n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
-          exit(0);
+          //exit(0);
           Failed fail = {i, j, k};
           fails.push_back(fail);
         }
@@ -654,7 +654,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
    
           aux[ID(Aux::vsqrd, i, j, k)] = solution[ID(0, i, j, k)]*solution[ID(0, i, j, k)]*((cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)]) 
                             + (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])*(cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)]) 
-                            + (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])*(cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)]))/(cons[ID(Cons::D, i, j, k)])*(cons[ID(Cons::D, i, j, k)]);
+                            + (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])*(cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)]))/(cons[ID(Cons::D, i, j, k)]*cons[ID(Cons::D, i, j, k)]);
           aux[ID(Aux::W, i, j, k)] = (1 / sqrt(1 - aux[ID(Aux::vsqrd, i, j, k)]));
           prims[Prims::n] = cons[ID(Cons::D, i, j, k)] / aux[ID(Aux::W, i, j, k)];
           prims[ID(Prims::v1, i, j, k)] = solution[ID(0, i, j, k)]*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])/cons[ID(Cons::D, i, j, k)];
