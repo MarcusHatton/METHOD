@@ -1398,14 +1398,14 @@ IS_C2PStressTest::IS_C2PStressTest(Data * data) : InitialFunc(data)
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
 
-          d->prims[ID(p, i, j, k)] = rand() % 20;
-          d->prims[ID(n, i, j, k)] = rand() % 30;
-          d->prims[ID(v1, i, j, k)] = (rand() % 10) / 50;
-          d->prims[ID(v2, i, j, k)] = (rand() % 10) / -50;
-          d->prims[ID(v3, i, j, k)] = (rand() % 10) / 100;
+          d->prims[ID(p, i, j, k)] = rand() % 5;
+          d->prims[ID(n, i, j, k)] = rand() % 10;
+          d->prims[ID(v1, i, j, k)] = (rand() % 10) / 15;
+          d->prims[ID(v2, i, j, k)] = (rand() % 10) / -20;
+          d->prims[ID(v3, i, j, k)] = (rand() % 10) / 50;
 
         for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(q1+nvar, i, j, k)] = 0;
+          d->prims[ID(q1+nvar, i, j, k)] = 0; // (rand() % 10) / 10;
         }
 
       }
