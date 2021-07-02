@@ -34,7 +34,9 @@ class IS : public Model
 
     double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
 
-    double * prev_vars;
+    double * prev_vars;   //!< Store variable at previous time-step for time derivatives' calculations
+    
+    bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
 
     IS();     //!< Default constructor
 
@@ -43,7 +45,7 @@ class IS : public Model
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    IS(Data * data);
+    IS(Data * data, bool alternative_C2P);
 
     virtual ~IS();     //!< Destructor
 

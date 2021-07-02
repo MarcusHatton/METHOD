@@ -14,7 +14,7 @@ IS::IS() : Model()
   this->Naux = 30;
 }
 
-IS::IS(Data * data) : Model(data)
+IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 15;
   this->Nprims = (this->data)->Nprims = 16;
@@ -26,6 +26,8 @@ IS::IS(Data * data) : Model(data)
   prev_vars = (double *) malloc(sizeof(double)*1*data->Nx*data->Ny*data->Nz);
 
   smartGuesses = 0;
+  
+  alternative_C2P = alt_C2P;
   
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
@@ -375,8 +377,6 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.pi33_rf = prims[Prims::pi33];
   args.gamma = d->gamma;
   
-  bool alternative_C2P = false;
-  
   if (alternative_C2P) {
   
     sol[0] = 1/(aux[Aux::W]*(1 + (prims[Prims::p]*(d->gamma/(d->gamma-1)) + prims[Prims::Pi])/prims[Prims::n]));
@@ -490,8 +490,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa4[n];                     // Work array
   */
   
-  bool alternative_C2P = false;
-  
   // Y1-3,U,Z11-33
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -564,16 +562,29 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                                                    
         // If root find fails, add failed cell to the list
         if (info!=1) {
-          printf("(%f, %f) Y1,q1\n",  cons[ID(Cons::Y1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
-          printf("(%f, %f, %f, %f) sol\n", sol[0],sol[1],sol[2],sol[3]);
           printf("%i info\n",info);
           printf("(%i, %i, %i) failed\n", i, j, k);
           printf("(%f, %f, %f, %f) res\n", res[0], res[1], res[2], res[3]);
           printf("(%f, %f, %f, %f) sol\n", sol[0], sol[1], sol[2], sol[3]);
-          printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], prims[ID(Prims::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
-          printf("(%f, %f, %f, %f) aux\n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
-          printf("(%f, %f, %f, %f) cons\n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
-          //exit(0);
+          std::cout << "Prims ";
+          for (int vz(0); vz < d->Nprims; vz++) {
+            std::cout << d->prims[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          std::cout << "Cons  ";
+          for (int vz(0); vz < d->Ncons; vz++) {
+            std::cout << d->cons[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          std::cout << "Aux   ";
+          for (int vz(0); vz < d->Naux; vz++) {
+            std::cout << d->aux[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          //printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], prims[ID(Prims::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
+          //printf("(%f, %f, %f, %f) aux  \n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
+          //printf("(%f, %f, %f, %f) cons \n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
+          exit(0);
           Failed fail = {i, j, k};
           fails.push_back(fail);
         }

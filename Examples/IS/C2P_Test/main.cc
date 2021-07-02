@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data);
+  IS model(&data, false); // alt_C2P?
   Outflow bcs(&data);
   Simulation sim(&data, &env);
   
@@ -120,8 +120,6 @@ int main(int argc, char *argv[]) {
 
   //C2P
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
-  cout << d->aux[ID(, i, j, k)]
-
 
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
