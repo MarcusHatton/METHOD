@@ -259,9 +259,9 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double rho_rf = rho_plus_p_rf - p_rf;
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 0 || v1_rf >= 1 || v2_rf >= 1 || v3_rf >= 1) {
-    //printf("EEK");
-    fvec[0] = fvec[1] = 1e6;
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1) {
+    printf("EEK");
+    fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
   }
   
@@ -309,9 +309,9 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
   double H_rf = 1 + (p_rf*(args->gamma/(args->gamma-1)) + args->Pi_rf)/n_rf;
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 0 || v1_rf >= 1 || v2_rf >= 1 || v3_rf >= 1) {
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1) {
     printf("EEK");
-    fvec[0] = fvec[1] = 1e6;
+    fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
   }
   
@@ -355,7 +355,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1.4e-7;          // Tolerance of rootfinder
+  const double tol = 1e-6;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
 
@@ -464,7 +464,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1.4e-7;          // Tolerance of rootfinder
+  const double tol = 1e-6;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
   std::vector<Failed> fails;          // Vector of failed structs. Stores location of failed cons2prims cells.
@@ -564,8 +564,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         if (info!=1) {
           printf("%i info\n",info);
           printf("(%i, %i, %i) failed\n", i, j, k);
-          printf("(%f, %f, %f, %f) res\n", res[0], res[1], res[2], res[3]);
-          printf("(%f, %f, %f, %f) sol\n", sol[0], sol[1], sol[2], sol[3]);
+          printf("(%g, %g, %g, %g) res\n", res[0], res[1], res[2], res[3]);
+          printf("(%g, %g, %g, %g) sol\n", sol[0], sol[1], sol[2], sol[3]);
           std::cout << "Prims ";
           for (int vz(0); vz < d->Nprims; vz++) {
             std::cout << d->prims[ID(vz, i, j, k)] << " ";

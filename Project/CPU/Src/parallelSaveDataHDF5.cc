@@ -103,7 +103,7 @@ void ParallelSaveDataHDF5::writeDataSetDouble(const hid_t *group, const char *na
     lengths_total[2] = d->nz;
     lengths_local[2] = (d->Nz - 2 * d->Ng);
     offsets[2] = (d->Nz - 2 * d->Ng) * env->zRankId;
-    buffer_size = lengths_local[2];
+    buffer_size *= lengths_local[2];
   }
 
   // We also need to create a buffer to write to, that excludes the ghost cells.
