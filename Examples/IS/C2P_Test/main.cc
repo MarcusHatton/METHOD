@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  bool alt_C2P = false;
+  bool alt_C2P = true;
 
   // Set up domain
   int Ng(4);
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
-          d->prims[ID(v, i, j, k)] *= 0.99;
+          d->prims[ID(v, i, j, k)] *= 0.95;
         }
       }
     }
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
 //              cout << orig_prims[ID(vz, i, j, k)] << " ";
-              cout << primsValues[vz] << " ";
+              cout << PrimsValues[vz] << " ";
             }
             cout << endl;
             cout << "Prims ";
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
             cout << "Diffs ";
             for (int vz(0); vz < d->Nprims; vz++) {
   //            cout << orig_prims[ID(vz, i, j, k)] - d->prims[ID(vz, i, j, k)] << " ";
-              cout << primsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
+              cout << PrimsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
             exit(0);
