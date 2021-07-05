@@ -156,7 +156,8 @@ int main(int argc, char *argv[]) {
             cout << "\nFails " << v << " " << i << " " << j << " " << k << endl;
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
-              cout << orig_prims[ID(vz, i, j, k)] << " ";
+//              cout << orig_prims[ID(vz, i, j, k)] << " ";
+              cout << primsValues[vz] << " ";
             }
             cout << endl;
             cout << "Prims ";
@@ -166,7 +167,8 @@ int main(int argc, char *argv[]) {
             cout << endl;
             cout << "Diffs ";
             for (int vz(0); vz < d->Nprims; vz++) {
-              cout << orig_prims[ID(vz, i, j, k)] - d->prims[ID(vz, i, j, k)] << " ";
+  //            cout << orig_prims[ID(vz, i, j, k)] - d->prims[ID(vz, i, j, k)] << " ";
+              cout << primsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
             exit(0);
