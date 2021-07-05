@@ -10,9 +10,6 @@
 
 using namespace std;
 
-
-Cons  0.530476 0.00041046 -0.167272 1.70464e-31 3.3264 -4.69292e-17 -4.69292e-17 -4.69292e-17 -6.77499e-17 6.3394e-17 -5.33928e-15 -7.3$
-
 int main(int argc, char *argv[]) {
 
   bool alt_C2P = false;
@@ -21,9 +18,9 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(200);
-  int ny(200);
-  int nz(200);
+  int nx(4);
+  int ny(4);
+  int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
   double ymin(-1.0);
@@ -109,7 +106,16 @@ int main(int argc, char *argv[]) {
   }
 
   //Set Cons manually
-  for int(
+  double ConsValues = [0.530476, 0.00041046, -0.167272, 1.70464e-31, 3.3264, -4.69292e-17, -4.69292e-17, -4.69292e-17, -6.77499e-17, 6.3394e-17, -5.33928e-15, -7.31913e-33, -1.06405e-14, 1.00532e-31, 0];
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        for (int nc(0); nc < d->Ncons; nc++) {
+          d->cons[ID(nc, i, j, k)] = ConsValues[nc];
+        }
+      }
+    }
+  }
 
 
   //P2C
