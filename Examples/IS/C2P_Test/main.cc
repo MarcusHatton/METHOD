@@ -151,7 +151,8 @@ int main(int argc, char *argv[]) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
-          if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
+//          if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
+          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
             cout << "\nFails " << v << " " << i << " " << j << " " << k << endl;
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
