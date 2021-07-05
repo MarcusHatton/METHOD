@@ -12,15 +12,15 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  bool alt_C2P = false;
+  bool alt_C2P = true;
 
   // Set up domain
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(4);
-  int ny(4);
-  int nz(0);
+  int nx(20);
+  int ny(20);
+  int nz(20);
   double xmin(-0.5);
   double xmax(0.5);
   double ymin(-1.0);
@@ -105,8 +105,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
+/*
   //Set Cons manually
-  double ConsValues = [0.530476, 0.00041046, -0.167272, 1.70464e-31, 3.3264, -4.69292e-17, -4.69292e-17, -4.69292e-17, -6.77499e-17, 6.3394e-17, -5.33928e-15, -7.31913e-33, -1.06405e-14, 1.00532e-31, 0];
+  double ConsValues[] {0.530476, 0.00041046, -0.167272, 1.70464e-31, 3.3264, -4.69292e-17, -4.69292e-17, -4.69292e-17, -6.77499e-17, 6.3394e-17, -5.33928e-15, -7.31913e-33, -1.06405e-14, 1.00532e-31, 0};
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
@@ -116,7 +117,7 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-
+*/
 
   //P2C
   model.primsToAll(d->cons, d->prims, d->aux);
