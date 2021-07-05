@@ -23,7 +23,6 @@ class IS : public Model
   public:
 
     // enums to save looking up numbering of C/P/As when using ID accessor.
-    
     enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
     enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
@@ -35,7 +34,9 @@ class IS : public Model
 
     double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
 
-    double * prev_vars;
+    double * prev_vars;   //!< Store variable at previous time-step for time derivatives' calculations
+    
+    bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
 
     IS();     //!< Default constructor
 
@@ -44,7 +45,7 @@ class IS : public Model
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    IS(Data * data);
+    IS(Data * data, bool alternative_C2P);
 
     virtual ~IS();     //!< Destructor
 

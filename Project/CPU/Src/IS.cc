@@ -14,7 +14,7 @@ IS::IS() : Model()
   this->Naux = 30;
 }
 
-IS::IS(Data * data) : Model(data)
+IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 15;
   this->Nprims = (this->data)->Nprims = 16;
@@ -26,6 +26,8 @@ IS::IS(Data * data) : Model(data)
   prev_vars = (double *) malloc(sizeof(double)*1*data->Nx*data->Ny*data->Nz);
 
   smartGuesses = 0;
+  
+  alternative_C2P = alt_C2P;
   
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
@@ -257,9 +259,9 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double rho_rf = rho_plus_p_rf - p_rf;
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 0 || v1_rf >= 1 || v2_rf >= 1 || v3_rf >= 1) {
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1) {
     printf("EEK");
-    fvec[0] = fvec[1] = 1e6;
+    fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
   }
   
@@ -307,9 +309,9 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
   double H_rf = 1 + (p_rf*(args->gamma/(args->gamma-1)) + args->Pi_rf)/n_rf;
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 0 || v1_rf >= 1 || v2_rf >= 1 || v3_rf >= 1) {
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1) {
     printf("EEK");
-    fvec[0] = fvec[1] = 1e6;
+    fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
   }
   
@@ -353,7 +355,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1.4e-7;          // Tolerance of rootfinder
+  const double tol = 1e-6;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
 
@@ -375,8 +377,6 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.pi33_rf = prims[Prims::pi33];
   args.gamma = d->gamma;
   
-  bool alternative_C2P = true;
-  
   if (alternative_C2P) {
   
     sol[0] = 1/(aux[Aux::W]*(1 + (prims[Prims::p]*(d->gamma/(d->gamma-1)) + prims[Prims::Pi])/prims[Prims::n]));
@@ -393,7 +393,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
       throw std::runtime_error("C2P could not converge.\n");
     }
     aux[Aux::vsqrd] = sol[0]*sol[0]*((cons[Cons::S1] - sol[1])*(cons[Cons::S1] - sol[1]) + (cons[Cons::S2] - sol[2])*(cons[Cons::S2] - sol[2]) 
-                      + (cons[Cons::S3] - sol[3])*(cons[Cons::S3] - sol[3]))/(cons[Cons::D])*(cons[Cons::D]);
+                      + (cons[Cons::S3] - sol[3])*(cons[Cons::S3] - sol[3]))/(cons[Cons::D]*cons[Cons::D]);
     aux[Aux::W] = (1 / sqrt(1 - aux[Aux::vsqrd]));
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
     prims[Prims::v1] = sol[0]*(cons[Cons::S1] - sol[1])/cons[Cons::D];
@@ -464,7 +464,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1.4e-7;          // Tolerance of rootfinder
+  const double tol = 1e-6;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
   std::vector<Failed> fails;          // Vector of failed structs. Stores location of failed cons2prims cells.
@@ -489,8 +489,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa3[n];                     // Work array
   double wa4[n];                     // Work array
   */
-  
-  bool alternative_C2P = true;
   
   // Y1-3,U,Z11-33
   for (int i(d->is); i < d->ie; i++) {
@@ -564,15 +562,28 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                                                    
         // If root find fails, add failed cell to the list
         if (info!=1) {
-          printf("(%f, %f) Y1,q1\n",  cons[ID(Cons::Y1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
-          printf("(%f, %f, %f, %f) sol\n", sol[0],sol[1],sol[2],sol[3]);
           printf("%i info\n",info);
           printf("(%i, %i, %i) failed\n", i, j, k);
-          printf("(%f, %f, %f, %f) res\n", res[0], res[1], res[2], res[3]);
-          printf("(%f, %f, %f, %f) sol\n", sol[0], sol[1], sol[2], sol[3]);
-          printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], prims[ID(Prims::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
-          printf("(%f, %f, %f, %f) aux\n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
-          printf("(%f, %f, %f, %f) cons\n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
+          printf("(%g, %g, %g, %g) res\n", res[0], res[1], res[2], res[3]);
+          printf("(%g, %g, %g, %g) sol\n", sol[0], sol[1], sol[2], sol[3]);
+          std::cout << "Prims ";
+          for (int vz(0); vz < d->Nprims; vz++) {
+            std::cout << d->prims[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          std::cout << "Cons  ";
+          for (int vz(0); vz < d->Ncons; vz++) {
+            std::cout << d->cons[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          std::cout << "Aux   ";
+          for (int vz(0); vz < d->Naux; vz++) {
+            std::cout << d->aux[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          //printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], prims[ID(Prims::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
+          //printf("(%f, %f, %f, %f) aux  \n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
+          //printf("(%f, %f, %f, %f) cons \n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
           exit(0);
           Failed fail = {i, j, k};
           fails.push_back(fail);
@@ -654,7 +665,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
    
           aux[ID(Aux::vsqrd, i, j, k)] = solution[ID(0, i, j, k)]*solution[ID(0, i, j, k)]*((cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)]) 
                             + (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])*(cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)]) 
-                            + (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])*(cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)]))/(cons[ID(Cons::D, i, j, k)])*(cons[ID(Cons::D, i, j, k)]);
+                            + (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])*(cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)]))/(cons[ID(Cons::D, i, j, k)]*cons[ID(Cons::D, i, j, k)]);
           aux[ID(Aux::W, i, j, k)] = (1 / sqrt(1 - aux[ID(Aux::vsqrd, i, j, k)]));
           prims[Prims::n] = cons[ID(Cons::D, i, j, k)] / aux[ID(Aux::W, i, j, k)];
           prims[ID(Prims::v1, i, j, k)] = solution[ID(0, i, j, k)]*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])/cons[ID(Cons::D, i, j, k)];
