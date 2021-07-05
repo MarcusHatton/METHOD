@@ -11,15 +11,19 @@
 using namespace std;
 
 
+Cons  0.530476 0.00041046 -0.167272 1.70464e-31 3.3264 -4.69292e-17 -4.69292e-17 -4.69292e-17 -6.77499e-17 6.3394e-17 -5.33928e-15 -7.3$
+
 int main(int argc, char *argv[]) {
+
+  bool alt_C2P = false;
 
   // Set up domain
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(20);
-  int ny(20);
-  int nz(20);
+  int nx(200);
+  int ny(200);
+  int nz(200);
   double xmin(-0.5);
   double xmax(0.5);
   double ymin(-1.0);
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, false); // alt_C2P?
+  IS model(&data, alt_C2P); // alt_C2P?
   Outflow bcs(&data);
   Simulation sim(&data, &env);
   
@@ -103,6 +107,10 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+
+  //Set Cons manually
+  for int(
+
 
   //P2C
   model.primsToAll(d->cons, d->prims, d->aux);

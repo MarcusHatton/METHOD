@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   // int nx(32768);
   int nx(800);
   int ny(800);
-  int nz(4);
+  int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
   double ymin(-1.0);
