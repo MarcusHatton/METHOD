@@ -117,10 +117,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-
+/*
   //P2C
   model.primsToAll(d->cons, d->prims, d->aux);
-
+*/
   //Perturb
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -141,7 +141,6 @@ int main(int argc, char *argv[]) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
           if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
-//	            || ((d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * orig_prims[ID(v, i, j, k)]) ) {
             cout << "Fails " << v << " " << i << " " << j << " " << k << endl;
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
