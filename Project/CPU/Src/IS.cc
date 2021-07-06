@@ -259,7 +259,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double rho_rf = rho_plus_p_rf - p_rf;
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1) {
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
     printf("EEK");
     fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
@@ -304,12 +304,12 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
   double v3_rf = x[0]*(args->S3_rf - x[3])/args->D_rf;
   double pi00_rf = args->pi11_rf + args->pi22_rf + args->pi33_rf;
   double qv_rf = args->q1_rf*v1_rf + args->q2_rf*v2_rf + args->q3_rf*v3_rf;
-  double p_rf = args->D_rf*(1/x[0] -1) - args->Pi_rf + 2*qv_rf*W_rf + pi00_rf - args->Tau_rf;
+  double p_rf = args->D_rf*((1/x[0]) -1) - args->Pi_rf + 2*qv_rf*W_rf + pi00_rf - args->Tau_rf;
   double rho_rf = n_rf + p_rf/(args->gamma-1);
   double H_rf = 1 + (p_rf*(args->gamma/(args->gamma-1)) + args->Pi_rf)/n_rf;
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1) {
+  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
     printf("EEK");
     fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;

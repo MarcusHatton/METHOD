@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
-  int ny(800);
+  int nx(1200);
+  int ny(1200);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);

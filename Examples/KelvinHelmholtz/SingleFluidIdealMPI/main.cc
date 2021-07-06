@@ -19,8 +19,8 @@ int main(int argc, char *argv[]) {
 
   // Set up domain
   int Ng(4);
-  int nx(64);
-  int ny(64);
+  int nx(400);
+  int ny(400);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(3.0);
-  double cfl(0.6);
+  double endTime(6.0);
+  double cfl(0.1);
   double gamma(4.0/3.0);
   double sigma(10);
   double cp(1.0);
@@ -38,8 +38,8 @@ int main(int argc, char *argv[]) {
   int frameSkip(10);
   bool output(false);
 
-  double nxRanks(2);
-  double nyRanks(2);
+  double nxRanks(1);
+  double nyRanks(1);
   double nzRanks(1);
 
   ParallelEnv env(&argc, &argv, nxRanks, nyRanks, nzRanks);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  KHInstabilitySingleFluid init(&data, 1);
+  KHInstabilitySingleFluid init(&data, false); // Turn off Mag
 
   RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
 

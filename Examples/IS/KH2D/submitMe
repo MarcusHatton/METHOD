@@ -2,7 +2,7 @@
 
 #SBATCH --ntasks-per-node=40
 #SBATCH --nodes=1
-#SBATCH --time=22:00:00          # walltime
+#SBATCH --time=48:00:00          # walltime
 
 module purge
 module load hdf5/1.10.2/gcc/parallel

@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  bool alt_C2P = true;
+  bool alt_C2P = false;
 
   // Set up domain
   int Ng(4);
@@ -57,6 +57,9 @@ int main(int argc, char *argv[]) {
   // Set up data
 
   Data * d(model.data);
+
+/*
+
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
@@ -104,12 +107,11 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-
-  //Set Cons manually
+*/
+  //Set CPA manually
   double ConsValues[] {0.530476, 0.00041046, -0.167272, 1.70464e-31, 3.3264, -4.69292e-17, -4.69292e-17, -4.69292e-17, -6.77499e-17, 6.3394e-17, -5.33928e-15, -7.31913e-33, -1.06405e-14, 1.00532e-31, 0};
   double PrimsValues[] {-0.000238559, -0.0337699, 1.77428e-17, 1.10693, 3.85078, 0.529976, -8.84663e-17, -8.84663e-17, -8.84663e-17, -1.27715e-16, 1.19504e-16, -1.00651e-14, -1.37973e-32, -2.00583e-14, 1.89513e-31, 0};
   double AuxValues[] {10.0953, 2.08865, 6.26595, 1.00057, 0, 3.0086e-18, -1.99388e-14, 3.39868e-16, 6.79769e-16, -6.39652e-33, -1.47514e-15, 1.46016e-13, 0, -2.43024e-15, 2.06821e-15, -9.33279e-14, -2.98424e-31, -1.86332e-13, 4.69996e-30, -0, 2.43024, 0, 0, 0, 0, 0, 0, 0.00114046, -0.0147437, 4.95772};
-
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -132,19 +134,35 @@ int main(int argc, char *argv[]) {
   //P2C
   model.primsToAll(d->cons, d->prims, d->aux);
 */
-  //Perturb
+  //Perturb prims
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
-          d->prims[ID(v, i, j, k)] *= 0.95;
+          d->prims[ID(v, i, j, k)] *= 1.3;
         }
       }
     }
   }
 
+/*
+  // Check nearby Cons stability
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        for (int v(0); v < d->Ncons; v++) {
+          d->cons[ID(v, i, j, k)] *= 1.2 - (double(v)/50.0);
+        }
+      }
+    }
+  }
+*/
+
   //C2P
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
+
+  //P2C
+  model.primsToAll(d->cons, d->prims, d->aux);
 
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
@@ -152,8 +170,11 @@ int main(int argc, char *argv[]) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
 //          if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
-          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
-            cout << "\nFails " << v << " " << i << " " << j << " " << k << endl;
+//          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
+          if ( abs(d->cons[ID(v, i, j, k)] - ConsValues[v]) > 1e-5 * abs(ConsValues[v]) ) {
+            
+            // Prims comparison
+            cout << "\nFails (nprim/con, i, j, k) " << v << " " << i << " " << j << " " << k << endl;
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
 //              cout << orig_prims[ID(vz, i, j, k)] << " ";
@@ -171,6 +192,24 @@ int main(int argc, char *argv[]) {
               cout << PrimsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
+
+            // Cons comparison
+            cout << "\nOrigs ";
+            for (int vz(0); vz < d->Ncons; vz++) {
+              cout << ConsValues[vz] << " ";
+            }
+            cout << endl;
+            cout << "Cons ";
+            for (int vz(0); vz < d->Ncons; vz++) {
+              cout << d->cons[ID(vz, i, j, k)] << " ";
+            }
+            cout << endl;
+            cout << "Diffs ";
+            for (int vz(0); vz < d->Ncons; vz++) {
+              cout << ConsValues[vz] - d->cons[ID(vz, i, j, k)] << " ";
+            }
+            cout << endl;
+
             exit(0);
           }
         }
