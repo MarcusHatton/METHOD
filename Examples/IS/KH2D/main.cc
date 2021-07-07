@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(1200);
-  int ny(1200);
+  int nx(400);
+  int ny(400);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
   double zmin(-0.1);
   double zmax(0.1);
   double endTime(6.0);
-  double cfl(0.1);
+  double cfl(0.25);
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
