@@ -506,7 +506,7 @@ int __cminpack_func__(hybrd)(__cminpack_decl_fcn_nn__ void *p, int n, real *x, r
             if (p1 * max(d1,pnorm) <= epsmch * xnorm) {
                 info = 3;
             }
-            if (nslow2 == 5) {
+            if (nslow2 == 3*n) {
 							// printf("setting info = 4 with nfev = %d\n", *nfev);
 
                 info = 4;
