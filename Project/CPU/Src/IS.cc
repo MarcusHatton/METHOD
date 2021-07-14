@@ -103,10 +103,10 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   // Thermodynamic calculation of timescales
   if (thermo_timescales) {
     float gamma = d->gamma;
-    h = aux[Aux::h];
-    T = aux[Aux::T];
+    double h = aux[Aux::h];
+    double T = aux[Aux::T];
     double beta = 1/T;
-    p = prims[Prims::p];
+    double p = prims[Prims::p];
     double Omega = 3*gamma - 5 + ((3*gamma)/(h*beta));
     double OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(h/beta);
     double beta0 = (3*OmegaStar)/(h**2 * Omega**2 * p);
@@ -206,12 +206,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   }   
 
   // Avoid constant re-allocation
-  if (thermo_timescales) {
-    float gamma = d->gamma;
-    double beta;
-    double Omega, OmegaStar;
-    double beta0, beta1, beta2;
-  }
+  float gamma = d->gamma;
+  double beta;
+  double Omega, OmegaStar;
+  double beta0, beta1, beta2;
+
 
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
@@ -220,11 +219,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         // Thermodynamic calculation of timescales
         if(thermo_timescales) {
           beta = 1/aux[ID(Aux::T, i, j, k)];
-          double Omega = 3*gamma - 5 + ((3*gamma)/(aux[ID(Aux::h, i, j, k)]*beta));
-          double OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(aux[ID(Aux::h, i, j, k)]/beta);
-          double beta0 = (3*OmegaStar)/(aux[ID(Aux::h, i, j, k)]**2 * Omega**2 * prims[ID(Prims::p, i, j, k)]);
-          double beta1 = ((gamma-1)/gamma)**2 * (beta/(aux[ID(Aux::h, i, j, k)]*prims[ID(Prims::p, i, j, k)])) * (5*aux[ID(Aux::h, i, j, k)]**2 - (gamma/(gamma-1)));
-          double beta2 = ((1 + 6*aux[ID(Aux::h, i, j, k)]*(1/beta))/(2*aux[ID(Aux::h, i, j, k)]**2*prims[ID(Prims::p, i, j, k)]));
+          Omega = 3*gamma - 5 + ((3*gamma)/(aux[ID(Aux::h, i, j, k)]*beta));
+          OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(aux[ID(Aux::h, i, j, k)]/beta);
+          beta0 = (3*OmegaStar)/(aux[ID(Aux::h, i, j, k)]**2 * Omega**2 * prims[ID(Prims::p, i, j, k)]);
+          beta1 = ((gamma-1)/gamma)**2 * (beta/(aux[ID(Aux::h, i, j, k)]*prims[ID(Prims::p, i, j, k)])) * (5*aux[ID(Aux::h, i, j, k)]**2 - (gamma/(gamma-1)));
+          beta2 = ((1 + 6*aux[ID(Aux::h, i, j, k)]*(1/beta))/(2*aux[ID(Aux::h, i, j, k)]**2*prims[ID(Prims::p, i, j, k)]));
           tau_q = kappa*aux[ID(Aux::T, i, j, k)]*beta1;
           tau_Pi = zeta*beta0;
           tau_pi = 2*eta*beta2;
