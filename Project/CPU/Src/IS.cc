@@ -89,12 +89,33 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   // printf("ToyQ model does not implement sourceTermSingleCell\n");
   // exit(1);
 
-//  double kappa = this->data->optionalSimArgs[0];
+  Data * d(this->data);
+
+  bool thermo_timescales = false;
+
+  double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
-//  double zeta = this->data->optionalSimArgs[2];
+  double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
-//  double eta = this->data->optionalSimArgs[4];
+  double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
+
+  // Thermodynamic calculation of timescales
+  if (thermo_timescales) {
+    float gamma = d->gamma;
+    h = aux[aux::h];
+    T = aux[aux::T];
+    beta = 1/T;
+    p = prims[prims::p];
+    double Omega = 3*gamma - 5 + ((3*gamma)/(h*beta));
+    double OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(h/beta);
+    double beta0 = (3*OmegaStar)/(h**2 * Omega**2 * p);
+    double beta1 = ((gamma-1)/gamma)**2 * (beta/(h*p)) * (5*h**2 - (gamma/(gamma-1)));
+    double beta2 = ((1 + 6*h*(1/beta))/(2*h**2*p));
+    tau_q = kappa*T*beta1;
+    tau_Pi = zeta*beta0;
+    tau_pi = 2*eta*beta2;
+  }
 
   // D
   source[0] = 0.0;
@@ -124,6 +145,8 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
 {
   // Syntax
   Data * d(this->data);
+
+  bool thermo_timescales = false;
 
   double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
@@ -182,9 +205,30 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
     }
   }   
 
+  // Avoid constant re-allocation
+  if (thermo_timescales) {
+    float gamma = d->gamma;
+    double beta;
+    double Omega, OmegaStar;
+    double beta0, beta1, beta2;
+  }
+
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
+
+        // Thermodynamic calculation of timescales
+        if(thermo_timescales) {
+          beta = 1/aux[ID(aux::T, i, j, k)];
+          double Omega = 3*gamma - 5 + ((3*gamma)/(aux[ID(aux::h, i, j, k)]*beta));
+          double OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(aux[ID(aux::h, i, j, k)]/beta);
+          double beta0 = (3*OmegaStar)/(aux[ID(aux::h, i, j, k)]**2 * Omega**2 * prims[ID(prims::p, i, j, k)]);
+          double beta1 = ((gamma-1)/gamma)**2 * (beta/(aux[ID(aux::h, i, j, k)]*prims[ID(prims::p, i, j, k)])) * (5*aux[ID(aux::h, i, j, k)]**2 - (gamma/(gamma-1)));
+          double beta2 = ((1 + 6*aux[ID(aux::h, i, j, k)]*(1/beta))/(2*aux[ID(aux::h, i, j, k)]**2*prims[ID(prims::p, i, j, k)]));
+          tau_q = kappa*aux[ID(aux::T, i, j, k)]*beta1;
+          tau_Pi = zeta*beta0;
+          tau_pi = 2*eta*beta2;
+        }
         // D
         source[ID(D, i, j, k)] = 0.0;
         // S1,2,3
