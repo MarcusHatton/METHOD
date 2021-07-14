@@ -86,6 +86,51 @@ IS::~IS()
   free(solution);
 }
 
+/*
+void IS::FOSpatGrad(int varID, int i, int j, int k, double dX, bool minmod) {
+
+  float D1A2C[] {-0.5, 0.0, 0.5};
+  float D1A4C[] {1/12, -2/3, 0, 2/3, -1/12};
+  float D2A2C[] {1.0, -2.0, 1.0};
+  float D1A1F[] {-1.0, 1.0};
+  float D1A2F[] {-1.5, 2, -0.5};
+
+  if (!minmod) {
+    double CD_grad {0};
+    for()
+    this->KernelD1A2C
+    return CD_grad;
+  }
+  // Minmod method
+  double BD_grad {0};
+  double FD_grad {0};
+
+}
+*/
+
+double minmodGradFO(double im1, i, ip1, dX) {
+
+  double FDGrad = (-1.0*i + 1*ip1)/dX;
+  double BDGrad = (1.0*i - 1*im1)/dX;
+  if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+    return 0;
+  } else {
+    return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+  }
+}
+
+double minmodGradSO(double im2, im1, i, ip1, ip2, dX) {
+  
+  double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
+  double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
+  if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+    return 0;
+  } else {
+    return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+  }
+}
+
+
 
 void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
@@ -166,14 +211,6 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         aux[ID(Aux::q1NS, i, j, k)] = -kappa* ( (aux[ID(Aux::T, i+1, j, k)] - aux[ID(Aux::T, i-1, j, k)])/(2*d->dx) );
         aux[ID(Aux::q2NS, i, j, k)] = -kappa* ( (aux[ID(Aux::T, i, j+1, k)] - aux[ID(Aux::T, i, j-1, k)])/(2*d->dy) );
         aux[ID(Aux::q3NS, i, j, k)] = -kappa* ( (aux[ID(Aux::T, i, j, k+1)] - aux[ID(Aux::T, i, j, k-1)])/(2*d->dz) );
-        
-        //printf("(%i, %i, %i) ijk\n", i, j, k);
-        //printf("(%f, %f, %f) \n", aux[ID(Aux::T, i+1, j, k)], aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::q1NS, i, j, k)]);
-        //printf("(%f, %f, %f, %f) \n", prims[ID(Prims::p, i+1, j, k)], prims[ID(Prims::n, i+1, j, k)], prims[ID(Prims::p, i-1, j, k)], prims[ID(Prims::n, i-1, j, k)]);
-        
-//          aux[ID(Aux::q1NS, i, j, k)] = -kappa*aux[ID(Aux::T, i, j, k)] * ( (log(aux[ID(Aux::T, i+1, j, k)]) - log(aux[ID(Aux::T, i-1, j, k)]))/(2*d->dx) );
-//          aux[ID(Aux::q2NS, i, j, k)] = -kappa*aux[ID(Aux::T, i, j, k)] * ( (log(aux[ID(Aux::T, i, j+1, k)]) - log(aux[ID(Aux::T, i, j-1, k)]))/(2*d->dy) );
-//          aux[ID(Aux::q3NS, i, j, k)] = -kappa*aux[ID(Aux::T, i, j, k)] * ( (log(aux[ID(Aux::T, i, j, k+1)]) - log(aux[ID(Aux::T, i, j, k-1)]))/(2*d->dz) );
  
         // Theta 20 then Pi,NS 13 
         aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx) 
