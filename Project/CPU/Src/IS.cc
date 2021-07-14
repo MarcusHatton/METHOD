@@ -7,6 +7,9 @@
 #include <stdexcept>
 #include "wenoUpwinds.h"
 
+template<typename T>
+T sqr(T x) { return x * x; }
+
 IS::IS() : Model()
 {
   this->Ncons = 15;
@@ -109,9 +112,9 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
     double p = prims[Prims::p];
     double Omega = 3*gamma - 5 + ((3*gamma)/(h*beta));
     double OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(h/beta);
-    double beta0 = (3*OmegaStar)/(h**2 * Omega**2 * p);
-    double beta1 = ((gamma-1)/gamma)**2 * (beta/(h*p)) * (5*h**2 - (gamma/(gamma-1)));
-    double beta2 = ((1 + 6*h*(1/beta))/(2*h**2*p));
+    double beta0 = (3*OmegaStar)/(sqr(h) * sqr(Omega) * p);
+    double beta1 = sqr((gamma-1)/gamma) * (beta/(h*p)) * (5*sqr(h) - (gamma/(gamma-1)));
+    double beta2 = ((1 + 6*h*(1/beta))/(2*sqr(h)*p));
     tau_q = kappa*T*beta1;
     tau_Pi = zeta*beta0;
     tau_pi = 2*eta*beta2;
@@ -221,8 +224,8 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
           beta = 1/aux[ID(Aux::T, i, j, k)];
           Omega = 3*gamma - 5 + ((3*gamma)/(aux[ID(Aux::h, i, j, k)]*beta));
           OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(aux[ID(Aux::h, i, j, k)]/beta);
-          beta0 = (3*OmegaStar)/(aux[ID(Aux::h, i, j, k)]**2 * Omega**2 * prims[ID(Prims::p, i, j, k)]);
-          beta1 = ((gamma-1)/gamma)**2 * (beta/(aux[ID(Aux::h, i, j, k)]*prims[ID(Prims::p, i, j, k)])) * (5*aux[ID(Aux::h, i, j, k)]**2 - (gamma/(gamma-1)));
+          beta0 = (3*OmegaStar)/(sqr(aux[ID(Aux::h, i, j, k)]) * sqr(Omega) * prims[ID(Prims::p, i, j, k)]);
+          beta1 = sqr((gamma-1)/gamma) * (beta/(aux[ID(Aux::h, i, j, k)]*prims[ID(Prims::p, i, j, k)])) * (5*sqr(aux[ID(Aux::h, i, j, k)]) - (gamma/(gamma-1));
           beta2 = ((1 + 6*aux[ID(Aux::h, i, j, k)]*(1/beta))/(2*aux[ID(Aux::h, i, j, k)]**2*prims[ID(Prims::p, i, j, k)]));
           tau_q = kappa*aux[ID(Aux::T, i, j, k)]*beta1;
           tau_Pi = zeta*beta0;
