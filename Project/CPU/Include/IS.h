@@ -177,9 +177,15 @@ class IS : public Model
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
             // dW/dt \equiv du0/dt
-            aux[ID(dWdt, i, j, k)] = (aux[ID(W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
-            //if (aux[ID(W, i, j, k)] != prev_vars[ID(0, i, j, k)]) { printf("W: %.17g, prevW: %.17g, dWdt: %.17g \n", aux[ID(W, i, j, k)], prev_vars[ID(0, i, j, k)], aux[ID(dWdt, i, j, k)]); }
-            prev_vars[ID(0, i, j, k)] = aux[ID(W, i, j, k)]; // Update previous value
+            aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
+            aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
+            aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
+            aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
+            // Update previous values
+            prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
+            prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
+            prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
+            prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
           } // End k-loop
         } // End j-loop
       } // End i-loop

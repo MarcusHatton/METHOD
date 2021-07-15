@@ -8,7 +8,7 @@
 #include "wenoUpwinds.h"
 
 template<typename T>
-T sqr(T x) { return x * x; }
+T sqr(T x) { return ((x) * (x)); }
 
 IS::IS() : Model()
 {
@@ -26,7 +26,9 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
 
-  prev_vars = (double *) malloc(sizeof(double)*1*data->Nx*data->Ny*data->Nz);
+  // Vector for storing variable at previous time-step...
+  // the 4 here is for the 4 time-deriv variables currently needed... should be automated really not hard-set
+  prev_vars = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz); 
 
   smartGuesses = 0;
   
@@ -108,6 +110,7 @@ void IS::FOSpatGrad(int varID, int i, int j, int k, double dX, bool minmod) {
 }
 */
 
+// First and second order "minmod" functions for slope-limiting
 double minmodGradFO(double im1, double i, double ip1, double dX) {
 
   double FDGrad = (-1.0*i + 1*ip1)/dX;
@@ -268,6 +271,17 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
                             aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
 
+        aux[ID(Aux::a1, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] 
+          + prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxux
+          + prims[ID(Prims::v2, i, j, k)]*dyux + prims[ID(Prims::v3, i, j, k)]*dzux );
+        
+        aux[ID(Aux::a2, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv2dt, i, j, k)] 
+          + prims[ID(Prims::v2, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxuy
+          + prims[ID(Prims::v2, i, j, k)]*dyuy + prims[ID(Prims::v3, i, j, k)]*dzuy );
+        
+        aux[ID(Aux::a3, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv3dt, i, j, k)] 
+          + prims[ID(Prims::v3, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxuz
+          + prims[ID(Prims::v2, i, j, k)]*dyuz + prims[ID(Prims::v3, i, j, k)]*dzuz );
 
         aux[ID(Aux::q1NS, i, j, k)] = -kappa* ( (1+ sqr(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*dxT 
           + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*dyT
@@ -322,7 +336,7 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         if(thermo_timescales) {
           beta = 1/aux[ID(Aux::T, i, j, k)];
           Omega = 3*gamma - 5 + ((3*gamma)/(aux[ID(Aux::h, i, j, k)]*beta));
-          OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(aux[ID(Aux::h, i, j, k)]/beta);
+          OmegaStar = 5 - 3*gamma + 3*(10 - 7*gamma)*(aux[ID(Aux::h, i, j, k)]/beta);
           beta0 = (3*OmegaStar)/(sqr(aux[ID(Aux::h, i, j, k)]) * sqr(Omega) * prims[ID(Prims::p, i, j, k)]);
           beta1 = sqr((gamma-1)/gamma) * (beta/(aux[ID(Aux::h, i, j, k)]*prims[ID(Prims::p, i, j, k)])) * (5*sqr(aux[ID(Aux::h, i, j, k)]) - (gamma/(gamma-1)));
           beta2 = ((1 + 6*aux[ID(Aux::h, i, j, k)]*(1/beta))/(2*sqr(aux[ID(Aux::h, i, j, k)])*prims[ID(Prims::p, i, j, k)]));
