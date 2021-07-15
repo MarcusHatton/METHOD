@@ -108,7 +108,7 @@ void IS::FOSpatGrad(int varID, int i, int j, int k, double dX, bool minmod) {
 }
 */
 
-double minmodGradFO(double im1, i, ip1, dX) {
+double minmodGradFO(double im1, double i, double ip1, double dX) {
 
   double FDGrad = (-1.0*i + 1*ip1)/dX;
   double BDGrad = (1.0*i - 1*im1)/dX;
@@ -119,7 +119,7 @@ double minmodGradFO(double im1, i, ip1, dX) {
   }
 }
 
-double minmodGradSO(double im2, im1, i, ip1, ip2, dX) {
+double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, double dX) {
   
   double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
   double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
