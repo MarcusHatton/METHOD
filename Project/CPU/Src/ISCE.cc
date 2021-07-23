@@ -1,4 +1,4 @@
-#include "IS.h"
+#include "ISCE.h"
 #include "cminpack.h"
 #include <cmath>
 #include <cstdlib>
@@ -17,7 +17,7 @@ IS::IS() : Model()
   this->Naux = 30;
 }
 
-IS::IS(Data * data, bool alt_C2P=false) : Model(data)
+ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 15;
   this->Nprims = (this->data)->Nprims = 16;
@@ -83,7 +83,7 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
 }
 
-IS::~IS()
+ISCE::~ISCE()
 {
   free(solution);
 }
@@ -135,7 +135,7 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
 
 
 
-void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
+void ISCE::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
   // printf("ToyQ model does not implement sourceTermSingleCell\n");
   // exit(1);
@@ -192,7 +192,7 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   
 }
 
-void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
+void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
 {
   // Syntax
   Data * d(this->data);
@@ -438,7 +438,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   return 0;
 }
 
-int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
+int ISCEAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 {
 
 //  Data * d(this->data);
@@ -489,7 +489,7 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
 
 
 
-void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
+void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
 
   Data * d(this->data);
@@ -612,7 +612,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
    
 }
 
-void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
+void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
 {
   // Syntax
   Data * d(this->data);
@@ -975,7 +975,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   
 }
 
-void IS::primsToAll(double *cons, double *prims, double *aux)
+void ISCE::primsToAll(double *cons, double *prims, double *aux)
 {
   // Syntax
   Data * d(this->data);
@@ -1141,7 +1141,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
 
 }
 
-void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const int dir)
+void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const int dir)
 {
   // Syntax
   Data * d(this->data);
@@ -1189,71 +1189,4 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
     } // End j loop
   } // End i loop
 }
-
-
-
-/* Model with functional kappa dependence */
-
-/*
-
-ToyQFunctional::ToyQFunctional() : ToyQ()
-{
-}
-
-ToyQFunctional::ToyQFunctional(Data * data) : ToyQ(data)
-{
-}
-
-ToyQFunctional::~ToyQFunctional()
-{
-}
-
-double kappa_of_T(double T, double kappa_0) {
-  // return kappa_0 / (0.1 + T + T*T);
-  // return kappa_0 / (1.0 + 1e-2*T);
-  double kT = kappa_0 * T;
-  return kT * T / (kT * kT + 0.25); // Andreas' Slides (bulk viscosity!!!)
-}
-
-double tau_q_of_T(double T, double tau_q_0) {
-  // return tau_q_0 / (0.1 + 0.5 * T + T*T);
-  // return tau_q_0 / (1.0 + 1e-3*T);
-  double tT = tau_q_0 * T;
-  return tT * T / (tT * tT + 0.25);
-}
-
-void ToyQFunctional::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
-{
-  
-  double kappa_0 = this->data->optionalSimArgs[0];
-  double tau_q_0 = this->data->optionalSimArgs[1];
-
-  source[0] = 0.0;
-  for (int dir(0); dir < 3; dir++) {
-    source[1+dir] = -(kappa_of_T(cons[0], kappa_0) * aux[dir] + prims[1+dir]) / tau_q_of_T(cons[0], tau_q_0);
-  }
-}
-
-void ToyQFunctional::sourceTerm(double *cons, double *prims, double *aux, double *source)
-{
-  // Syntax
-  Data * d(this->data);
-
-  double kappa_0 = d->optionalSimArgs[0]; 
-  double tau_q_0 = d->optionalSimArgs[1];
-
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        source[ID(0, i, j, k)] = 0.0;
-        for (int dir(0); dir < 3; dir++) {
-          source[ID(1+dir, i, j, k)] = -(kappa_of_T(cons[ID(Cons::0, i, j, k)], kappa_0) * aux[ID(Aux::dir, i, j, k)] +
-                                         prims[ID(Prims::v2+dir, i, j, k)]) / tau_q_of_T(cons[ID(Cons::0, i, j, k)], tau_q_0);
-        }
-      }
-    }
-  }
-}
-
-*/
 
