@@ -10,25 +10,27 @@
 template<typename T>
 T sqr(T x) { return ((x) * (x)); }
 
-IS::IS() : Model()
+ISCE::ISCE() : Model()
 {
   this->Ncons = 15;
   this->Nprims = 16;
-  this->Naux = 30;
+  this->Naux = 40;
+  this->Ntderivs = 15;
 }
 
 ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 15;
   this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 30;
+  this->Naux = (this->data)->Naux = 40;
+  this->Ntderivs = (this->data)->Ntderivs = 15;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
 
   // Vector for storing variable at previous time-step...
   // the 4 here is for the 4 time-deriv variables currently needed... should be automated really not hard-set
-  prev_vars = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz); 
+  prev_vars = (double *) malloc(sizeof(double)*(this->Ntderivs)*data->Nx*data->Ny*data->Nz); 
 
   smartGuesses = 0;
   
@@ -66,21 +68,33 @@ ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("q0");    this->data->auxLabels.push_back("qv");
   this->data->auxLabels.push_back("pi00");  this->data->auxLabels.push_back("pi01");
   this->data->auxLabels.push_back("pi02");  this->data->auxLabels.push_back("pi03");
-  // 10
+  this->data->auxLabels.push_back("Theta"); this->data->auxLabels.push_back("vsqrd");
+  // 12
   this->data->auxLabels.push_back("q1NS");  this->data->auxLabels.push_back("q2NS");
   this->data->auxLabels.push_back("q3NS");
-  // 13
+  // 15
   this->data->auxLabels.push_back("PiNS");    
-  // 14
+  // 16
   this->data->auxLabels.push_back("pi11NS"); this->data->auxLabels.push_back("pi12NS");
   this->data->auxLabels.push_back("pi13NS"); this->data->auxLabels.push_back("pi22NS");
   this->data->auxLabels.push_back("pi23NS"); this->data->auxLabels.push_back("pi33NS");
-  // 20
-  this->data->auxLabels.push_back("Theta");  this->data->auxLabels.push_back("dv1dt");
-  this->data->auxLabels.push_back("dv2dt");  this->data->auxLabels.push_back("dv3dt");
+  // 22
+  this->data->auxLabels.push_back("q1LO");  this->data->auxLabels.push_back("q2LO");
+  this->data->auxLabels.push_back("qLO");
+  // 25
+  this->data->auxLabels.push_back("PiLO");    
+  // 26
+  this->data->auxLabels.push_back("pi11LO"); this->data->auxLabels.push_back("pi12LO");
+  this->data->auxLabels.push_back("pi13LO"); this->data->auxLabels.push_back("pi22LO");
+  this->data->auxLabels.push_back("pi23LO"); this->data->auxLabels.push_back("pi33LO");
+  // 32
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
-  this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
-  this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
+  this->data->auxLabels.push_back("a3");
+
+  this->data->tderivLabels.push_back("dWdt"); this->data->tderivLabels.push_back("dv1dt");
+  this->data->tderivLabels.push_back("dv2dt");  this->data->tderivLabels.push_back("dv3dt");
+  this->data->tderivLabels.push_back("dndt"); 
+
 }
 
 ISCE::~ISCE()
@@ -389,7 +403,7 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
     iflag : int
       Error flag
 */
-int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
+int ISCEresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 {
 
 //  Data * d(this->data);
@@ -438,7 +452,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   return 0;
 }
 
-int ISCEAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
+int ISCEalternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 {
 
 //  Data * d(this->data);
@@ -544,7 +558,7 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
     sol[3] = (prims[Prims::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
   
     // Solve residual = 0
-    info = __cminpack_func__(hybrd1) (&ISAlternativeResidual, &args, sys_size, sol, res,
+    info = __cminpack_func__(hybrd1) (&ISCEalternativeResidual, &args, sys_size, sol, res,
                                       tol, wa, lwa);
     // If root find fails, add failed cell to the list
     if (info!=1) {
@@ -580,7 +594,7 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
     sol[3] = (prims[Prims::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
   
     // Solve residual = 0
-    info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
+    info = __cminpack_func__(hybrd1) (&ISCEresidual, &args, sys_size, sol, res,
                                       tol, wa, lwa);
     // If root find fails, add failed cell to the list
     if (info!=1) {
@@ -592,12 +606,12 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
                        /((cons[Cons::Tau] + cons[Cons::D] + sol[0])*(cons[Cons::Tau]  + cons[Cons::D] + sol[0]));
     aux[Aux::W] = 1 / sqrt((1-aux[Aux::vsqrd]));
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
-    aux[Aux::rho_plus_p] = (cons[Cons::Tau] + cons[Cons::D] + sol[0])/(aux[Aux::W]*aux[Aux::W]) - prims[Prims::Pi];
-    prims[Prims::v1] = (cons[Cons::S1] - sol[1])/((aux[Aux::rho_plus_p] + prims[Prims::Pi])*aux[Aux::W]*aux[Aux::W]);
-    prims[Prims::v2] = (cons[Cons::S2] - sol[2])/((aux[Aux::rho_plus_p] + prims[Prims::Pi])*aux[Aux::W]*aux[Aux::W]);  
-    prims[Prims::v3] = (cons[Cons::S3] - sol[3])/((aux[Aux::rho_plus_p] + prims[Prims::Pi])*aux[Aux::W]*aux[Aux::W]);  
-    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n])*((d->gamma-1)/d->gamma);
-    prims[Prims::rho] = aux[Aux::rho_plus_p] - prims[Prims::p];
+    double rho_plus_p = (cons[Cons::Tau] + cons[Cons::D] + sol[0])/(aux[Aux::W]*aux[Aux::W]) - prims[Prims::Pi];
+    prims[Prims::v1] = (cons[Cons::S1] - sol[1])/((rho_plus_p + prims[Prims::Pi])*aux[Aux::W]*aux[Aux::W]);
+    prims[Prims::v2] = (cons[Cons::S2] - sol[2])/((rho_plus_p + prims[Prims::Pi])*aux[Aux::W]*aux[Aux::W]);  
+    prims[Prims::v3] = (cons[Cons::S3] - sol[3])/((rho_plus_p + prims[Prims::Pi])*aux[Aux::W]*aux[Aux::W]);  
+    prims[Prims::p] = (rho_plus_p - prims[Prims::n])*((d->gamma-1)/d->gamma);
+    prims[Prims::rho] = rho_plus_p - prims[Prims::p];
     
     // Repeating the ones here that depend on v1,v2,v3...
     aux[Aux::qv] = prims[Prims::q1]*prims[Prims::v1] + prims[Prims::q2]*prims[Prims::v2] + prims[Prims::q3]*prims[Prims::v3];
@@ -702,7 +716,7 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
           sol[3] = (prims[ID(Prims::q3, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi03, i, j, k)];
         
           // Solve residual = 0
-          info = __cminpack_func__(hybrd1) (&ISAlternativeResidual, &args, sys_size, sol, res,
+          info = __cminpack_func__(hybrd1) (&ISCEalternativeResidual, &args, sys_size, sol, res,
                                             tol, wa, lwa);        
         
         } else {
@@ -713,9 +727,9 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
           sol[3] = (prims[ID(Prims::q3, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi03, i, j, k)];
   
           // Solve residual = 0
-          info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
+          info = __cminpack_func__(hybrd1) (&ISCEresidual, &args, sys_size, sol, res,
                                             tol, wa, lwa);
-  //        info = __cminpack_func__(hybrd) (&ISresidual, &args, sys_size, sol, res,
+  //        info = __cminpack_func__(hybrd) (&ISCEalternativeResidual, &args, sys_size, sol, res,
   //                                          tol, maxfev, ml, mu, epsfcn, &diag[0], mode, factor, nprint, &nfev, &fjac[0][0], ldfjac, &r[0], lr, &qtf[0], &wa1[0], &wa2[0], &wa3[0], &wa4[0]);        
         }
                                                                    
@@ -876,16 +890,16 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
                                     + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)]));
           aux[ID(Aux::W, i, j, k)] = 1 / sqrt((1-aux[ID(Aux::vsqrd, i, j, k)]));
           prims[ID(Prims::n, i, j, k)] = cons[ID(Cons::D, i, j, k)] / aux[ID(Aux::W, i, j, k)];
-          aux[ID(Aux::rho_plus_p, i, j, k)] = ((cons[ID(Cons::Tau, i, j, k)] + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)])
+          double rho_plus_p = ((cons[ID(Cons::Tau, i, j, k)] + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)])
                                               /(aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)])) - prims[ID(Prims::Pi, i, j, k)];
-          prims[ID(Prims::v1, i, j, k)] = (cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
+          prims[ID(Prims::v1, i, j, k)] = (cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])/((rho_plus_p 
                                    + prims[ID(Prims::Pi, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);
-          prims[ID(Prims::v2, i, j, k)] = (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
+          prims[ID(Prims::v2, i, j, k)] = (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])/((rho_plus_p 
                                    + prims[ID(Prims::Pi, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
-          prims[ID(Prims::v3, i, j, k)] = (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
+          prims[ID(Prims::v3, i, j, k)] = (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])/((rho_plus_p
                                    + prims[ID(Prims::Pi, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
-          prims[ID(Prims::p, i, j, k)] = (aux[ID(Aux::rho_plus_p, i, j, k)] - prims[ID(Prims::n, i, j, k)])*((d->gamma-1)/d->gamma);
-          prims[ID(Prims::rho, i, j, k)] = aux[ID(Aux::rho_plus_p, i, j, k)] - prims[ID(Prims::p, i, j, k)];
+          prims[ID(Prims::p, i, j, k)] = (rho_plus_p - prims[ID(Prims::n, i, j, k)])*((d->gamma-1)/d->gamma);
+          prims[ID(Prims::rho, i, j, k)] = rho_plus_p - prims[ID(Prims::p, i, j, k)];
   
           // Again, repeating this here once the correct values for v1,v2,v3 have been set...
           aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
@@ -1085,26 +1099,26 @@ void ISCE::primsToAll(double *cons, double *prims, double *aux)
         cons[ID(Cons::D, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)];
         
         // S1,2,3
-        cons[ID(Cons::S1, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::vx, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::vx, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::vx, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qxNS, i, j, k)]*sqr(prims[ID(Prims::vx, i, j, k)]) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qxNS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qyNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qzNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + aux[ID(Aux::pixxNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)] + aux[ID(Aux::pixyNS, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + aux[ID(Aux::pixzNS, i, j, k)]*prims[ID(Prims::vz, i, j, k)]
-        + tau_q*(qx1(t, x, y, z)*sqr(prims[ID(Prims::vx, i, j, k)]) + qx1(t, x, y, z) + qy1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + qz1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vz, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*Pi1(t, x, y, z)*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::vx, i, j, k)]
-        + tau_pi*(pixx1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)] + pixy1(t, x, y, z)*prims[ID(Prims::vy, i, j, k)] + pixz1(t, x, y, z)*prims[ID(Prims::vz, i, j, k)]);
+        cons[ID(Cons::S1, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]**2 + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
+        + tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]**2 + aux[ID(Aux::q1LO, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)]
+        + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]
+        + tau_pi*(aux[ID(Aux::pi11LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]);
 
-        cons[ID(Cons::S2, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::vy, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qxNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qyNS, i, j, k)]*sqr(prims[ID(Prims::vy, i, j, k)]) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qyNS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qzNS, i, j, k)]*prims[ID(Prims::vy, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + aux[ID(Aux::piyyNS, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + aux[ID(Aux::piyzNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)] + aux[ID(Aux::piyzNS, i, j, k)]*prims[ID(Prims::vz, i, j, k)]
-        + tau_q*(qx1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + qy1(t, x, y, z)*sqr(prims[ID(Prims::vy, i, j, k)]) + qy1(t, x, y, z) + qz1(t, x, y, z)*prims[ID(Prims::vy, i, j, k)]*prims[ID(Prims::vz, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*Pi1(t, x, y, z)*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::vy, i, j, k)]
-        + tau_pi*(piyy1(t, x, y, z)*prims[ID(Prims::vy, i, j, k)] + piyz1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)] + piyz1(t, x, y, z)*prims[ID(Prims::vz, i, j, k)]);
+        cons[ID(Cons::S2, i, j, k)] = ux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]**2 + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi21NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
+        + tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)]**2 + aux[ID(Aux::q2LO, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)]
+        + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)]
+        + tau_pi*(aux[ID(Aux::pi21LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi22LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi23LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]);
 
-        cons[ID(Cons::S3, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::vz, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qxNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qyNS, i, j, k)]*prims[ID(Prims::vy, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qzNS, i, j, k)]*sqr(prims[ID(Prims::vz, i, j, k)]) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qzNS, i, j, k)] + aux[ID(Aux::pizxNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)] + aux[ID(Aux::pizyNS, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + aux[ID(Aux::pizzNS, i, j, k)]*prims[ID(Prims::vz, i, j, k)]
-        + tau_q*(qx1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + qy1(t, x, y, z)*prims[ID(Prims::vy, i, j, k)]*prims[ID(Prims::vz, i, j, k)] + qz1(t, x, y, z)*sqr(prims[ID(Prims::vz, i, j, k)]) + qz1(t, x, y, z))*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*Pi1(t, x, y, z)*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::vz, i, j, k)]
-        + tau_pi*(pizx1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)] + pizy1(t, x, y, z)*prims[ID(Prims::vy, i, j, k)] + pizz1(t, x, y, z)*prims[ID(Prims::vz, i, j, k)]);
+        cons[ID(Cons::S3, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]**2 + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)] + aux[ID(Aux::pi31NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi32NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
+        + tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]**2 + aux[ID(Aux::q3LO, i, j, k)])*aux[ID(Aux::W, i, j, k)]
+        + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)]
+        + tau_pi*(aux[ID(Aux::pi31LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi32LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi33LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]);
 
         // E
-        cons[ID(Cons::Tau, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)]) - aux[ID(Aux::PiNS, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qxNS, i, j, k)]*prims[ID(Prims::vx, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qyNS, i, j, k)]*prims[ID(Prims::vy, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::qzNS, i, j, k)]*prims[ID(Prims::vz, i, j, k)] - prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::pixxNS, i, j, k)] + aux[ID(Aux::piyyNS, i, j, k)] + aux[ID(Aux::pizzNS, i, j, k)]
-        + 2*tau_q*(qx1(t, x, y, z)*prims[ID(Prims::vx, i, j, k)] + qy1(t, x, y, z)*prims[ID(Prims::vy, i, j, k)] + qz1(t, x, y, z)*prims[ID(Prims::vz, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*(sqr(aux[ID(Aux::W, i, j, k)]) - 1)*Pi1(t, x, y, z)
-        + tau_pi*(pixx1(t, x, y, z) + piyy1(t, x, y, z) + pizz1(t, x, y, z));
+        cons[ID(Cons::Tau, i, j, k)] = aaux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)]) - aux[ID(Aux::PiNS, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] - prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]
+        + 2*tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)]
+        + tau_Pi*(sqr(aux[ID(Aux::W, i, j, k)]) - 1)*aux[ID(Aux::PiLO, i, j, k)]
+        + tau_pi*(aux[ID(Aux::pi11LO, i, j, k)] + aux[ID(Aux::pi22LO, i, j, k)] + aux[ID(Aux::pi33LO, i, j, k)]);
 
         // Y1-3
         cons[ID(Cons::Y1, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q1, i, j, k)];

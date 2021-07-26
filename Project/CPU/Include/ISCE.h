@@ -1,5 +1,5 @@
-#ifndef IS_H
-#define IS_H
+#ifndef ISCE_H
+#define ISCE_H
 
 #include "model.h"
 
@@ -14,10 +14,10 @@ This is the human readable description of this models variables.
   30 auxiliary variables:
     h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
     pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p 
+    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt 
 */
 
-class IS : public Model
+class ISCE : public Model
 {
 
   public:
@@ -27,7 +27,7 @@ class IS : public Model
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
     enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
                pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
+               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt };
 
 
     int smartGuesses;     //!< Number of smart guess required
@@ -38,16 +38,16 @@ class IS : public Model
     
     bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
 
-    IS();     //!< Default constructor
+    ISCE();     //!< Default constructor
 
     //! Parameterized constructor
     /*!
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    IS(Data * data, bool alternative_C2P);
+    ISCE(Data * data, bool alternative_C2P);
 
-    virtual ~IS();     //!< Destructor
+    virtual ~ISCE();     //!< Destructor
 
 
     //! Single cell source term contribution
@@ -181,11 +181,13 @@ class IS : public Model
             aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
             aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
             aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
+            aux[ID(Aux::dndt, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(4, i, j, k)])/dt;
             // Update previous values
             prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
             prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
             prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
             prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
+            prev_vars[ID(4, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
           } // End k-loop
         } // End j-loop
       } // End i-loop
@@ -266,7 +268,8 @@ class IS : public Model
   @note For more information regarding the form of this function and its parameters see the URL below
   @sa [Original source](https://github.com/devernay/cminpack)
 */
-int residual(void *p, int n, const double *x, double *fvec, int iflag);
+int ISCEresidual(void *p, int n, const double *x, double *fvec, int iflag);
+int ISCEalternativeResidual(void *p, int n, const double *x, double *fvec, int iflag);
 
 
 
