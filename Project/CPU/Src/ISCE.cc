@@ -91,9 +91,20 @@ ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");
 
-  this->data->tderivLabels.push_back("dWdt"); this->data->tderivLabels.push_back("dv1dt");
-  this->data->tderivLabels.push_back("dv2dt");  this->data->tderivLabels.push_back("dv3dt");
-  this->data->tderivLabels.push_back("dndt"); 
+  // 0
+  this->data->tderivLabels.push_back("dtn");
+  // 1
+  this->data->tderivLabels.push_back("dtW"); this->data->tderivLabels.push_back("dtv1");
+  this->data->tderivLabels.push_back("dtv2");  this->data->tderivLabels.push_back("dtv3");
+  // 5
+  this->data->auxLabels.push_back("dtq1NS");  this->data->auxLabels.push_back("dtq2NS");
+  this->data->auxLabels.push_back("dtq3NS");
+  // 8
+  this->data->auxLabels.push_back("dtPiNS");    
+  // 9
+  this->data->auxLabels.push_back("dtpi11NS"); this->data->auxLabels.push_back("dtpi12NS");
+  this->data->auxLabels.push_back("dtpi13NS"); this->data->auxLabels.push_back("dtpi22NS");
+  this->data->auxLabels.push_back("dtpi23NS"); this->data->auxLabels.push_back("dtpi33NS");
 
 }
 

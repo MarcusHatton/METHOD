@@ -12,9 +12,13 @@ This is the human readable description of this models variables.
   16 primitive variables:
     v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
   30 auxiliary variables:
-    h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-    pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt 
+    h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
+    q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
+    pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  a1, a2, a3
+  15 time derivatives:
+    dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+    dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS
+
 */
 
 class ISCE : public Model
@@ -25,9 +29,11 @@ class ISCE : public Model
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
-    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-               pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt };
+    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
+               q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
+               pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  a1, a2, a3 };
+    enum TDerivs { dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+               dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS};
 
 
     int smartGuesses;     //!< Number of smart guess required
@@ -176,18 +182,28 @@ class ISCE : public Model
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
+            
+            tderivs[ID(TDerivs::dtn, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
             // dW/dt \equiv du0/dt
-            aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
-            aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
-            aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
-            aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
-            aux[ID(Aux::dndt, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(4, i, j, k)])/dt;
+            tderivs[ID(TDerivs::dtW, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
+            // Velocities
+            for (int count(0); count < 3; count++) {
+              tderivs[ID(TDerivs::dtv1+count, i, j, k)] = (prims[ID(Prims::v1+count, i, j, k)] - prev_vars[ID(2+count, i, j, k)])/dt;
+            }
+            // Dissipative NS terms
+            for (int count(0); count < 10; count++) {
+              tderivs[ID(TDerivs::dtq1+count, i, j, k)] = (aux[ID(Aux::q1NS+count, i, j, k)] - prev_vars[ID(5+count, i, j, k)])/dt;
+            }
             // Update previous values
-            prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
-            prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
-            prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
-            prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
-            prev_vars[ID(4, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
+            prev_vars[ID(0, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
+            prev_vars[ID(1, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
+            for (int count(0); count < 3; count++) {
+              prev_vars[ID(count+2, i, j, k)] = prims[ID(Prims::v1+count, i, j, k)]; 
+            }
+            for (int count(0); count < 10; count++) {
+              prev_vars[ID(count+5, i, j, k)] = aux[ID(Aux::q1NS+count, i, j, k)];
+            }            
+
           } // End k-loop
         } // End j-loop
       } // End i-loop
