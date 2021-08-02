@@ -2,7 +2,7 @@
 #define ISCE_H
 
 #include "model.h"
-
+#include "modelExtension.h"
 
 /*
 This is the human readable description of this models variables.
