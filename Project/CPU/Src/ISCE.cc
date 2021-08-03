@@ -305,7 +305,7 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
         // Pi,NS = -zeta*Theta
         aux[ID(Aux::PiNS, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)];
   
-        // pi^l_j,NS 14
+        // pi^l_j,NS 14 - STILL NOT FULLY CORRECT - NEED MORE h_munu factors in front of big bracket!
         // 11
         aux[ID(Aux::pi11NS, i, j, k)] = -2*eta*( 2*dxux 
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
@@ -1103,10 +1103,6 @@ void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
           + (prims[ID(Prims::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
           + aux[ID(Aux::pi01+dir, i, j, k)];
-        // Y1-3,U,Z11-33 *v
-        for (int ndissvar(0); ndissvar < 10; ndissvar++) {                
-          f[ID(Y1+ndissvar, i, j, k)] = cons[ID(Cons::Y1+ndissvar, i, j, k)]*prims[ID(dir, i, j, k)];
-        }
       } // End k loop
     } // End j loop
   } // End i loop
