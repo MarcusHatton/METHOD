@@ -20,7 +20,7 @@ class Model
 
     int
     //@{
-    Ncons, Nprims, Naux;  //!< Size of specified vector
+    Ncons, Nprims, Naux, Ntderivs;  //!< Size of specified vector
     //@}
 
     Model() : data(NULL) {}     //!< Default constructor
