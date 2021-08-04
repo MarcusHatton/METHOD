@@ -1,5 +1,5 @@
 #include "DEIFY.h"
-#include "ISCE.h"
+//#include "ISCE.h"
 #include <cstdio>
 #include <cmath>
 #include <ctime>
