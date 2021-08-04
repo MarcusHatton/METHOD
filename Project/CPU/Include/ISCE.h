@@ -26,11 +26,12 @@ class ISCE : public Model
   public:
 
     // enums to save looking up numbering of C/P/As when using ID accessor.
-    enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
+    enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
     enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
                q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
-               pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  a1, a2, a3 };
+               q1LO, q2LO, q3LO, PiNS, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
+               a1, a2, a3 };
     enum TDerivs { dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS};
 
@@ -39,8 +40,6 @@ class ISCE : public Model
 
     double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
 
-    bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
-
     ISCE();     //!< Default constructor
 
     //! Parameterized constructor
@@ -48,7 +47,7 @@ class ISCE : public Model
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    ISCE(Data * data, bool alternative_C2P);
+    ISCE(Data * data);
 
     virtual ~ISCE();     //!< Destructor
 
@@ -257,7 +256,7 @@ class ISCE : public Model
 //! <b> Residual function for spectral analysis </b>
 /*!
   @par
-    IS requires N=4 rootfind, therefore need to implement the hybrd cminpack
+    IS requires N=1 rootfind, therefore need to implement the hybrd cminpack
   multiD Newton solver. Things may get ugly.
   @par
     Cant do anything about the arguments of this function, cminpack demands you

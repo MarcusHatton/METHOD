@@ -14,15 +14,15 @@ ISCE::ISCE() : Model()
 {
   this->Ncons = 5;
   this->Nprims = 16;
-  this->Naux = 40;
+  this->Naux = 35;
   this->Ntderivs = 15;
 }
 
-ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
+ISCE::ISCE(Data * data) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 40;
+  this->Naux = (this->data)->Naux = 35;
   this->Ntderivs = (this->data)->Ntderivs = 15;
 
   // Solutions for C2P all cells
@@ -767,13 +767,14 @@ void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const
         f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
         for (int nvar(0); nvar < 3; nvar++) {
-          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( prims[ID(Prims::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
-            - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
+          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)]; // + ( prims[ID(Prims::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
+            // - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
           // (p+Pi)delta_ij
           if (dir == nvar) {
-            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::Pi, i, j, k)]);
+            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)]; // + prims[ID(Prims::Pi, i, j, k)]);
           }
         }
+        /*
         //  pi^i_j  
         if (dir == 0) {
           for (int nvar(0); nvar < 3; nvar++) {
@@ -790,11 +791,12 @@ void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const
         } else {
           throw std::runtime_error("Flux direction is not 0, 1 or 2");
         }
+        */
 
         // (Tau+p)*v + ...
-        f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
-          + (prims[ID(Prims::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-          + aux[ID(Aux::pi01+dir, i, j, k)];
+        f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)];
+          // + (prims[ID(Prims::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
+          // + aux[ID(Aux::pi01+dir, i, j, k)];
       } // End k loop
     } // End j loop
   } // End i loop

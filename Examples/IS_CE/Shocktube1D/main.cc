@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  ISCE model(&data, false);
+  ISCE model(&data);
 
   Weno3 weno(&data);
 
