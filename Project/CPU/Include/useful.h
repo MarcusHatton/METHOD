@@ -29,3 +29,5 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
     return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
   }
 }
+
+#endif
