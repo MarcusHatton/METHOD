@@ -111,11 +111,11 @@ void ISCE::sourceTermSingleCell(double *cons, double *prims, double *aux, double
   bool thermo_timescales = false;
 
   double kappa = this->data->optionalSimArgs[0];
-  double tau_q = this->data->optionalSimArgs[1];
+//  double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
-  double tau_Pi = this->data->optionalSimArgs[3];
+//  double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
-  double tau_pi = this->data->optionalSimArgs[5];
+//  double tau_pi = this->data->optionalSimArgs[5];
 
   // Thermodynamic calculation of timescales
   if (thermo_timescales) {
@@ -157,7 +157,14 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
   double beta;
   double Omega, OmegaStar;
   double beta0, beta1, beta2;
-  double tauq, tauPi, taupi;
+  double tau_q, tau_Pi, tau_pi;
+
+  double kappa = this->data->optionalSimArgs[0];
+//  double tau_q = this->data->optionalSimArgs[1];
+  double zeta = this->data->optionalSimArgs[2];
+//  double tau_Pi = this->data->optionalSimArgs[3];
+  double eta = this->data->optionalSimArgs[4];
+//  double tau_pi = this->data->optionalSimArgs[5];
 
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
@@ -812,7 +819,7 @@ void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const
             // - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
           // (p+Pi)delta_ij
           if (dir == nvar) {
-            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)]; // + prims[ID(Prims::Pi, i, j, k)]);
+            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)]); // + prims[ID(Prims::Pi, i, j, k)]);
           }
         }
         /*
