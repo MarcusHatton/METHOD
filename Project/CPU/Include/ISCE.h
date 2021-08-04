@@ -30,7 +30,7 @@ class ISCE : public Model
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
     enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
                q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
-               q1LO, q2LO, q3LO, PiNS, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
+               q1LO, q2LO, q3LO, PiLO, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
                a1, a2, a3 };
     enum TDerivs { dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS};
@@ -170,9 +170,9 @@ class ISCE : public Model
       //printf("final_step: %d", final_step);
       if (!final_step) return;
 
+      /*
       Data * d(this->data);
 
-      /*
       // Get timestep
       double dt=d->dt;
       //printf("dt: %.17g", dt);
