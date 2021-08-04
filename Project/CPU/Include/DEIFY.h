@@ -1,5 +1,5 @@
-#ifndef DEIHY_H
-#define DEIHY_H
+#ifndef DEIFY_H
+#define DEIFY_H
 
 #include "modelExtension.h"
 #include "flux.h"
@@ -13,19 +13,19 @@
 #define IDM(ldx, mdx, idx, jdx, kdx)  ((ldx)*(3)*(d->Nx)*(d->Ny)*(d->Nz) + (mdx)*(d->Nx)*(d->Ny)*(d->Nz) + (idx)*(d->Ny)*(d->Nz) + (jdx)*(d->Nz) + (kdx))
 
 
-//! <b> DEIHY: // Dissipative Extension for Ideal Hydrodynamics </b>
+//! <b> DEIFY: // Dissipative Extension for Ideal Fluid dYnamics </b>
 /*!
-    This class represents the implementation of DEIHY, a resistive extension
+    This class represents the implementation of DEIFY, a resistive extension
   to the special relativistic, ideal MHD equations. Details can be found in
   Wright & Hawke 2019 `A resistive extension to ideal MHD`.
 
-    DEIHY extends the equations of ideal MHD by means of an additional, diffusive
+    DEIFY extends the equations of ideal MHD by means of an additional, diffusive
   source term. The new system has the following form:
   \f{align}{
     \frac{\partial q}{\partial t} + \frac{\partial f^i(q)}{\partial x^i} = \frac{\partial D^i}{\partial x^i}
   \f}
   where the LHS corresponds to the standard, special relativistic ideal MHD (SRMHD)
-  equations, and the RHD is the source term extension of DEIHY.
+  equations, and the RHD is the source term extension of DEIFY.
 
   The diffusion vector is defined by the following:
   \f{align}{
@@ -44,7 +44,7 @@
     </ul>
 
   To understand the elements of this extension, please view the paper. Including this
-  extension is as simple as declaring `DEIHY modelExtension(&data, &fluxMethod);` in
+  extension is as simple as declaring `DEIFY modelExtension(&data, &fluxMethod);` in
   `main`, and including a pointer to `modelExtension` in the time integrator's
   constructor. With this, the SRMHD model will be able to capture resistive
   effects. You should play with the model to get a feel for how it behaves with
@@ -58,7 +58,7 @@
 
   Optimisations
   -------------
-    To improve the performance of DEIHY, we have implemented a number of optimisations.
+    To improve the performance of DEIFY, we have implemented a number of optimisations.
   These will make the source faster to compute, but may have led to a slightly
   less readable code (and less modular than I would have liked). We list some of
   these below:
@@ -78,42 +78,25 @@
   provided. Run the main programs with `make run` and observe the results using
   the `interactivePlot` script.
 */
-class DEIHY : public ModelExtension
+class DEIFY : public ModelExtension
 {
   public:
 
-    double
-    //{
-    *dfxdw, *dfydw, *dfzdw,      //!< Derivative of flux vector wrt to primitive variables
-    //}
-    *dwdsb,                      //!< Derivative of primitive vector wrt stiff source
-    *E,                          //!< Electric field vector
-    *q,                          //!< Charge density
-    *K,                          //!< partial_a fbar^a
-    //{
-    *Mx, *My, *Mz,               //!< Directional matrices multiplying K. Dot prod(partial_w f^a, partial_sbar w)
-    //}
-    //{
-    *fbx, *fby, *fbz,               //!< Stiff flux vector
-    //}
-    //{
-    *diffuX, *diffuY, *diffuZ,   //!< Diffusion vector
-    //}
-    *alpha;                      //!< Prefactor for dwdsb
+    double *diffuX, *diffuY, *diffuZ;   //!< Diffusion vector
 
     FluxMethod * fluxMethod;     //!< Pointer to the flux method class
 
-    DEIHY();
+    DEIFY();
 
     //! Constructor
-    DEIHY(Data * data, FluxMethod * fluxMethod);
+    DEIFY(Data * data, FluxMethod * fluxMethod);
 
     //! Destructor
-    virtual ~DEIHY();
+    virtual ~DEIFY();
 
     //! Main user function for the modified source
     /*!
-        This method implements the modified source for DEIHY. Given the current
+        This method implements the modified source for DEIFY. Given the current
       state of the system in cons, prims and aux, it writes into source the
       contribution from the derivative of the diffusion vector.
 
@@ -134,27 +117,6 @@ class DEIHY : public ModelExtension
     void set_Dy(double * cons, double * prims, double * aux);
     void set_Dz(double * cons, double * prims, double * aux);
     //}
-
-    //! Determines the RHS bracket of the diffusion terms
-    /*!
-      I.e.
-      \f{align}{
-      K &= \partial_a \overline{f}^a - \partial_w \overline{q}_0 (\partial_w q)^{-1} \partial_a f^a \\
-        &= \partial_a \overline{f}^a
-      \f}
-        for the resistive model. Recall M2 = 0.
-    */
-    void set_K(double * cons, double * prims, double * aux);
-
-    //{
-    //! Sets the derivative of the non-stiff flux wrt the primitive vector
-    void set_dfxdw(double * cons, double * prims, double * aux);
-    void set_dfydw(double * cons, double * prims, double * aux);
-    void set_dfzdw(double * cons, double * prims, double * aux);
-    //}
-
-    //! Sets the derivative of the primitive vector wrt the stiff source vector
-    void set_dwdsb(double * cons, double * prims, double * aux);
 
 };
 

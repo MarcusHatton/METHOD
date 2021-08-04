@@ -229,16 +229,6 @@ class ISCE : public Model
       S2_rf,
       S3_rf,
       Tau_rf,
-      q1_rf,
-      q2_rf,
-      q3_rf,
-      Pi_rf,
-      pi11_rf,
-      pi12_rf,
-      pi13_rf,
-      pi22_rf,
-      pi23_rf,
-      pi33_rf,
       gamma;
       int i;
     } Args;
