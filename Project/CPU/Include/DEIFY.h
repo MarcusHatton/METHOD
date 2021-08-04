@@ -4,6 +4,16 @@
 #include "modelExtension.h"
 #include "flux.h"
 
+// enums to save looking up numbering of C/P/As when using ID accessor.
+enum Cons { D, S1, S2, S3, Tau };
+enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
+enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
+            q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
+            q1LO, q2LO, q3LO, PiLO, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
+            a1, a2, a3 };
+enum TDerivs { dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+            dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS};
+
 //! <b> DEIFY: // Dissipative Extension for Ideal Fluid dYnamics </b>
 /*!
     This class represents the implementation of DEIFY, a resistive extension
@@ -104,9 +114,9 @@ class DEIFY : public ModelExtension
 
     //{
     //! Set the diffusion vector. Method assumes K and dwdsb are set
-    void set_Dx(double * cons, double * prims, double * aux);
-    void set_Dy(double * cons, double * prims, double * aux);
-    void set_Dz(double * cons, double * prims, double * aux);
+    void set_Fx(double * cons, double * prims, double * aux);
+    void set_Fy(double * cons, double * prims, double * aux);
+    void set_Fz(double * cons, double * prims, double * aux);
     //}
 
 };
