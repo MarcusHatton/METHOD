@@ -129,9 +129,9 @@ void ISCE::sourceTermSingleCell(double *cons, double *prims, double *aux, double
     double beta0 = (3*OmegaStar)/(sqr(h) * sqr(Omega) * p);
     double beta1 = sqr((gamma-1)/gamma) * (beta/(h*p)) * (5*sqr(h) - (gamma/(gamma-1)));
     double beta2 = ((1 + 6*h*(1/beta))/(2*sqr(h)*p));
-    tau_q = kappa*T*beta1;
-    tau_Pi = zeta*beta0;
-    tau_pi = 2*eta*beta2;
+    double tau_q = kappa*T*beta1;
+    double tau_Pi = zeta*beta0;
+    double tau_pi = 2*eta*beta2;
   }
 
   // D
@@ -598,11 +598,11 @@ void ISCE::primsToAll(double *cons, double *prims, double *aux)
   }
 
   double kappa = this->data->optionalSimArgs[0];
-  double tau_q = this->data->optionalSimArgs[1];
+  // double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
-  double tau_Pi = this->data->optionalSimArgs[3];
+  // double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
-  double tau_pi = this->data->optionalSimArgs[5];
+  // double tau_pi = this->data->optionalSimArgs[5];
   
   double dxT;
   double dyT;
