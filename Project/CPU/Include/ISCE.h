@@ -2,7 +2,8 @@
 #define ISCE_H
 
 #include "model.h"
-//#include <cmath>
+#include <cmath>
+#include <cstdlib>
 
 /*
 This is the human readable description of this models variables.
