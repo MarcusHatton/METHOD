@@ -15,6 +15,7 @@ ISCE::ISCE() : Model()
   this->Ncons = 5;
   this->Nprims = 16;
   this->Naux = 40;
+  this->Ntderivs = 15;
 }
 
 ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
@@ -22,6 +23,7 @@ ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 16;
   this->Naux = (this->data)->Naux = 40;
+  this->Ntderivs = (this->data)->Ntderivs = 15;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*data->Nx*data->Ny*data->Nz);
@@ -84,14 +86,14 @@ ISCE::ISCE(Data * data, bool alt_C2P=false) : Model(data)
   this->data->tderivLabels.push_back("dtW"); this->data->tderivLabels.push_back("dtv1");
   this->data->tderivLabels.push_back("dtv2");  this->data->tderivLabels.push_back("dtv3");
   // 5
-  this->data->auxLabels.push_back("dtq1NS");  this->data->auxLabels.push_back("dtq2NS");
-  this->data->auxLabels.push_back("dtq3NS");
+  this->data->tderivLabels.push_back("dtq1NS");  this->data->tderivLabels.push_back("dtq2NS");
+  this->data->tderivLabels.push_back("dtq3NS");
   // 8
-  this->data->auxLabels.push_back("dtPiNS");    
+  this->data->tderivLabels.push_back("dtPiNS");    
   // 9
-  this->data->auxLabels.push_back("dtpi11NS"); this->data->auxLabels.push_back("dtpi12NS");
-  this->data->auxLabels.push_back("dtpi13NS"); this->data->auxLabels.push_back("dtpi22NS");
-  this->data->auxLabels.push_back("dtpi23NS"); this->data->auxLabels.push_back("dtpi33NS");
+  this->data->tderivLabels.push_back("dtpi11NS"); this->data->tderivLabels.push_back("dtpi12NS");
+  this->data->tderivLabels.push_back("dtpi13NS"); this->data->tderivLabels.push_back("dtpi22NS");
+  this->data->tderivLabels.push_back("dtpi23NS"); this->data->tderivLabels.push_back("dtpi33NS");
 
 }
 

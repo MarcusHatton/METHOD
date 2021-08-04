@@ -2,7 +2,6 @@
 #define ISCE_H
 
 #include "model.h"
-#include "modelExtension.h"
 
 /*
 This is the human readable description of this models variables.
@@ -38,9 +37,9 @@ class ISCE : public Model
 
     int smartGuesses;     //!< Number of smart guess required
 
-    double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz    
+    double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
 
-    // bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
+    bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
 
     ISCE();     //!< Default constructor
 
