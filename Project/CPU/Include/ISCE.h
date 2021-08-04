@@ -2,7 +2,7 @@
 #define ISCE_H
 
 #include "model.h"
-//#include "modelExtension.h"
+#include "modelExtension.h"
 
 /*
 This is the human readable description of this models variables.
@@ -38,11 +38,9 @@ class ISCE : public Model
 
     int smartGuesses;     //!< Number of smart guess required
 
-    double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
+    double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz    
 
-    double * prev_vars;   //!< Store variable at previous time-step for time derivatives' calculations
-    
-    bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
+    // bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
 
     ISCE();     //!< Default constructor
 
@@ -176,6 +174,7 @@ class ISCE : public Model
 
       Data * d(this->data);
 
+      /*
       // Get timestep
       double dt=d->dt;
       //printf("dt: %.17g", dt);
@@ -207,6 +206,7 @@ class ISCE : public Model
           } // End k-loop
         } // End j-loop
       } // End i-loop
+      */
 
       };
 
@@ -265,7 +265,7 @@ class ISCE : public Model
   not enjoy anything it offers...
 
   @param *p void pointer to the additional arguments struct, Args
-  @param n size of system (n=2 for IS)
+  @param n size of system (n=1 for ISCE)
   @param *x pointer to array containing initial estimate of solution, will also hold solution
   @param *fvec pointer to array to hold residual values. These should be 0 +- tol
   @param iflag Cminpack error flag
@@ -274,13 +274,5 @@ class ISCE : public Model
   @sa [Original source](https://github.com/devernay/cminpack)
 */
 int ISCEresidual(void *p, int n, const double *x, double *fvec, int iflag);
-int ISCEalternativeResidual(void *p, int n, const double *x, double *fvec, int iflag);
-
-
-
-
-  
-
-
 
 #endif

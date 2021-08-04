@@ -22,7 +22,7 @@ DEIFY::DEIFY(Data * data, FluxMethod * fluxMethod) : ModelExtension(data), fluxM
   Fx = new double[d->Nx*d->Ny*d->Nz*5] ();
   Fy = new double[d->Nx*d->Ny*d->Nz*5] ();
   Fz = new double[d->Nx*d->Ny*d->Nz*5] ();
-  d->sourceExtension = new double[d->Nx*d->Ny*d->Nz*9] ();
+  d->sourceExtension = new double[d->Nx*d->Ny*d->Nz*5] ();
 }
 
 DEIFY::~DEIFY()

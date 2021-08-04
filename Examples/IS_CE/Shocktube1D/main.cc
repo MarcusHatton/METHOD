@@ -2,13 +2,14 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "IS.h"
+#include "ISCE.h"
 #include "boundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 #include "RKPlus.h"
 // #include "SSP2.h"
 #include "fluxVectorSplitting.h"
+#include "DEIFY.h"
 #include "serialEnv.h"
 #include "serialSaveDataHDF5.h"
 #include "weno.h"
@@ -22,9 +23,9 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(100);
-  int ny(3);
-  int nz(3);
+  int nx(20);
+  int ny(20);
+  int nz(20);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
@@ -64,11 +65,13 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, false);
+  ISCE model(&data, false);
 
   Weno3 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
+
+  DEIFY ModelExtension(&data, &fluxMethod);
 
   Outflow bcs(&data);
   // Periodic bcs(&data);
