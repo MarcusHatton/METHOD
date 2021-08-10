@@ -486,7 +486,17 @@ class IS_C2PStressTest : public InitialFunc
     virtual ~IS_C2PStressTest() { }     //!< Destructor
 };
 
+class ISCE_Shocktube_1D : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    ISCE_Shocktube_1D(Data * data, int dir);
 
+    virtual ~ISCE_Shocktube_1D() { }     //!< Destructor
+};
 
 
 #endif
