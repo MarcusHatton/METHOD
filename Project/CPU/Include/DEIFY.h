@@ -110,7 +110,7 @@ class DEIFY : public ModelExtension
       @param[out] *source pointer to source vector work array. Size is \f$N_{cons} \times N_x \times N_y \times N_z\f$
       @sa ModelExtension
     */
-    void sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source);
+    void sourceExtension(double * cons, double * prims, double * aux, double * source);
 
     //! Sets up variables including the electric field and charge density
     void set_vars(double * cons, double * prims, double * aux);
@@ -125,7 +125,7 @@ class DEIFY : public ModelExtension
     //{
     //! Set the time derivative of the state vector's NS contribution,
     //! purely in terms of spatial derivatives
-    void set_dtH(double * cons, double * prims, double * aux, double * tderivs);
+    void set_dtH(double * cons, double * prims, double * aux, double);
     //}
 
 };

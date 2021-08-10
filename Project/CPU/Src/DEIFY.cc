@@ -64,7 +64,7 @@ DEIFY::~DEIFY()
   delete[] d->sourceExtension;
 }
 
-void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source)
+void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double * source)
 {
   // Syntax
   Data * d(this->data);
@@ -133,6 +133,7 @@ void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, do
 void DEIFY::set_vars(double * cons, double * prims, double * aux)
 {
   Data * d(this->data);
+  double * tderivs = d->tderivs;
 
   double kappa = this->data->optionalSimArgs[0];
 //  double tau_q = this->data->optionalSimArgs[1];
@@ -252,7 +253,6 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // 33
         aux[ID(Aux::pi33NS, i, j, k)] = -2*eta*( 2*dzuz
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
-
 
         tderivs[ID(TDerivs::dtE, i, j, k)] = tderivs[ID(TDerivs::dtTau, i, j, k)] + tderivs[ID(TDerivs::dtD, i, j, k)];
 
