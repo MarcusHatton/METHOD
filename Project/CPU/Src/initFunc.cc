@@ -1409,7 +1409,7 @@ IS_C2PStressTest::IS_C2PStressTest(Data * data) : InitialFunc(data)
 
 }
 
-ISCE_Shocktube_1D::IS_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
+ISCE_Shocktube_1D::ISCE_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
