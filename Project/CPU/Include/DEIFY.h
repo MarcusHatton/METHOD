@@ -3,8 +3,6 @@
 
 #include "modelExtension.h"
 #include "flux.h"
-//#include "useful.h"
-//#include "ISCE.h"
 
 // enums to save looking up numbering of C/P/As when using ID accessor.
 enum Cons { D, S1, S2, S3, Tau };
@@ -13,8 +11,9 @@ enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
             q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
             q1LO, q2LO, q3LO, PiLO, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
             a1, a2, a3 };
-enum TDerivs { dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
-            dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS};
+enum TDerivs { dtp, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+            dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
+            dtTau, dtE};
 
 //! <b> DEIFY: // Dissipative Extension for Ideal Fluid dYnamics </b>
 /*!
@@ -111,10 +110,10 @@ class DEIFY : public ModelExtension
       @param[out] *source pointer to source vector work array. Size is \f$N_{cons} \times N_x \times N_y \times N_z\f$
       @sa ModelExtension
     */
-    void sourceExtension(double * cons, double * prims, double * aux, double * source);
+    void sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source, double * tderivs);
 
     //! Sets up variables including the electric field and charge density
-    void set_vars(double * cons, double * prims, double * aux);
+    void set_vars(double * cons, double * prims, double * aux, double * tderivs);
 
     //{
     //! Set the diffusion vectors
@@ -126,7 +125,7 @@ class DEIFY : public ModelExtension
     //{
     //! Set the time derivative of the state vector's NS contribution,
     //! purely in terms of spatial derivatives
-    void set_dtH(double * cons, double * prims, double * aux);
+    void set_dtH(double * cons, double * prims, double * aux, double * tderivs);
     //}
 
 };

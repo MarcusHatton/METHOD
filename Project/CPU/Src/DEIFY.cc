@@ -64,13 +64,13 @@ DEIFY::~DEIFY()
   delete[] d->sourceExtension;
 }
 
-void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double * source)
+void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source, double * tderivs)
 {
   // Syntax
   Data * d(this->data);
 
   // Set vars - dissipative NS forms
-  this->set_vars(cons, prims, aux);
+  this->set_vars(cons, prims, aux, tderivs);
 
   // MINUS SIGN HERE ON FLUXES?
   // SWAP RANGES TO USE E.G. JS_MINUS
@@ -116,7 +116,7 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
     }
   }
  
-  this->set_dtH(cons, prims, aux);
+  this->set_dtH(cons, prims, aux, tderivs);
   for (int var(0); var<5; var++) {
     for (int i(0); i<d->Nx; i++) {
       for (int j(0); j<d->Ny; j++) {
@@ -129,7 +129,7 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
 
 }
 
-void DEIFY::set_vars(double * cons, double * prims, double * aux)
+void DEIFY::set_vars(double * cons, double * prims, double * aux, double * tderivs)
 {
   // Syntax
   Data * d(this->data);
@@ -295,7 +295,7 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
 
 }
 
-void DEIFY::set_dtH(double * cons, double * prims, double * aux)
+void DEIFY::set_dtH(double * cons, double * prims, double * aux, double * tderivs)
 {
   for (int i(0); i<d->Nx; i++) {
     for (int j(0); j<d->Ny; j++) {

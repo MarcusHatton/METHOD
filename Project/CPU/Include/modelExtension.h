@@ -43,6 +43,7 @@ class ModelExtension
       @param[out] *source pointer to source vector work array. Size is \f$N_{cons} \times N_x \times N_y \times N_z\f$
     */
     virtual void sourceExtension(double * cons, double * prims, double * aux, double * source) { } ;
+    virtual void sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source, double * tderivs) { } ;
 
     //!< Modified source term
     /*!
