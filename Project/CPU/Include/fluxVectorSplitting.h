@@ -4,6 +4,8 @@
 #include "flux.h"
 #include "wenoUpwinds.h"
 #include "weno.h"
+#include "simData.h"
+#include "ISCE.h"
 
 //! <b> Flux vector splitting method </b>
 /*!

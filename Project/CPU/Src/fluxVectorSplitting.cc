@@ -108,7 +108,7 @@ void FVS::F(double * cons, double * prims, double * aux, double * f, double * fn
         for (int j(d->Ng); j < d->Ny-d->Ng; j++) {
           fnet[ID(var, i, j, 0)] = (fx[ID(var, i+1, j, 0)] / d->dx - fx[ID(var, i, j, 0)] / d->dx) +
                                    (fy[ID(var, i, j+1, 0)] / d->dy - fy[ID(var, i, j, 0)] / d->dy);
-        tderivs[ID(TDerivs::dtD+var, i, j, k)] = -fnet[ID(var, i, j, k)];
+        tderivs[ID(TDerivs::dtD+var, i, j, 0)] = -fnet[ID(var, i, j, 0)];
         }
       }
     }
@@ -126,7 +126,7 @@ void FVS::F(double * cons, double * prims, double * aux, double * f, double * fn
     for (int var(0); var < d->Ncons; var++) {
       for (int i(d->Ng); i < d->Nx-d->Ng; i++) {
         fnet[ID(var, i, 0, 0)] = (fx[ID(var, i+1, 0, 0)] / d->dx - fx[ID(var, i, 0, 0)] / d->dx);
-        tderivs[ID(TDerivs::dtD+var, i, j, k)] = -fnet[ID(var, i, j, k)];
+        tderivs[ID(TDerivs::dtD+var, i, 0, 0)] = -fnet[ID(var, i, 0, 0)];
       }
     }
     free(fx);
