@@ -73,7 +73,7 @@ Simulation::~Simulation()
   free(this->data->x);
   free(this->data->y);
   free(this->data->z);
-  free(this->data->tderivs)
+  free(this->data->tderivs);
 }
 
 

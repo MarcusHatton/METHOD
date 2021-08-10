@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(-0.1);
   double zmax(0.1);
-  double endTime(6.0);
-  double cfl(0.1);
+  double endTime(50.0);
+  double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(10);
+  int nreports(50);
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  1.0e-3, 5.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  ParallelSaveDataHDF5 save(&data, &env, "2d/cfl01/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/cfl04/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/cfl01/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/Shear/cfl04/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
