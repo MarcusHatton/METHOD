@@ -80,19 +80,26 @@ ISCE::ISCE(Data * data) : Model(data)
   this->data->auxLabels.push_back("a3");
 
   // 0
+  this->data->tderivLabels.push_back("dtp");  this->data->tderivLabels.push_back("dtrho");
   this->data->tderivLabels.push_back("dtn");
-  // 1
+
+
   this->data->tderivLabels.push_back("dtW"); this->data->tderivLabels.push_back("dtv1");
   this->data->tderivLabels.push_back("dtv2");  this->data->tderivLabels.push_back("dtv3");
-  // 5
+
   this->data->tderivLabels.push_back("dtq1NS");  this->data->tderivLabels.push_back("dtq2NS");
   this->data->tderivLabels.push_back("dtq3NS");
-  // 8
+
   this->data->tderivLabels.push_back("dtPiNS");    
-  // 9
+
   this->data->tderivLabels.push_back("dtpi11NS"); this->data->tderivLabels.push_back("dtpi12NS");
   this->data->tderivLabels.push_back("dtpi13NS"); this->data->tderivLabels.push_back("dtpi22NS");
   this->data->tderivLabels.push_back("dtpi23NS"); this->data->tderivLabels.push_back("dtpi33NS");
+
+  this->data->tderivLabels.push_back("dtD"); this->data->tderivLabels.push_back("dtS1");
+  this->data->tderivLabels.push_back("dtS2"); this->data->tderivLabels.push_back("dtS3");
+  this->data->tderivLabels.push_back("dtTau");  this->data->tderivLabels.push_back("dtE"); 
+ 
 
 }
 

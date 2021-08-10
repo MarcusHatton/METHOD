@@ -87,6 +87,8 @@ class DEIFY : public ModelExtension
 
     double *Fx, *Fy, *Fz;   //!< Diffusion vectors
 
+    double *dtH;
+    
     FluxMethod * fluxMethod;     //!< Pointer to the flux method class
 
     DEIFY();
@@ -115,10 +117,16 @@ class DEIFY : public ModelExtension
     void set_vars(double * cons, double * prims, double * aux);
 
     //{
-    //! Set the diffusion vector. Method assumes K and dwdsb are set
+    //! Set the diffusion vectors
     void set_Fx(double * cons, double * prims, double * aux);
     void set_Fy(double * cons, double * prims, double * aux);
     void set_Fz(double * cons, double * prims, double * aux);
+    //}
+
+    //{
+    //! Set the time derivative of the state vector's NS contribution,
+    //! purely in terms of spatial derivatives
+    void set_dtH(double * cons, double * prims, double * aux);
     //}
 
 };
