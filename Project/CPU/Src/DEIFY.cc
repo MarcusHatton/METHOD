@@ -64,13 +64,14 @@ DEIFY::~DEIFY()
   delete[] d->sourceExtension;
 }
 
-void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source, double * tderivs)
+void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, double * source)
 {
   // Syntax
   Data * d(this->data);
+  double * tderivs = d->tderivs;
 
   // Set vars - dissipative NS forms
-  this->set_vars(cons, prims, aux, tderivs);
+  this->set_vars(cons, prims, aux);
 
   // MINUS SIGN HERE ON FLUXES?
   // SWAP RANGES TO USE E.G. JS_MINUS
@@ -116,7 +117,7 @@ void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, do
     }
   }
  
-  this->set_dtH(cons, prims, aux, tderivs);
+  this->set_dtH(cons, prims, aux);
   for (int var(0); var<5; var++) {
     for (int i(0); i<d->Nx; i++) {
       for (int j(0); j<d->Ny; j++) {
@@ -129,9 +130,8 @@ void DEIFY::sourceExtensionDEIFY(double * cons, double * prims, double * aux, do
 
 }
 
-void DEIFY::set_vars(double * cons, double * prims, double * aux, double * tderivs)
+void DEIFY::set_vars(double * cons, double * prims, double * aux)
 {
-  // Syntax
   Data * d(this->data);
 
   double kappa = this->data->optionalSimArgs[0];
@@ -262,7 +262,7 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux, double * tderi
         tderivs[ID(TDerivs::dtv3, i, j, k)] = tderivs[ID(TDerivs::dtS3, i, j, k)]/((prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*sqr(aux[ID(Aux::W, i, j, k)]));
 
         tderivs[ID(TDerivs::dtW, i, j, k)] = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*(prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)]
-                                             prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)]);
+                                             + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)]);
 
         tderivs[ID(TDerivs::dtn, i, j, k)] = tderivs[ID(TDerivs::dtD, i, j, k)]/aux[ID(Aux::W, i, j, k)] 
                                              - (prims[ID(Prims::n, i, j, k)]/aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)];
@@ -295,20 +295,22 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux, double * tderi
 
 }
 
-void DEIFY::set_dtH(double * cons, double * prims, double * aux, double * tderivs)
+void DEIFY::set_dtH(double * cons, double * prims, double * aux)
 {
-  for (int i(0); i<d->Nx; i++) {
-    for (int j(0); j<d->Ny; j++) {
-      for (int k(0); k<d->Nz; k++) {
-        // Now can get the state vector NS correction
-        dtH[ID(0, i, j, k)] = 0;
-        dtH[ID(1, i, j, k)] = ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q1NS, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtv1, i, j, k)] + (aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*prims[ID(Prims::v1, i, j, k)] + tderivs[ID(TDerivs::dtq1NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtv1, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtpi11NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtpi12NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtpi13NS, i, j, k)];
-        dtH[ID(2, i, j, k)] = ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtv2, i, j, k)] + (aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*prims[ID(Prims::v2, i, j, k)] + tderivs[ID(TDerivs::dtq2NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtv2, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtpi12NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtpi22NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtpi23NS, i, j, k)];
-        dtH[ID(3, i, j, k)] = ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtv3, i, j, k)] + (aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*prims[ID(Prims::v3, i, j, k)] + tderivs[ID(TDerivs::dtq3NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtv3, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtpi13NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtpi23NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtpi33NS, i, j, k)];
-        dtH[ID(4, i, j, k)] = (sqr(aux[ID(Aux::W, i, j, k)]) - 1)*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + (2*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + 2*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + 2*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + (2*aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + 2*aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + 2*aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + 2*prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + 2*prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + 2*prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + tderivs[ID(TDerivs::dtpi11NS, i, j, k)] + tderivs[ID(TDerivs::dtpi22NS, i, j, k)] + tderivs[ID(TDerivs::dtpi33NS, i, j, k)];
+  Data * d(this->data);
+
+    for (int i(0); i<d->Nx; i++) {
+      for (int j(0); j<d->Ny; j++) {
+        for (int k(0); k<d->Nz; k++) {
+          // Now can get the state vector NS correction
+          dtH[ID(0, i, j, k)] = 0;
+          dtH[ID(1, i, j, k)] = ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q1NS, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtv1, i, j, k)] + (aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*prims[ID(Prims::v1, i, j, k)] + tderivs[ID(TDerivs::dtq1NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtv1, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtpi11NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtpi12NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtpi13NS, i, j, k)];
+          dtH[ID(2, i, j, k)] = ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtv2, i, j, k)] + (aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*prims[ID(Prims::v2, i, j, k)] + tderivs[ID(TDerivs::dtq2NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtv2, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtpi12NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtpi22NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtpi23NS, i, j, k)];
+          dtH[ID(3, i, j, k)] = ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + ((aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtv3, i, j, k)] + (aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*prims[ID(Prims::v3, i, j, k)] + tderivs[ID(TDerivs::dtq3NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*tderivs[ID(TDerivs::dtv3, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtpi13NS, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtpi23NS, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtpi33NS, i, j, k)];
+          dtH[ID(4, i, j, k)] = (sqr(aux[ID(Aux::W, i, j, k)]) - 1)*tderivs[ID(TDerivs::dtPiNS, i, j, k)] + (2*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + 2*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + 2*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*tderivs[ID(TDerivs::dtW, i, j, k)] + (2*aux[ID(Aux::q1NS, i, j, k)]*tderivs[ID(TDerivs::dtv1, i, j, k)] + 2*aux[ID(Aux::q2NS, i, j, k)]*tderivs[ID(TDerivs::dtv2, i, j, k)] + 2*aux[ID(Aux::q3NS, i, j, k)]*tderivs[ID(TDerivs::dtv3, i, j, k)] + 2*prims[ID(Prims::v1, i, j, k)]*tderivs[ID(TDerivs::dtq1NS, i, j, k)] + 2*prims[ID(Prims::v2, i, j, k)]*tderivs[ID(TDerivs::dtq2NS, i, j, k)] + 2*prims[ID(Prims::v3, i, j, k)]*tderivs[ID(TDerivs::dtq3NS, i, j, k)])*aux[ID(Aux::W, i, j, k)] + 2*aux[ID(Aux::PiNS, i, j, k)]*aux[ID(Aux::W, i, j, k)]*tderivs[ID(TDerivs::dtW, i, j, k)] + tderivs[ID(TDerivs::dtpi11NS, i, j, k)] + tderivs[ID(TDerivs::dtpi22NS, i, j, k)] + tderivs[ID(TDerivs::dtpi33NS, i, j, k)];
+        }
       }
     }
-  }
 
 }
 
