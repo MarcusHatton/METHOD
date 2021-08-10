@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  IS_Shocktube_1D init(&data, 0); //direction given by second arg (int)
+  ISCE_Shocktube_1D init(&data, 0); //direction given by second arg (int)
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
