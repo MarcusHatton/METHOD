@@ -113,7 +113,7 @@ class DEIFY : public ModelExtension
     void sourceExtension(double * cons, double * prims, double * aux, double * source);
 
     //! Sets up variables including the electric field and charge density
-    void set_vars(double * cons, double * prims, double * aux);
+    void set_vars(double * cons, double * prims, double * aux, double * tderivs);
 
     //{
     //! Set the diffusion vectors
@@ -125,7 +125,7 @@ class DEIFY : public ModelExtension
     //{
     //! Set the time derivative of the state vector's NS contribution,
     //! purely in terms of spatial derivatives
-    void set_dtH(double * cons, double * prims, double * aux, double);
+    void set_dtH(double * cons, double * prims, double * aux, double * tderivs);
     //}
 
 };
