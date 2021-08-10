@@ -61,9 +61,9 @@ class ISCE : public Model
                q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
                q1LO, q2LO, q3LO, PiLO, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
                a1, a2, a3 };
-    enum TDerivs { dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
-               dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS};
-
+    enum TDerivs { dtp, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+               dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
+               dtTau, dtE};
 
     int smartGuesses;     //!< Number of smart guess required
 
