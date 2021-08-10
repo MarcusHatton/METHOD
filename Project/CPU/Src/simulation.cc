@@ -28,7 +28,7 @@ Simulation::Simulation(Data * data, PlatformEnv *env) : data(data), env(env)
   d->x      = (double *) malloc(sizeof(double) * d->Nx);
   d->y      = (double *) malloc(sizeof(double) * d->Ny);
   d->z      = (double *) malloc(sizeof(double) * d->Nz);
-
+  d->tderivs = (double *) malloc(sizeof(double) * Ntot * d->Ntderivs);
   // Initialise the data
 
   d->dx = (d->xmax - d->xmin) / (d->nx);
@@ -73,6 +73,7 @@ Simulation::~Simulation()
   free(this->data->x);
   free(this->data->y);
   free(this->data->z);
+  free(this->data->tderivs)
 }
 
 
