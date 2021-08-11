@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(20);
-  int ny(20);
-  int nz(20);
+  int nx(100);
+  int ny(4);
+  int nz(4);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
