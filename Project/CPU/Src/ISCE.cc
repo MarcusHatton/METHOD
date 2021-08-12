@@ -437,21 +437,7 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
         prims[ID(Prims::v3, i, j, k)] = cons[ID(Cons::S3, i, j, k)]/(rho_plus_p*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);
         prims[ID(Prims::p, i, j, k)] = (rho_plus_p - prims[ID(Prims::n, i, j, k)])*((d->gamma-1)/d->gamma);
         prims[ID(Prims::rho, i, j, k)] = rho_plus_p - prims[ID(Prims::p, i, j, k)];
-
-        // Again, repeating this here once the correct values for v1,v2,v3 have been set...
-        aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
-                                + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
-        // aux[ID(Aux::pi00, i, j, k)] = prims[ID(Prims::pi11, i, j, k)] + prims[ID(Prims::pi22, i, j, k)] + prims[ID(Prims::pi33, i, j, k)]; // Should be unncessary here
-        aux[ID(Aux::pi01, i, j, k)] = prims[ID(Prims::pi11, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-                                  + prims[ID(Prims::pi12, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + prims[ID(Prims::pi13, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
-        aux[ID(Aux::pi02, i, j, k)] = prims[ID(Prims::pi12, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-                                  + prims[ID(Prims::pi22, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + prims[ID(Prims::pi23, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
-        aux[ID(Aux::pi03, i, j, k)] = prims[ID(Prims::pi13, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-                                  + prims[ID(Prims::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + prims[ID(Prims::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
-        
+       
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
 
@@ -476,9 +462,6 @@ void ISCE::primsToAll(double *cons, double *prims, double *aux)
                                   + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                   + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - aux[ID(Aux::vsqrd, i, j, k)] );
-        aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
-                               + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
-        aux[ID(Aux::pi00, i, j, k)] = prims[ID(Prims::pi11, i, j, k)] + prims[ID(Prims::pi22, i, j, k)] + prims[ID(Prims::pi33, i, j, k)];
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
         prims[ID(Prims::rho, i, j, k)] = prims[ID(Prims::n, i, j, k)]*(1+aux[ID(Aux::e, i, j, k)]);
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
