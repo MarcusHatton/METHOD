@@ -69,7 +69,7 @@ class Data
     memSet,                //!< Indicator that memory has been allocated for state vectors
     bcsSet,                //!< Indicator that boundary conditions have been created (before this information about the domain decomposition used in MPI version will not be correct).
     //@{
-    Ncons, Nprims, Naux, Ntderivs;   //!< Number of specified variables
+    Ncons, Nprims, Naux;   //!< Number of specified variables
     //@}
     double
     cp,                    //!< Constant divergence cleaning term
@@ -86,7 +86,7 @@ class Data
     gam;                   //!< Exponent in the functional conductivity
     double
     //@{
-    *cons, *prims, *aux, *tderivs,
+    *cons, *prims, *aux,
     *f, *fnet,             //!< Pointer to specified work array
     *source,
     *sourceExtension,
@@ -112,8 +112,7 @@ class Data
     //@{
     consLabels,
     primsLabels,           //!< Vector of labels for the specified variables
-    auxLabels,
-    tderivLabels;
+    auxLabels;
     //@}
     int
     dims,                  //!< Number of dimensions of simulation
