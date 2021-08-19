@@ -49,7 +49,7 @@ SRCS = simulation.cc \
 			 SSP2.cc \
 			 boundaryConds.cc \
 			 fluxVectorSplitting.cc \
-			 DEIFY.cc
+			 DEIFY.cc \
 
 SERIAL_SRCS = serialSaveData.cc \
 			  serialEnv.cc
