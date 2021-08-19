@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   // With really steep initial data there can be minor Gibbs oscillation
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
-  bool output(false);
+  bool output(true);
   int nreports(5);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
@@ -60,6 +60,7 @@ int main(int argc, char *argv[]) {
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
+  data_args.reportItersPeriod = 1;
 
   Data data(data_args, &env);
 
