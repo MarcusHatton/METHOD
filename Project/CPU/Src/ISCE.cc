@@ -7,22 +7,18 @@
 #include "cminpack.h"
 #include "wenoUpwinds.h"
 
-
-
 ISCE::ISCE() : Model()
 {
   this->Ncons = 5;
   this->Nprims = 16;
-  this->Naux = 35;
-  this->Ntderivs = 24;
+  this->Naux = 59;
 }
 
 ISCE::ISCE(Data * data) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 35;
-  this->Ntderivs = (this->data)->Ntderivs = 24;
+  this->Naux = (this->data)->Naux = 59;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*data->Nx*data->Ny*data->Nz);
@@ -79,27 +75,27 @@ ISCE::ISCE(Data * data) : Model(data)
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");
 
-  // 0
-  this->data->tderivLabels.push_back("dtp");  this->data->tderivLabels.push_back("dtrho");
-  this->data->tderivLabels.push_back("dtn");
-  // 3
-  this->data->tderivLabels.push_back("dtv1");
-  this->data->tderivLabels.push_back("dtv2");  this->data->tderivLabels.push_back("dtv3");
-  // 6
-  this->data->tderivLabels.push_back("dtW");   this->data->tderivLabels.push_back("dtT"); 
-  // 8
-  this->data->tderivLabels.push_back("dtq1NS");  this->data->tderivLabels.push_back("dtq2NS");
-  this->data->tderivLabels.push_back("dtq3NS");
-  // 11
-  this->data->tderivLabels.push_back("dtPiNS");    
-  // 12
-  this->data->tderivLabels.push_back("dtpi11NS"); this->data->tderivLabels.push_back("dtpi12NS");
-  this->data->tderivLabels.push_back("dtpi13NS"); this->data->tderivLabels.push_back("dtpi22NS");
-  this->data->tderivLabels.push_back("dtpi23NS"); this->data->tderivLabels.push_back("dtpi33NS");
-  // 18
-  this->data->tderivLabels.push_back("dtD"); this->data->tderivLabels.push_back("dtS1");
-  this->data->tderivLabels.push_back("dtS2"); this->data->tderivLabels.push_back("dtS3");
-  this->data->tderivLabels.push_back("dtTau");  this->data->tderivLabels.push_back("dtE"); 
+  // 35
+  this->data->auxLabels.push_back("dtp");  this->data->auxLabels.push_back("dtrho");
+  this->data->auxLabels.push_back("dtn");
+  // 38
+  this->data->auxLabels.push_back("dtv1");
+  this->data->auxLabels.push_back("dtv2");  this->data->auxLabels.push_back("dtv3");
+  // 41
+  this->data->auxLabels.push_back("dtW");   this->data->auxLabels.push_back("dtT"); 
+  // 43
+  this->data->auxLabels.push_back("dtq1NS");  this->data->auxLabels.push_back("dtq2NS");
+  this->data->auxLabels.push_back("dtq3NS");
+  // 46
+  this->data->auxLabels.push_back("dtPiNS");    
+  // 47
+  this->data->auxLabels.push_back("dtpi11NS"); this->data->auxLabels.push_back("dtpi12NS");
+  this->data->auxLabels.push_back("dtpi13NS"); this->data->auxLabels.push_back("dtpi22NS");
+  this->data->auxLabels.push_back("dtpi23NS"); this->data->auxLabels.push_back("dtpi33NS");
+  // 53
+  this->data->auxLabels.push_back("dtD"); this->data->auxLabels.push_back("dtS1");
+  this->data->auxLabels.push_back("dtS2"); this->data->auxLabels.push_back("dtS3");
+  this->data->auxLabels.push_back("dtTau");  this->data->auxLabels.push_back("dtE"); 
  
 
 }

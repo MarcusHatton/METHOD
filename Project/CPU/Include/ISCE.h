@@ -9,17 +9,18 @@
 /*
 This is the human readable description of this models variables.
 
-  IS has 15 conserved variables:
-    D, Sx, Sy, Sz, tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33
+  ISCE has 5 conserved variables:
+    D, S1, S2, S3, tau
   16 primitive variables:
     v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
-  30 auxiliary variables:
+  59 auxiliary variables:
     h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
     q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
     pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  a1, a2, a3
-  15 time derivatives:
-    dtn, dtW, dtv1, dtv2, dtv3, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
-    dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS
+    Including 24 time-derivatives:
+    dtp = 35, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+    dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
+    dtTau, dtE
 
 */
 
@@ -60,7 +61,7 @@ class ISCE : public Model
                q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
                q1LO, q2LO, q3LO, PiLO, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
                a1, a2, a3 };
-    enum TDerivs { dtp, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
+    enum TDerivs { dtp = 35, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
                dtTau, dtE};
 
@@ -208,16 +209,16 @@ class ISCE : public Model
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
             
-            tderivs[ID(TDerivs::dtn, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
+            aux[ID(TDerivs::dtn, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
             // dW/dt \equiv du0/dt
-            tderivs[ID(TDerivs::dtW, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
+            aux[ID(TDerivs::dtW, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
             // Velocities
             for (int count(0); count < 3; count++) {
-              tderivs[ID(TDerivs::dtv1+count, i, j, k)] = (prims[ID(Prims::v1+count, i, j, k)] - prev_vars[ID(2+count, i, j, k)])/dt;
+              aux[ID(TDerivs::dtv1+count, i, j, k)] = (prims[ID(Prims::v1+count, i, j, k)] - prev_vars[ID(2+count, i, j, k)])/dt;
             }
             // Dissipative NS terms
             for (int count(0); count < 10; count++) {
-              tderivs[ID(TDerivs::dtq1+count, i, j, k)] = (aux[ID(Aux::q1NS+count, i, j, k)] - prev_vars[ID(5+count, i, j, k)])/dt;
+              aux[ID(TDerivs::dtq1+count, i, j, k)] = (aux[ID(Aux::q1NS+count, i, j, k)] - prev_vars[ID(5+count, i, j, k)])/dt;
             }
             // Update previous values
             prev_vars[ID(0, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
