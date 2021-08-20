@@ -319,8 +319,8 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
         if (info!=1) {
           printf("%i info\n",info);
           printf("(%i, %i, %i) failed\n", i, j, k);
-          printf("(%g, %g, %g, %g) res\n", res[0]);
-          printf("(%g, %g, %g, %g) sol\n", sol[0]);
+          printf("(%g) res\n", res[0]);
+          printf("(%g) sol\n", sol[0]);
           std::cout << "Prims ";
           for (int prim_count(0); prim_count < d->Nprims; prim_count++) {
             std::cout << d->prims[ID(prim_count, i, j, k)] << " ";
