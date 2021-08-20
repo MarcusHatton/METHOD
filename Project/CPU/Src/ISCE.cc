@@ -251,6 +251,7 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
         
   aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
   aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
+  aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
    
 }
 
@@ -431,6 +432,7 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
        
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
+        aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
 
       } // End k-loop
     } // End j-loop
