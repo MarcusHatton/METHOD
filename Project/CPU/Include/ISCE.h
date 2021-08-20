@@ -199,41 +199,8 @@ class ISCE : public Model
       //printf("final_step: %d", final_step);
       if (!final_step) return;
 
-      /*
-      Data * d(this->data);
+      
 
-      // Get timestep
-      double dt=d->dt;
-      //printf("dt: %.17g", dt);
-      for (int i(d->is); i < d->ie; i++) {
-        for (int j(d->js); j < d->je; j++) {
-          for (int k(d->ks); k < d->ke; k++) {
-            
-            aux[ID(TDerivs::dtn, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
-            // dW/dt \equiv du0/dt
-            aux[ID(TDerivs::dtW, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
-            // Velocities
-            for (int count(0); count < 3; count++) {
-              aux[ID(TDerivs::dtv1+count, i, j, k)] = (prims[ID(Prims::v1+count, i, j, k)] - prev_vars[ID(2+count, i, j, k)])/dt;
-            }
-            // Dissipative NS terms
-            for (int count(0); count < 10; count++) {
-              aux[ID(TDerivs::dtq1+count, i, j, k)] = (aux[ID(Aux::q1NS+count, i, j, k)] - prev_vars[ID(5+count, i, j, k)])/dt;
-            }
-            // Update previous values
-            prev_vars[ID(0, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
-            prev_vars[ID(1, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
-            for (int count(0); count < 3; count++) {
-              prev_vars[ID(count+2, i, j, k)] = prims[ID(Prims::v1+count, i, j, k)]; 
-            }
-            for (int count(0); count < 10; count++) {
-              prev_vars[ID(count+5, i, j, k)] = aux[ID(Aux::q1NS+count, i, j, k)];
-            }            
-
-          } // End k-loop
-        } // End j-loop
-      } // End i-loop
-      */
 
       };
 

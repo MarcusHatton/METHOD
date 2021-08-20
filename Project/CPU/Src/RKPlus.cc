@@ -63,11 +63,6 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
   // Syntax
   Data * d(this->data);
 
-  // New ones for time differential calcs
-//  orig_cons  = new double[d->Ntot * d->Ncons](); // can be shortened to the number we need
-//  orig_prims = new double[d->Ntot * d->Ncons]();
-//  orig_aux   = new double[d->Ntot](); // only 1 needed for now
-
   u1cons  = new double[d->Ntot * d->Ncons]();
   u1prims = new double[d->Ntot * d->Nprims]();
   u1aux   = new double[d->Ntot * d->Naux]();
@@ -78,10 +73,6 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
 RK2B::~RK2B()
 {
   // Free arrays
-//  delete orig_cons;
-//  delete orig_prims;
-//  delete orig_aux; 
-  
   delete u1cons;
   delete u1prims;
   delete u1aux;
@@ -151,34 +142,29 @@ void RK2B::step(double * cons, double * prims, double * aux, double dt)
   // Get timestep
   if (dt <= 0) (dt=data->dt);
 
-/*  No longer needed - time deriv calcs moved to model
-  Data * d(this->data);
-
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        // W
-        orig_aux[ID(0, i, j, k)] = aux[ID(3, i, j, k)];
-      } // End k-loop
-    } // End j-loop
-  } // End i-loop
-*/
   stage1(cons, prims, aux, dt);
   finalise(u1cons, u1prims, u1aux);
 
   stage2(cons, prims, aux, dt);
   finalise(cons, prims, aux, true);
 
-/*
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        // dW/dt \equiv du0/dt
-        aux[ID(28, i, j, k)] = (aux[ID(3, i, j, k)] - orig_aux[ID(0, i, j, k)])/dt;
-      } // End k-loop
-    } // End j-loop
-  } // End i-loop
-*/
+  // Syntax
+  Data * d(this->data);
+  
+  // If there is a subgrid model, add that contribution
+  if (modelExtension != NULL && modelExtension->sourceExists) {
+    modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
+
+    for (int var(0); var < d->Ncons; var++) {
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {
+            d->source[ID(var, i, j, k)] += d->sourceExtension[ID(var, i, j, k)];
+          }
+        }
+      }
+    }
+  }
 
 }
 
