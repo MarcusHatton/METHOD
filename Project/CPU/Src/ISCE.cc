@@ -107,11 +107,6 @@ ISCE::~ISCE()
 
 void ISCE::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
-  // printf("ToyQ model does not implement sourceTermSingleCell\n");
-  // exit(1);
-
-  Data * d(this->data);
-
   // D
   source[0] = 0.0;
   // S1,2,3
