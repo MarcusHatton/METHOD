@@ -77,8 +77,8 @@ int main(int argc, char *argv[]) {
 
   DEIFY ModelExtension(&data, &fluxMethod);
 
-  ParallelOutflow bcs(&data, &env);
-//  ParallelPeriodic bcs(&data, &env);
+//  ParallelOutflow bcs(&data, &env);
+  ParallelPeriodic bcs(&data, &env);
 
   Simulation sim(&data, &env);
 
