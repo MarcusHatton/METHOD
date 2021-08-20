@@ -199,9 +199,6 @@ class ISCE : public Model
       //printf("final_step: %d", final_step);
       if (!final_step) return;
 
-      
-
-
       };
 
     //! <b> Additional arguments for the IS residual function </b>

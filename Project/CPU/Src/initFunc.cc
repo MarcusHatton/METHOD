@@ -1330,7 +1330,7 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : I
           d->prims[ID(1, i, j, k)] = - A0 * vShear * sin(2*PI*d->x[i]) * (exp(-pow((d->y[j] + 0.5), 2)/(sig*sig)));
         }
 
-        // If we have electric fields, set to the ideal values
+        // Set all the dissipative variables to zero
         for (int nvar(0); nvar < 10; nvar++) {
           d->prims[ID(6+nvar, i, j, k)] = 0;
         }

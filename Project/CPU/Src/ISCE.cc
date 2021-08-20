@@ -319,8 +319,8 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
         if (info!=1) {
           printf("%i info\n",info);
           printf("(%i, %i, %i) failed\n", i, j, k);
-          printf("(%g, %g, %g, %g) res\n", res[0], res[1], res[2], res[3]);
-          printf("(%g, %g, %g, %g) sol\n", sol[0], sol[1], sol[2], sol[3]);
+          printf("(%g, %g, %g, %g) res\n", res[0]);
+          printf("(%g, %g, %g, %g) sol\n", sol[0]);
           std::cout << "Prims ";
           for (int prim_count(0); prim_count < d->Nprims; prim_count++) {
             std::cout << d->prims[ID(prim_count, i, j, k)] << " ";
@@ -344,7 +344,7 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
           fails.push_back(fail);
         }
         else {
-          // Now have the correct values for Chi, Sigma123
+          // Now have the correct value for p
           solution[ID(0, i, j, k)] = sol[0];
         }      
       
