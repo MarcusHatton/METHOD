@@ -54,14 +54,14 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int nreports(10);
 
-  ParallelEnv env(&argc, &argv, 8, 5, 1);
+  ParallelEnv env(&argc, &argv, 1, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  5.0e-3, 5.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -89,7 +89,8 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
 
   ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/cfl04/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
