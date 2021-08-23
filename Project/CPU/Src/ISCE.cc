@@ -324,12 +324,12 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
           printf("(%g) sol\n", sol[0]);
           std::cout << "Prims ";
           for (int prim_count(0); prim_count < d->Nprims; prim_count++) {
-            std::cout << prim_count << " : " <<d->prims[ID(prim_count, i, j, k)] << ", ";
+            std::cout << prim_count << " : " << d->prims[ID(prim_count, i, j, k)] << ", ";
           }
           std::cout << std::endl;
           std::cout << "Cons  ";
           for (int con_count(0); con_count < d->Ncons; con_count++) {
-            std::cout << con_count << " : " <<d->cons[ID(con_count, i, j, k)] << ", ";
+            std::cout << con_count << " : " << d->cons[ID(con_count, i, j, k)] << ", ";
           }
           std::cout << std::endl;
           std::cout << "Aux   ";

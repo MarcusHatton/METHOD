@@ -46,8 +46,13 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
   // Set vars - dissipative NS forms
   this->set_vars(cons, prims, aux);
 
-  // MINUS SIGN HERE ON FLUXES?
   // SWAP RANGES TO USE E.G. JS_MINUS
+
+/*
+      for (int i(is_minus); i<ie_plus; i++) {
+        for (int j(js_minus); j<je_plus; j++) {
+          for (int k(ks_minus);k<ke_plus; k++) {
+*/
 
   // Get fa, determine its gradient and add to source
   {
@@ -129,10 +134,15 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   double dzux;
   double dzuy;
 
-  // q_j,NS 10
+/*
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
       for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
+*/
+
+  for (int i(d->Ng); i < d->Nx-d->Ng; i++) {
+    for (int j(d->Ng); j < d->Ny-d->Ng; j++) {
+      for (int k(d->Ng); k < d->Nz-d->Ng; k++) {
 
         /*
 
