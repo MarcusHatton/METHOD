@@ -1288,7 +1288,7 @@ IS_Shocktube_1D::IS_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
 
 }
 
-ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : InitialFunc(data)
+ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1305,18 +1305,11 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : I
   double rho0(0.55);
   double rho1(0.45);
 
-  double B0{0.1};
-
-  mag = false;
-
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
 
         d->prims[ID(3, i, j, k)] = 1.0;
-
-        // Magnetic Fields
-        if (mag) d->prims[ID(7, i, j, k)] = B0;
 
         if (d->y[j] > 0) {
           d->prims[ID(5, i, j, k)] = rho0 + rho1 * tanh((d->y[j] - 0.5)/a);

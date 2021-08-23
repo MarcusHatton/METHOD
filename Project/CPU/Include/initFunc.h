@@ -457,7 +457,7 @@ class ISKHInstabilitySingleFluid : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    ISKHInstabilitySingleFluid(Data * data, int mag);
+    ISKHInstabilitySingleFluid(Data * data);
 
     virtual ~ISKHInstabilitySingleFluid() { }     //!< Destructor
 };
