@@ -147,9 +147,6 @@ void RK2B::step(double * cons, double * prims, double * aux, double dt)
 
   stage2(cons, prims, aux, dt);
   finalise(cons, prims, aux, true);
-
-  // Syntax
-  Data * d(this->data);
   
 }
 
