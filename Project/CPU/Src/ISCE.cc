@@ -324,17 +324,17 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
           printf("(%g) sol\n", sol[0]);
           std::cout << "Prims ";
           for (int prim_count(0); prim_count < d->Nprims; prim_count++) {
-            std::cout << d->prims[ID(prim_count, i, j, k)] << " ";
+            std::cout << prim_count << " : " <<d->prims[ID(prim_count, i, j, k)] << ", ";
           }
           std::cout << std::endl;
           std::cout << "Cons  ";
           for (int con_count(0); con_count < d->Ncons; con_count++) {
-            std::cout << d->cons[ID(con_count, i, j, k)] << " ";
+            std::cout << con_count << " : " <<d->cons[ID(con_count, i, j, k)] << ", ";
           }
           std::cout << std::endl;
           std::cout << "Aux   ";
           for (int aux_count(0); aux_count < d->Naux; aux_count++) {
-            std::cout << d->aux[ID(aux_count, i, j, k)] << " ";
+            std::cout << aux_count << " : " << d->aux[ID(aux_count, i, j, k)] << ", ";
           }
           std::cout << std::endl;
           //printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], prims[ID(Prims::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], prims[ID(Prims::q1, i, j, k)]);
