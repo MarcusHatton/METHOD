@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 
 //  IS_Shocktube_1D init(&data);
   // Blob2dToyQ init(&data);
-  ISKHInstabilitySingleFluid init(&data, 1); // number is for magnetic field
+  ISKHInstabilitySingleFluid init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
