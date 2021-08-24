@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
   SerialSaveDataHDF5 save(&data, &env, "test/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
