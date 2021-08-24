@@ -1276,8 +1276,8 @@ IS_Shocktube_1D::IS_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
           d->prims[ID(1, i, j, k)] = -0.2;
         }
 
-        d->prims[ID(0, i, j, k)] = 0;
-        d->prims[ID(2, i, j, k)] = 0;
+        d->prims[ID(0, i, j, k)] = 1e-15;
+        d->prims[ID(2, i, j, k)] = 1e-15;
         for (int ndissvar(0); ndissvar < 10; ndissvar++) {
           d->prims[ID(6+ndissvar, i, j, k)] = 0;
         }
