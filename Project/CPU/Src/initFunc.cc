@@ -1435,8 +1435,8 @@ ISCE_Shocktube_1D::ISCE_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
           d->prims[ID(1, i, j, k)] = -0.2;
         }
 
-        d->prims[ID(0, i, j, k)] = 1e-15;
-        d->prims[ID(2, i, j, k)] = 1e-15;
+        d->prims[ID(0, i, j, k)] = 0;
+        d->prims[ID(2, i, j, k)] = 0;
       }
     }
   }
