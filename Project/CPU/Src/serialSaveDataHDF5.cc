@@ -261,6 +261,7 @@ void SerialSaveDataHDF5::saveConsts()
   H5LTset_attribute_int(group, ".", "nOptionalSimArgs", &d->nOptionalSimArgs, 1);
   for(int i(0); i < d->nOptionalSimArgs; i++) {
     string name = d->optionalSimArgNames[i];
+    std::cout << name << std::endl;
     double arg = d->optionalSimArgs[i];
     H5LTset_attribute_double(group, ".", name.c_str(), &arg, 1);
   }
