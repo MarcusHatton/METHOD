@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
   // int nx(65536);
   // int nx(32768);
   int nx(100);
-  int ny(8);
-  int nz(8);
+  int ny(4);
+  int nz(4);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 5.0e-2,  1.0e-15, 5.0e-2,  1.0e-15, 5.0e-2} };
+  const std::vector<double> toy_params           { {1.0e-15, 5.0e-2,  1.0e-15, 5.0e-2,  1.0e-2, 5.0e-2} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  ISCE_Shocktube_1D init(&data, 0); //direction given by second arg (int)
+  ISCE_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
