@@ -317,7 +317,7 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
         //                                  tol, maxfev, ml, mu, epsfcn, &diag[0], mode, factor, nprint, &nfev, &fjac[0][0], ldfjac, &r[0], lr, &qtf[0], &wa1[0], &wa2[0], &wa3[0], &wa4[0]);                                  
 
         // If root find fails, add failed cell to the list
-        if (info!=1 || (i==4 && j==4 && k==5)) {
+        if (info!=1) { // || (i==4 && j==4 && k==5)) {
           printf("%i info\n",info);
           printf("(%i, %i, %i) failed\n", i, j, k);
           printf("(%g) res\n", res[0]);
