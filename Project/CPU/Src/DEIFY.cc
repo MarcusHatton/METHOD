@@ -240,8 +240,8 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
 
         // Write out time-derivative forms for primitives and dissNS variables in terms of spatial calcs
         aux[ID(TDerivs::dtv1, i, j, k)] = -prims[ID(Prims::v1, i, j, k)]*aux[ID(TDerivs::dtE, i, j, k)]/(prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)]) +  aux[ID(TDerivs::dtS1, i, j, k)]/((prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*sqr(aux[ID(Aux::W, i, j, k)]));
-        aux[ID(TDerivs::dtv2, i, j, k)] = -prims[ID(Prims::v2, i, j, k)]*aux[ID(TDerivs::dtE, i, j, k)]/(prims[ID(Prims::p, i, j, k)] + aux[ID(TDerivs::dtS2, i, j, k)]/((prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*sqr(aux[ID(Aux::W, i, j, k)]));
-        aux[ID(TDerivs::dtv3, i, j, k)] = -prims[ID(Prims::v3, i, j, k)]*aux[ID(TDerivs::dtE, i, j, k)]/(prims[ID(Prims::p, i, j, k)] + aux[ID(TDerivs::dtS3, i, j, k)]/((prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*sqr(aux[ID(Aux::W, i, j, k)]));
+        aux[ID(TDerivs::dtv2, i, j, k)] = -prims[ID(Prims::v2, i, j, k)]*aux[ID(TDerivs::dtE, i, j, k)]/(prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)]) + aux[ID(TDerivs::dtS2, i, j, k)]/((prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*sqr(aux[ID(Aux::W, i, j, k)]));
+        aux[ID(TDerivs::dtv3, i, j, k)] = -prims[ID(Prims::v3, i, j, k)]*aux[ID(TDerivs::dtE, i, j, k)]/(prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)]) + aux[ID(TDerivs::dtS3, i, j, k)]/((prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*sqr(aux[ID(Aux::W, i, j, k)]));
 
         aux[ID(TDerivs::dtW, i, j, k)] = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*(prims[ID(Prims::v1, i, j, k)]*aux[ID(TDerivs::dtv1, i, j, k)]
                                              + prims[ID(Prims::v2, i, j, k)]*aux[ID(TDerivs::dtv2, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*aux[ID(TDerivs::dtv3, i, j, k)]);
