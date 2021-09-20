@@ -2,8 +2,8 @@
 # and links for main.cc
 
 # Compiler
-CC = mpic++
-##CC = g++
+#CC = mpic++
+CC = g++
 
 USE_MPI = 0
 USE_OMP = 0
@@ -48,7 +48,7 @@ SRCS = simulation.cc \
 			 IMEX2Args.cc \
 			 SSP2.cc \
 			 boundaryConds.cc \
-			 fluxVectorSplitting.cc \
+			 fluxVectorSplitting.cc
 
 SERIAL_SRCS = serialSaveData.cc \
 			  serialEnv.cc
