@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, false);
+  IS model(&data, true); // bool for alt_C2P
 
   Weno3 weno(&data);
 
