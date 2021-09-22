@@ -84,8 +84,6 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
     }
   }
 
-}
- 
   this->set_dtH(cons, prims, aux);
   for (int var(0); var<5; var++) {
     for (int i(d->is); i < d->ie; i++) {
