@@ -44,8 +44,12 @@ void RKPlus::rhs(double * cons, double * prims, double * aux, double * rhsVec)
       for (int j(d->js); j < d->je; j++) {
         for (int k(d->ks); k < d->ke; k++) {
           rhsVec[ID(var, i, j, k)] = d->source[ID(var, i, j, k)] - fluxCont[ID(var, i, j, k)];
-          std::cout << "(i, j, k):" << "(" << i << ", " << j << ", " << k << ") " << std::endl;
-          std::cout << "  Source: " << d->source[ID(var, i, j, k)] << "  Flux: " << fluxCont[ID(var, i, j, k)] << std::endl;
+
+          printf("(%i, %i, %i) \n", i, j, k);
+          printf("(%g, %g) Source, Flux\n", d->source[ID(var, i, j, k)], fluxCont[ID(var, i, j, k)]);
+
+          //std::cout << "(i, j, k):" << "(" << i << ", " << j << ", " << k << ") " << std::endl;
+          //std::cout << "  Source: " << d->source[ID(var, i, j, k)] << "  Flux: " << fluxCont[ID(var, i, j, k)] << std::endl;
         }
       }
     }
