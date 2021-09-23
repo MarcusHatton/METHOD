@@ -25,7 +25,7 @@ void RKPlus::rhs(double * cons, double * prims, double * aux, double * rhsVec)
 
   // If there is a subgrid model, add that contribution
   if (modelExtension != NULL && modelExtension->sourceExists) {
-    printf("modelExtension running...");
+    //printf("modelExtension running...");
     modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
 
     for (int var(0); var < d->Ncons; var++) {
@@ -46,12 +46,10 @@ void RKPlus::rhs(double * cons, double * prims, double * aux, double * rhsVec)
         for (int k(d->ks); k < d->ke; k++) {
           rhsVec[ID(var, i, j, k)] = d->source[ID(var, i, j, k)] - fluxCont[ID(var, i, j, k)];
           
-          if (d->source[ID(var, i, j, k)] != 0) {
-            printf("(%i, %i, %i) \n", i, j, k);
-            printf("(%g, %g) Source, Flux\n", d->source[ID(var, i, j, k)], fluxCont[ID(var, i, j, k)]);
-          }
-          //std::cout << "(i, j, k):" << "(" << i << ", " << j << ", " << k << ") " << std::endl;
-          //std::cout << "  Source: " << d->source[ID(var, i, j, k)] << "  Flux: " << fluxCont[ID(var, i, j, k)] << std::endl;
+          //if (d->source[ID(var, i, j, k)] != 0) {
+            //printf("(%i, %i, %i) \n", i, j, k);
+            //printf("(%g, %g) Source, Flux\n", d->source[ID(var, i, j, k)], fluxCont[ID(var, i, j, k)]);
+          //}
         }
       }
     }
