@@ -1300,9 +1300,9 @@ IS_Shocktube_1D_Para::IS_Shocktube_1D_Para(Data * data) : InitialFunc(data)
   if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
   
   // Limit checking
-  if ((d->xmin != 0.0 || d->xmax != 1.0) && dir==0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
-  if ((d->ymin != 0.0 || d->ymax != 1.0) && dir==1) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
-  if ((d->zmin != 0.0 || d->zmax != 1.0) && dir==2) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+  if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
 
   for (int i(0); i<d->Nx; i++) {
     for (int j(0); j<d->Ny; j++) {
