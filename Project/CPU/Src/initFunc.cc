@@ -1248,7 +1248,7 @@ enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS,
            pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
            dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
 
-IS_Shocktube_1D::IS_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
+IS_Shocktube_1D_Perp::IS_Shocktube_1D_Perp(Data * data, int dir) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1287,6 +1287,40 @@ IS_Shocktube_1D::IS_Shocktube_1D(Data * data, int dir) : InitialFunc(data)
           d->prims[ID(q1+ndissvar, i, j, k)] = 0;
         }
 
+      }
+    }
+  }
+
+}
+
+IS_Shocktube_1D_Para::IS_Shocktube_1D_Para(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  if ((d->xmin != 0.0 || d->xmax != 1.0) && dir==0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  if ((d->ymin != 0.0 || d->ymax != 1.0) && dir==1) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  if ((d->zmin != 0.0 || d->zmax != 1.0) && dir==2) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        if (d->x[i] < 0.5 ) {
+          d->prims[ID(p, i, j, k)] = 10;
+          d->prims[ID(n, i, j, k)] = 10;
+          d->prims[ID(v1, i, j, k)] = 0.2;
+        } else {
+          d->prims[ID(p, i, j, k)] = 1.0;
+          d->prims[ID(n, i, j, k)] = 1.0;
+          d->prims[ID(v1, i, j, k)] = -0.2;
+        }
+        d->prims[ID(v2, i, j, k)] = 0;
+        d->prims[ID(v3, i, j, k)] = 0;
+        for (int ndissvar(0); ndissvar < 10; ndissvar++) {
+          d->prims[ID(q1+ndissvar, i, j, k)] = 0;
+        }
       }
     }
   }
