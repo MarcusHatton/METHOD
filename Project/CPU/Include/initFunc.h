@@ -438,16 +438,28 @@ class Blob2dToyQ_CE : public InitialFunc
     virtual ~Blob2dToyQ_CE() { }     //!< Destructor
 };
 
-class IS_Shocktube_1D : public InitialFunc
+class IS_Shocktube_1D_Perp : public InitialFunc
 {
   public:
     /*! Constructor
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    IS_Shocktube_1D(Data * data, int dir);
+    IS_Shocktube_1D_Perp(Data * data, int dir);
 
-    virtual ~IS_Shocktube_1D() { }     //!< Destructor
+    virtual ~IS_Shocktube_1D_Perp() { }     //!< Destructor
+};
+
+class IS_Shocktube_1D_Para : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    IS_Shocktube_1D_Para(Data * data);
+
+    virtual ~IS_Shocktube_1D_Para() { }     //!< Destructor
 };
 
 class ISKHInstabilitySingleFluid : public InitialFunc
