@@ -457,7 +457,7 @@ class IS_Shocktube_1D_Para : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    IS_Shocktube_1D_Para(Data * data);
+    IS_Shocktube_1D_Para(Data * data, int dir);
 
     virtual ~IS_Shocktube_1D_Para() { }     //!< Destructor
 };
