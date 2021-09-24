@@ -1479,14 +1479,14 @@ ISCE_Shocktube_1D_Para::ISCE_Shocktube_1D_Para(Data * data, int dir) : InitialFu
             d->prims[ID(3, i, j, k)] = 10;
             d->prims[ID(5, i, j, k)] = 10;
             d->prims[ID(1, i, j, k)] = 0.2;
-            d->prims[ID(2, i, j, k)] = 1e-15;
-            d->prims[ID(0, i, j, k)] = 1e-15;
+            d->prims[ID(2, i, j, k)] = 0;
+            d->prims[ID(0, i, j, k)] = 0;
           } else {
             d->prims[ID(3, i, j, k)] = 1.0;
             d->prims[ID(5, i, j, k)] = 1.0;
             d->prims[ID(1, i, j, k)] = -0.2;
-            d->prims[ID(2, i, j, k)] = 1e-15;  
-            d->prims[ID(0, i, j, k)] = 1e-15;  
+            d->prims[ID(2, i, j, k)] = 0;  
+            d->prims[ID(0, i, j, k)] = 0;  
           }
         }
 
@@ -1495,14 +1495,14 @@ ISCE_Shocktube_1D_Para::ISCE_Shocktube_1D_Para(Data * data, int dir) : InitialFu
             d->prims[ID(3, i, j, k)] = 10;
             d->prims[ID(5, i, j, k)] = 10;
             d->prims[ID(2, i, j, k)] = 0.2;
-            d->prims[ID(0, i, j, k)] = 1e-15;
-            d->prims[ID(1, i, j, k)] = 1e-15;
+            d->prims[ID(0, i, j, k)] = 0;
+            d->prims[ID(1, i, j, k)] = 0;
           } else {
             d->prims[ID(3, i, j, k)] = 1.0;
             d->prims[ID(5, i, j, k)] = 1.0;
             d->prims[ID(2, i, j, k)] = -0.2;
-            d->prims[ID(0, i, j, k)] = 1e-15;  
-            d->prims[ID(1, i, j, k)] = 1e-15;  
+            d->prims[ID(0, i, j, k)] = 0;  
+            d->prims[ID(1, i, j, k)] = 0;  
           }
         }
 
