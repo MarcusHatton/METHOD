@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(2000);
+  int nx(4000);
   int ny(0);
   int nz(0);
   double xmin(0.0);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   double zmin(0.0);
   double zmax(1.0);
   double endTime(0.4);
-  double cfl(0.4);
+  double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int nreports(5);
 
-  SerialEnv env(&argc, &argv, 1, 1, 1);
+  SerialEnv env(&argc, &argv, 8, 5, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
