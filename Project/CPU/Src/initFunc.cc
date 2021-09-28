@@ -1484,7 +1484,75 @@ IS_C2PStressTest::IS_C2PStressTest(Data * data) : InitialFunc(data)
 
 }
 
+IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  //if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
 
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        
+        if (d->x[i] < 0.5 ) {
+          d->prims[ID(3, i, j, k)] = 1.0;
+          d->prims[ID(5, i, j, k)] = 1.0;
+          d->prims[ID(1, i, j, k)] = 0.1;
+          d->prims[ID(0, i, j, k)] = 0;
+          d->prims[ID(2, i, j, k)] = 0;
+        } else {
+          d->prims[ID(3, i, j, k)] = 1.0;
+          d->prims[ID(5, i, j, k)] = 1.0;
+          d->prims[ID(1, i, j, k)] = -0.1;
+          d->prims[ID(0, i, j, k)] = 0;  
+          d->prims[ID(2, i, j, k)] = 0;  
+        }
+
+      }
+    }
+  }
+
+}
+
+IS_BulkHeatTest::IS_ShearTest(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  //if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        
+        if (d->x[i] < 0.5 ) {
+          d->prims[ID(3, i, j, k)] = 10;
+          d->prims[ID(5, i, j, k)] = 8;
+          d->prims[ID(1, i, j, k)] = 0;
+          d->prims[ID(0, i, j, k)] = 0;
+          d->prims[ID(2, i, j, k)] = 0;
+        } else {
+          d->prims[ID(3, i, j, k)] = 1.0;
+          d->prims[ID(5, i, j, k)] = 1.0;
+          d->prims[ID(1, i, j, k)] = 0;
+          d->prims[ID(0, i, j, k)] = 0;  
+          d->prims[ID(2, i, j, k)] = 0;  
+        }
+
+      }
+    }
+  }
+
+}
 
 
 
