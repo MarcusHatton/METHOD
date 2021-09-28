@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int nreports(5);
 
-  SerialEnv env(&argc, &argv, 8, 5, 1);
+  SerialEnv env(&argc, &argv, 1, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
