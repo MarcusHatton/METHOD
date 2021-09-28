@@ -1547,7 +1547,7 @@ IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
 
 }
 
-IS_BulkHeatTest::IS_ShearTest(Data * data) : InitialFunc(data)
+IS_BulkHeatTest::IS_BulkHeatTest(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
