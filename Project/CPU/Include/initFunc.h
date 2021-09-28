@@ -498,7 +498,29 @@ class IS_C2PStressTest : public InitialFunc
     virtual ~IS_C2PStressTest() { }     //!< Destructor
 };
 
+class IS_ShearTest : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    IS_ShearTest(Data * data);
 
+    virtual ~IS_ShearTest() { }     //!< Destructor
+};
+
+class IS_BulkHeatTest : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    IS_BulkHeatTest(Data * data);
+
+    virtual ~IS_BulkHeatTest() { }     //!< Destructor
+};
 
 
 #endif
