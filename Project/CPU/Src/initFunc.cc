@@ -1529,7 +1529,7 @@ IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
         
         d->prims[ID(3, i, j, k)] = 1.0;
         d->prims[ID(5, i, j, k)] = 1.0;
-        d->prims[ID(1, i, j, k)] = erf(6*(d->x[i] - 0.5));
+        d->prims[ID(1, i, j, k)] = erf(3*(d->x[i] - 0.5));
         d->prims[ID(0, i, j, k)] = 0;
         d->prims[ID(2, i, j, k)] = 0;
 
