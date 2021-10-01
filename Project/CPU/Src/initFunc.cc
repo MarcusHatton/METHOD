@@ -1488,10 +1488,10 @@ IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
-  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
   
   // Limit checking
-  if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  //if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
   //if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
   //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
 
@@ -1501,7 +1501,7 @@ IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
         
         d->prims[ID(3, i, j, k)] = 1.0;
         d->prims[ID(5, i, j, k)] = 1.0;
-        d->prims[ID(1, i, j, k)] = erf(3*(d->x[i] - 0.5));
+        d->prims[ID(1, i, j, k)] = erf( 3*(d->x[i] - (d->xmax - d->xmin)/2) );
         d->prims[ID(0, i, j, k)] = 0;
         d->prims[ID(2, i, j, k)] = 0;
 
@@ -1515,10 +1515,10 @@ IS_BulkHeatTest::IS_BulkHeatTest(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
-  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
   
   // Limit checking
-  if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  //if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
   //if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
   //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
 
@@ -1526,7 +1526,7 @@ IS_BulkHeatTest::IS_BulkHeatTest(Data * data) : InitialFunc(data)
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
         
-        if (d->x[i] < 0.5 ) {
+        if (d->x[i] < (d->xmax - abs(d->xmin))/2 ) {
           d->prims[ID(3, i, j, k)] = 10;
           d->prims[ID(5, i, j, k)] = 8;
           d->prims[ID(1, i, j, k)] = 0;
