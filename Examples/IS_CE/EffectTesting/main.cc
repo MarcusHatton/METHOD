@@ -23,16 +23,16 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(100);
+  int nx(300);
   int ny(0);
   int nz(0);
-  double xmin(0.0);
+  double xmin(-1.0);
   double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(6.0);
+  double endTime(0.8);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
-  IS_ShearTest init(&data);
-  //IS_BulkHeatTest init(&data);
+  //IS_ShearTest init(&data);
+  IS_BulkHeatTest init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
