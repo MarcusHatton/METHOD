@@ -13,6 +13,7 @@
 #include "serialSaveDataHDF5.h"
 #include "weno.h"
 #include <cstring>
+#include "sys/stat.h"
 
 using namespace std;
 
@@ -23,11 +24,14 @@ int main(int argc, char *argv[]) {
 
   for(int i=0; i<6; i++) {
     nx = nxs[i];
-    mkdir("./1d/shear/"+std::to_string(nx));
-
+    cout << nx << std::endl;
+    std::string dirpath = "./1d/shear/"+std::to_string(nx);
+    mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  
   // Set up domain
   int Ng(4);
-  // int nx(400);
+  //int nx(400);
+  //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
   double xmin(-1.0);
