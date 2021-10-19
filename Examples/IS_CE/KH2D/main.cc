@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(80);
-  int ny(80);
+  int nx(200);
+  int ny(200);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   double zmin(-0.1);
   double zmax(0.1);
   double endTime(6.0);
-  double cfl(0.4);
+  double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int nreports(10);
 
-  ParallelEnv env(&argc, &argv, 1, 1, 1);
+  ParallelEnv env(&argc, &argv, 8, 5, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
