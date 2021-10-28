@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   //int nxs[] = {3200,4800,6400};
   int nx = 0;
 
-  for(int i=0; i<3; i++) {
+  for(int i=3; i<6; i++) {
     nx = nxs[i];
     cout << nx << std::endl;
     std::string dirpath = "./1d/bulk/"+std::to_string(nx);
