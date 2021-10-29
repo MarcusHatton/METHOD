@@ -20,14 +20,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  int nxs[] = {100,200,400,800,1600,3200};
-  //int nxs[] = {3200,4800,6400};
+  int nxs[] = {1000,2000,4000,8000,16000};
   int nx = 0;
 
-  for(int i=3; i<6; i++) {
+  for(int i=0; i<6; i++) {
     nx = nxs[i];
     cout << nx << std::endl;
-    std::string dirpath = "./1d/bulk/"+std::to_string(nx);
+    std::string dirpath = "./1d/shear/res/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     
   // Set up domain
@@ -35,8 +34,8 @@ int main(int argc, char *argv[]) {
   //int nx(3200);
   int ny(0);
   int nz(0);
-  double xmin(-1.0);
-  double xmax(1.0);
+  double xmin(-10.0);
+  double xmax(10.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-15, 1.0e-1,  1.0e-3, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -93,15 +92,15 @@ int main(int argc, char *argv[]) {
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
-  //IS_ShearTest init(&data);
-  IS_BulkHeatTest init(&data);
+  IS_ShearTest init(&data);
+  //IS_BulkHeatTest init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/"+std::to_string(nx)+"/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/shear/res/"+std::to_string(nx)+"/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -110,7 +109,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/bulk/"+std::to_string(nx)+"/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/shear/res/"+std::to_string(nx)+"/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
