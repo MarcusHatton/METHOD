@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   int nxs[] = {1000,2000,4000,8000,16000};
   int nx = 0;
 
-  for(int i=0; i<3; i++) {
+  for(int i=0; i<5; i++) {
     nx = nxs[i];
     //cout << nx << std::endl;
     std::string dirpath = "./1d/shear/res/"+std::to_string(nx);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
