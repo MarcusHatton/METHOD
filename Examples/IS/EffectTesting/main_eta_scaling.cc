@@ -20,10 +20,10 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  float etas[] = {1e-2, 1e-3, 1e-4, 1e-5};
+  float etas[] = {5e-2, 1e-2, 5e-2, 1e-3, 1e-4, 1e-5};
   float eta = 0;
 
-  for(int i=0; i<4; i++) {
+  for(int i=0; i<6; i++) {
     eta = etas[i];
     cout << eta << std::endl;
     std::string dirpath = "./1d/shear/etas/"+std::to_string(eta);
@@ -31,12 +31,12 @@ int main(int argc, char *argv[]) {
   
   // Set up domain
   int Ng(4);
-  int nx(1600);
+  int nx(4000);
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
-  double xmin(-1.0);
-  double xmax(1.0);
+  double xmin(-10.0);
+  double xmax(10.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
