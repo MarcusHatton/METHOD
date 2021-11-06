@@ -19,14 +19,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  //int nxs[] = {100,200,400,800,1600,3200};
-  int nxs[] = {3200, 4800, 6400};
+  int nxs[] = {1000,2000,4000,8000,16000};
   int nx = 0;
 
-  for(int i=0; i<3; i++) {
+  for(int i=0; i<5; i++) {
     nx = nxs[i];
     //cout << nx << std::endl;
-    std::string dirpath = "./1d/shear/"+std::to_string(nx);
+    std::string dirpath = "./1d/shear/res/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -41,7 +40,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(6.0);
+  double endTime(50.0);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -97,7 +96,7 @@ int main(int argc, char *argv[]) {
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/shear/"+std::to_string(nx)+"/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/shear/res/"+std::to_string(nx)+"/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -106,7 +105,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/shear/"+std::to_string(nx)+"/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/shear/res/"+std::to_string(nx)+"/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
