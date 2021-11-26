@@ -20,18 +20,18 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  float kappas[] = {1e-5,1e-4,1e-3,5e-3,1e-2};
-  float kappa = 0;
+  float scales[] = {1e-5,1e-4};
+  float scale = 0;
 
-  for(int i=0; i<5; i++) {
-    kappa = kappas[i];
-    cout << kappa << std::endl;
-    std::string dirpath = "./1d/heat/stillshock/kappas/"+std::to_string(kappa);
+  for(int i=0; i<2; i++) {
+    scale = scales[i];
+    cout << scale << std::endl;
+    std::string dirpath = "./1d/all/stillshock/str_scal/"+std::to_string(scale);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     
   // Set up domain
   int Ng(4);
-  int nx(400);
+  int nx(4000);
   int ny(0);
   int nz(0);
   double xmin(-1.0);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {kappa, 1.0e-1,  1e-15, 1.0e-1,  1e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {scale, 1.0e-1,  scale*100.0, 1.0e-1,  scale*10.0, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/heat/stillshock/kappas/"+std::to_string(kappa)+"/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/all/stillshock/str_scal/"+std::to_string(scale)+"/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/heat/stillshock/kappas/"+std::to_string(kappa)+"/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/all/stillshock/str_scal/"+std::to_string(scale)+"/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
