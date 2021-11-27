@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   
   // Set up domain
   int Ng(4);
-  int nx(4000);
+  int nx(400);
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
