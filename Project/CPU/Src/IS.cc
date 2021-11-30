@@ -36,13 +36,7 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
-  this->data->consLabels.push_back("Tau");  this->data->consLabels.push_back("Y1");
-  this->data->consLabels.push_back("Y2");  this->data->consLabels.push_back("Y3");
-  this->data->consLabels.push_back("U");  this->data->consLabels.push_back("Z11");
-  this->data->consLabels.push_back("Z12");  this->data->consLabels.push_back("Z13");
-  this->data->consLabels.push_back("Z22");  this->data->consLabels.push_back("Z23");
-  this->data->consLabels.push_back("Z33");
-
+  this->data->consLabels.push_back("Tau");  
   // 0
   this->data->primsLabels.push_back("v1");   this->data->primsLabels.push_back("v2");
   this->data->primsLabels.push_back("v3");
