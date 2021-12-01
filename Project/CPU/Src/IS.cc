@@ -170,20 +170,7 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   source[3] = 0.0; 
   // Tau
   source[4] = 0.0;
-  // Y1,2,3
-  source[5] = (prims[Prims::n] / tau_q) * (aux[Aux::q1NS] - prims[Prims::q1]);
-  source[6] = (prims[Prims::n] / tau_q) * (aux[Aux::q2NS] - prims[Prims::q2]);
-  source[7] = (prims[Prims::n] / tau_q) * (aux[Aux::q3NS] - prims[Prims::q3]);
-  // U
-  source[8] = (prims[Prims::n] / tau_Pi) * (aux[Aux::PiNS] - prims[Prims::Pi]);
-  // Z11,12,13,22,23,33
-  source[9] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi11NS] - prims[Prims::pi11]);
-  source[10] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi12NS] - prims[Prims::pi12]);
-  source[11] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi13NS] - prims[Prims::pi13]);
-  source[12] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi22NS] - prims[Prims::pi22]);
-  source[13] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi23NS] - prims[Prims::pi23]);
-  source[14] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi33NS] - prims[Prims::pi33]);
-  
+ 
 }
 
 void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
@@ -346,19 +333,6 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         source[ID(S3, i, j, k)] = 0.0;
         // Tau
         source[ID(Tau, i, j, k)] = 0.0;
-        // Y1,2,3
-        source[ID(Y1, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_q) * (aux[ID(Aux::q1NS, i, j, k)] - prims[ID(Prims::q1, i, j, k)]);
-        source[ID(Y2, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_q) * (aux[ID(Aux::q1NS, i, j, k)] - prims[ID(Prims::q2, i, j, k)]);
-        source[ID(Y3, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_q) * (aux[ID(Aux::q1NS, i, j, k)] - prims[ID(Prims::q3, i, j, k)]);        
-        // U
-        source[ID(U, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_Pi) * (aux[ID(Aux::PiNS, i, j, k)] - prims[ID(Prims::Pi, i, j, k)]);
-        // Z11,12,13,22,23,33
-        source[ID(Z11, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi11NS, i, j, k)] - prims[ID(Prims::pi11, i, j, k)]);
-        source[ID(Z12, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi12NS, i, j, k)] - prims[ID(Prims::pi12, i, j, k)]);
-        source[ID(Z13, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi13NS, i, j, k)] - prims[ID(Prims::pi13, i, j, k)]);
-        source[ID(Z22, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi22NS, i, j, k)] - prims[ID(Prims::pi22, i, j, k)]); 
-        source[ID(Z23, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi23NS, i, j, k)] - prims[ID(Prims::pi23, i, j, k)]);
-        source[ID(Z33, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi33NS, i, j, k)] - prims[ID(Prims::pi33, i, j, k)]);                       
         
       }
     }
@@ -480,9 +454,6 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
   return 0;
 }
 
-
-
-
 void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
 
@@ -492,7 +463,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
 
   // Y1-3,U,Z11-33
   for (int ndissvar(0); ndissvar < 10; ndissvar++) {
-    prims[Prims::q1+ndissvar] = cons[Cons::Y1+ndissvar] / cons[Cons::D];
+    prims[Prims::q1+ndissvar] = aux[Aux::q1NS+ndissvar];
   }
 
   aux[Aux::pi00] = prims[Prims::pi11] + prims[Prims::pi22] + prims[Prims::pi33]; // this one can be done here fine
@@ -653,7 +624,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
       for (int k(d->ks -1); k < d->ke +1; k++) {
   */      
         for (int ndissvar(0); ndissvar < 10; ndissvar++) {
-          prims[ID(Prims::q1+ndissvar, i, j, k)] = cons[ID(Cons::Y1+ndissvar, i, j, k)] / cons[ID(Cons::D, i, j, k)];
+          prims[ID(Prims::q1+ndissvar, i, j, k)] = aux[ID(Aux::q1NS+ndissvar, i, j, k)];
         }
         //aux[ID(Aux::W, i, j, k)] = 1 / ( 1 - (prims[ID(Prims::v1, i, j, k)]**2 + prims[ID(Prims::v2, i, j, k)]**2 + prims[ID(Prims::v3, i, j, k)]**2) )**0.5; // Point in re-calcing this here?
         aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) 
