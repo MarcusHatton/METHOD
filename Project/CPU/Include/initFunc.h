@@ -462,6 +462,31 @@ class ISKHInstabilitySingleFluid : public InitialFunc
     virtual ~ISKHInstabilitySingleFluid() { }     //!< Destructor
 };
 
+class ISKHInstabilityTIIdeal : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    ISKHInstabilityTIIdeal(Data * data);
+
+    virtual ~ISKHInstabilityTIIdeal() { }     //!< Destructor
+};
+
+class ISKHInstabilityTIShear : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    ISKHInstabilityTIShear(Data * data);
+
+    virtual ~ISKHInstabilityTIShear() { }     //!< Destructor
+};
+
+
 class Shocktube_Chab21 : public InitialFunc
 {
   public:
