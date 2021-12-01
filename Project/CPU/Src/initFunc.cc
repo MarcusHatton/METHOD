@@ -1415,6 +1415,81 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : I
   }
 }
 
+ISKHInstabilityTIIdeal::ISKHInstabilityTIIdeal(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+
+//  if (d->Nprims > 15) throw std::invalid_argument("Trying to implement a single fluid initial state on incorrect model.\n\tModel has wrong number of primitive variables to be single fluid model.");
+  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  if (d->xmin != -0.5 || d->xmax != 0.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-0.5, 0.5]\n");
+  if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
+
+  double vShear(0.1);
+  double rho0(1.5);
+  double rho1(0.5);
+
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) {
+
+        if (d->y[j] > 0.01*sin(2*PI*d->x[i])) {
+          d->prims[ID(p, i, j, k)] = 0.3;
+          d->prims[ID(v1, i, j, k)] = vShear;
+          d->prims[ID(n, i, j, k)] = rho0 + rho1;
+          d->prims[ID(v2, i, j, k)] = 0.0;
+        }
+        else {
+          d->prims[ID(p, i, j, k)] = 0.3;
+          d->prims[ID(v1, i, j, k)] = - vShear;
+          d->prims[ID(n, i, j, k)] = rho0 - rho1;
+          d->prims[ID(v2, i, j, k)] = 0.0;
+        }
+
+        // Set all the dissipative variables to zero
+        for (int nvar(0); nvar < 10; nvar++) {
+          d->prims[ID(6+nvar, i, j, k)] = 0;
+        }
+
+      }
+    }
+  }
+}
+
+ISKHInstabilityTIShear::ISKHInstabilityTIShear(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+
+//  if (d->Nprims > 15) throw std::invalid_argument("Trying to implement a single fluid initial state on incorrect model.\n\tModel has wrong number of primitive variables to be single fluid model.");
+  if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  if (d->xmin != -0.5 || d->xmax != 0.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-0.5, 0.5]\n");
+  if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
+
+  double vShear(0.1);
+  double a(0.01);
+  double rho0(1.5);
+  double rho1(0.5);
+
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) {
+
+        d->prims[ID(p, i, j, k)] = 0.3;
+        d->prims[ID(v1, i, j, k)] = vShear * tanh(d->y[j]/a);
+        d->prims[ID(n, i, j, k)] = rho0 + rho1 * tanh(d->y[j]/a);
+        d->prims[ID(v2, i, j, k)] = 0.0;
+
+        // Set all the dissipative variables to zero
+        for (int nvar(0); nvar < 10; nvar++) {
+          d->prims[ID(6+nvar, i, j, k)] = 0;
+        }
+
+      }
+    }
+  }
+}
+
 Shocktube_Chab21::Shocktube_Chab21(Data * data) : InitialFunc(data)
 {
   // Syntax
