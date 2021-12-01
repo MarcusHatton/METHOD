@@ -1059,50 +1059,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         cons[ID(Cons::Tau, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::Pi, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] 
         - (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::Pi, i, j, k)] + prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)]) 
         + 2*aux[ID(Aux::qv, i, j, k)]*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi00, i, j, k)];
-        // Y1-3
-        cons[ID(Cons::Y1, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q1, i, j, k)];
-        cons[ID(Cons::Y2, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q2, i, j, k)];
-        cons[ID(Cons::Y3, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q3, i, j, k)];
-        //printf("%f, %f, %f, q123\n", prims[ID(Prims::q1, i, j, k)], cons[ID(Cons::Y1, i, j, k)]);
-        // U
-        cons[ID(Cons::U, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::Pi, i, j, k)];
-        // Z11-33
-        cons[ID(Cons::Z11, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi11, i, j, k)];
-        cons[ID(Cons::Z12, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi12, i, j, k)]; 
-        cons[ID(Cons::Z13, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi13, i, j, k)];
-        cons[ID(Cons::Z22, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi22, i, j, k)];        
-        cons[ID(Cons::Z23, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi23, i, j, k)];
-        cons[ID(Cons::Z33, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi33, i, j, k)];
       }  
     }
   }
-
-/*
-
-  for (int i(1); i < d->Nx-1; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
-        aux[ID(Aux::0, i, j, k)] = (prims[ID(Prims::v1, i+1, j, k)]-prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx);
-      }
-    }
-  }
-
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(1); j < d->Ny-1; j++) {
-      for (int k(0); k < d->Nz; k++) {
-        aux[ID(Aux::1, i, j, k)] = (prims[ID(Prims::v1, i, j+1, k)]-prims[ID(Prims::v1, i, j-1, k)])/(2*d->dy);
-      }
-    }
-  }
-
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(Aux::2, i, j, k)] = (prims[ID(Prims::v1, i, j, k+1)]-prims[ID(Prims::v1, i, j, k-1)])/(2*d->dz);
-      }
-    }
-  }
-*/
 
 }
 
@@ -1146,79 +1105,7 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
           + (prims[ID(Prims::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
           + aux[ID(Aux::pi01+dir, i, j, k)];
-        // Y1-3,U,Z11-33 *v
-        for (int ndissvar(0); ndissvar < 10; ndissvar++) {                
-          f[ID(Y1+ndissvar, i, j, k)] = cons[ID(Cons::Y1+ndissvar, i, j, k)]*prims[ID(dir, i, j, k)];
-        }
       } // End k loop
     } // End j loop
   } // End i loop
 }
-
-
-
-/* Model with functional kappa dependence */
-
-/*
-
-ToyQFunctional::ToyQFunctional() : ToyQ()
-{
-}
-
-ToyQFunctional::ToyQFunctional(Data * data) : ToyQ(data)
-{
-}
-
-ToyQFunctional::~ToyQFunctional()
-{
-}
-
-double kappa_of_T(double T, double kappa_0) {
-  // return kappa_0 / (0.1 + T + T*T);
-  // return kappa_0 / (1.0 + 1e-2*T);
-  double kT = kappa_0 * T;
-  return kT * T / (kT * kT + 0.25); // Andreas' Slides (bulk viscosity!!!)
-}
-
-double tau_q_of_T(double T, double tau_q_0) {
-  // return tau_q_0 / (0.1 + 0.5 * T + T*T);
-  // return tau_q_0 / (1.0 + 1e-3*T);
-  double tT = tau_q_0 * T;
-  return tT * T / (tT * tT + 0.25);
-}
-
-void ToyQFunctional::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
-{
-  
-  double kappa_0 = this->data->optionalSimArgs[0];
-  double tau_q_0 = this->data->optionalSimArgs[1];
-
-  source[0] = 0.0;
-  for (int dir(0); dir < 3; dir++) {
-    source[1+dir] = -(kappa_of_T(cons[0], kappa_0) * aux[dir] + prims[1+dir]) / tau_q_of_T(cons[0], tau_q_0);
-  }
-}
-
-void ToyQFunctional::sourceTerm(double *cons, double *prims, double *aux, double *source)
-{
-  // Syntax
-  Data * d(this->data);
-
-  double kappa_0 = d->optionalSimArgs[0]; 
-  double tau_q_0 = d->optionalSimArgs[1];
-
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        source[ID(0, i, j, k)] = 0.0;
-        for (int dir(0); dir < 3; dir++) {
-          source[ID(1+dir, i, j, k)] = -(kappa_of_T(cons[ID(Cons::0, i, j, k)], kappa_0) * aux[ID(Aux::dir, i, j, k)] +
-                                         prims[ID(Prims::v2+dir, i, j, k)]) / tau_q_of_T(cons[ID(Cons::0, i, j, k)], tau_q_0);
-        }
-      }
-    }
-  }
-}
-
-*/
-
