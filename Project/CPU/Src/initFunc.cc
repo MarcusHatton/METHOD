@@ -1344,8 +1344,6 @@ ISKHInstabilityTIIdeal::ISKHInstabilityTIIdeal(Data * data) : InitialFunc(data)
   if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
 
   double vShear(0.1);
-  double A0(0.1);
-  double a(0.01);
   double rho0(1.5);
   double rho1(0.5);
 
@@ -1387,7 +1385,6 @@ ISKHInstabilityTIShear::ISKHInstabilityTIShear(Data * data) : InitialFunc(data)
   if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
 
   double vShear(0.1);
-  double A0(0.1);
   double a(0.01);
   double rho0(1.5);
   double rho1(0.5);
