@@ -481,7 +481,7 @@ class ISKHInstabilityTIIdeal : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    ISKHInstabilityTIIdeal(Data * data, int mag);
+    ISKHInstabilityTIIdeal(Data * data);
 
     virtual ~ISKHInstabilityTIIdeal() { }     //!< Destructor
 };
@@ -493,7 +493,7 @@ class ISKHInstabilityTIShear : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    ISKHInstabilityTIShear(Data * data, int mag);
+    ISKHInstabilityTIShear(Data * data);
 
     virtual ~ISKHInstabilityTIShear() { }     //!< Destructor
 };
