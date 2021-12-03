@@ -463,6 +463,23 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa4[n];                     // Work array
   */
   
+  double dxT;
+  double dyT;
+  double dzT;
+  double dxux;
+  double dxuy;
+  double dxuz;
+  double dyux;
+  double dyuy;
+  double dyuz;
+  double dzux;
+  double dzuy;
+  double dzuz;
+
+  double kappa = this->data->optionalSimArgs[0];
+  double zeta = this->data->optionalSimArgs[2];
+  double eta = this->data->optionalSimArgs[4];
+
   // Y1-3,U,Z11-33
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
