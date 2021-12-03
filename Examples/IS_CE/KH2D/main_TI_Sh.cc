@@ -82,8 +82,8 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  ISKHInstabilitySingleFluid init(&data);
-  //ISKHInstabilityTIIdeal init(&data);
+  //ISKHInstabilitySingleFluid init(&data);
+  ISKHInstabilityTIShear init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
