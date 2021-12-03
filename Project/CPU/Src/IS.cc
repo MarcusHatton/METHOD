@@ -155,28 +155,6 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
 
-  double dxT;
-  double dyT;
-  double dzT;
-  
-  double dxux;
-  double dyuy;
-  double dzuz;
-
-  double dxuy;
-  double dxuz;
-  double dyux;
-  double dyuz;
-  double dzux;
-  double dzuy;
-
-  // q_j,NS 10
-  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
-    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
-      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
-
-
-
   // Avoid constant re-allocation
   float gamma = d->gamma;
   double beta;
@@ -584,7 +562,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     }
   }
 
-
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
@@ -901,7 +878,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     for (int j(1); j < d->Ny-1; j++) {
       for (int k(1); k < d->Nz-1; k++) {
         // 11
-        aux[ID(Prims::pi11 i, j, k)] = -2*eta*( (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(d->dx)
+        aux[ID(Prims::pi11, i, j, k)] = -2*eta*( (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(d->dx)
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
         // 12
         aux[ID(Prims::pi12, i, j, k)] = -2*eta*( (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v2, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v2, i-1, j, k)])/(2*d->dx)
