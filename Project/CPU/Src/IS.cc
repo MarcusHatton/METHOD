@@ -139,8 +139,11 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   bool thermo_timescales = false;
 
   double kappa = this->data->optionalSimArgs[0];
+  double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
+  double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
+  double tau_pi = this->data->optionalSimArgs[5];
 
   // Thermodynamic calculation of timescales
   if (thermo_timescales) {
@@ -178,8 +181,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   bool thermo_timescales = false;
 
   double kappa = this->data->optionalSimArgs[0];
+  double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
+  double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
+  double tau_pi = this->data->optionalSimArgs[5];
 
   double dxT;
   double dyT;
