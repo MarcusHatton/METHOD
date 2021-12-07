@@ -669,11 +669,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     for (int i(d->is); i < d->ie; i++) {
       for (int j(d->js); j < d->je; j++) {
         for (int k(d->ks); k < d->ke; k++) {
-  /*
-    for (int i(d->is -1); i < d->ie +1; i++) {
-      for (int j(d->js -1); j < d->je +1; j++) {
-        for (int k(d->ks -1); k < d->ke +1; k++) {
-  */
+
           // C2P Scheme as outlined in HP/FYR
           aux[ID(Aux::vsqrd, i, j, k)] = ((cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)]) 
                                     + (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])*(cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])
