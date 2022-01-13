@@ -1301,7 +1301,8 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data) : InitialFun
   double sig(0.1);
   double vShear(0.5);
   double A0(0.1);
-  double a(0.01);
+  //double a(0.01);
+  double a(0.0025);
   double rho0(0.55);
   double rho1(0.45);
 
