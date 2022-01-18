@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1e-15, 5.0e-1,  1e-15, 5.0e-1,  1.0e-3, 1.0e-3} };
+  const std::vector<double> toy_params           { {1e-15, 5.0e-1,  1e-15, 5.0e-1,  1.0e-3, 5.0e-3} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
