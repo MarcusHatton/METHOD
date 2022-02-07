@@ -34,53 +34,45 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   
   alternative_C2P = alt_C2P;
   
+  // 0  
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
-  this->data->consLabels.push_back("Tau");  this->data->consLabels.push_back("Y1");
-  this->data->consLabels.push_back("Y2");  this->data->consLabels.push_back("Y3");
-  this->data->consLabels.push_back("U");  this->data->consLabels.push_back("Z11");
-  this->data->consLabels.push_back("Z12");  this->data->consLabels.push_back("Z13");
-  this->data->consLabels.push_back("Z22");  this->data->consLabels.push_back("Z23");
-  this->data->consLabels.push_back("Z33");
+  this->data->consLabels.push_back("Tau");
 
   // 0
   this->data->primsLabels.push_back("v1");   this->data->primsLabels.push_back("v2");
   this->data->primsLabels.push_back("v3");
   // 3
   this->data->primsLabels.push_back("p");   this->data->primsLabels.push_back("rho");
-  this->data->primsLabels.push_back("n");   
-  // 6
-  this->data->primsLabels.push_back("q1");  this->data->primsLabels.push_back("q2");
-  this->data->primsLabels.push_back("q3");
-  // 9
-  this->data->primsLabels.push_back("Pi");  
-  // 10
-  this->data->primsLabels.push_back("pi11");   this->data->primsLabels.push_back("pi12");
-  this->data->primsLabels.push_back("pi13");  this->data->primsLabels.push_back("pi22");
-  this->data->primsLabels.push_back("pi23");  this->data->primsLabels.push_back("pi33");
+  this->data->primsLabels.push_back("n");
 
   // 0
-  this->data->auxLabels.push_back("h");     this->data->auxLabels.push_back("T");
-  this->data->auxLabels.push_back("e");     this->data->auxLabels.push_back("W");
+  this->data->auxLabels.push_back("h");       this->data->auxLabels.push_back("T");
+  this->data->auxLabels.push_back("e");       this->data->auxLabels.push_back("W");
   // 4
+  this->data->auxLabels.push_back("A");       this->data->auxLabels.push_back("Pi");
+  this->data->auxLabels.push_back("Q_0");     this->data->auxLabels.push_back("Q_1");
+  this->data->auxLabels.push_back("Q_2");     this->data->auxLabels.push_back("Q_3");   
+  // 12
   this->data->auxLabels.push_back("q0");    this->data->auxLabels.push_back("qv");
   this->data->auxLabels.push_back("pi00");  this->data->auxLabels.push_back("pi01");
   this->data->auxLabels.push_back("pi02");  this->data->auxLabels.push_back("pi03");
-  // 10
-  this->data->auxLabels.push_back("q1NS");  this->data->auxLabels.push_back("q2NS");
-  this->data->auxLabels.push_back("q3NS");
-  // 13
-  this->data->auxLabels.push_back("PiNS");    
+ 
   // 14
-  this->data->auxLabels.push_back("pi11NS"); this->data->auxLabels.push_back("pi12NS");
-  this->data->auxLabels.push_back("pi13NS"); this->data->auxLabels.push_back("pi22NS");
-  this->data->auxLabels.push_back("pi23NS"); this->data->auxLabels.push_back("pi33NS");
+  this->data->auxLabels.push_back("sigma11"); this->data->auxLabels.push_back("sigma12");
+  this->data->auxLabels.push_back("sigma13"); this->data->auxLabels.push_back("sigma22");
+  this->data->auxLabels.push_back("sigma23"); this->data->auxLabels.push_back("sigma33");
   // 20
-  this->data->auxLabels.push_back("Theta");  this->data->auxLabels.push_back("dv1dt");
+  this->data->auxLabels.push_back("drhodt");  this->data->auxLabels.push_back("dv1dt");
   this->data->auxLabels.push_back("dv2dt");  this->data->auxLabels.push_back("dv3dt");
+  
+  
+  this->data->auxLabels.push_back("Theta");  
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
   this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
+
+
 }
 
 IS::~IS()
@@ -176,19 +168,7 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   source[3] = 0.0; 
   // Tau
   source[4] = 0.0;
-  // Y1,2,3
-  source[5] = (prims[Prims::n] / tau_q) * (aux[Aux::q1NS] - prims[Prims::q1]);
-  source[6] = (prims[Prims::n] / tau_q) * (aux[Aux::q2NS] - prims[Prims::q2]);
-  source[7] = (prims[Prims::n] / tau_q) * (aux[Aux::q3NS] - prims[Prims::q3]);
-  // U
-  source[8] = (prims[Prims::n] / tau_Pi) * (aux[Aux::PiNS] - prims[Prims::Pi]);
-  // Z11,12,13,22,23,33
-  source[9] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi11NS] - prims[Prims::pi11]);
-  source[10] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi12NS] - prims[Prims::pi12]);
-  source[11] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi13NS] - prims[Prims::pi13]);
-  source[12] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi22NS] - prims[Prims::pi22]);
-  source[13] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi23NS] - prims[Prims::pi23]);
-  source[14] = (prims[Prims::n] / tau_pi) * (aux[Aux::pi33NS] - prims[Prims::pi33]);
+
   
 }
 
@@ -352,20 +332,6 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         source[ID(S3, i, j, k)] = 0.0;
         // Tau
         source[ID(Tau, i, j, k)] = 0.0;
-        // Y1,2,3
-        source[ID(Y1, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_q) * (aux[ID(Aux::q1NS, i, j, k)] - prims[ID(Prims::q1, i, j, k)]);
-        source[ID(Y2, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_q) * (aux[ID(Aux::q1NS, i, j, k)] - prims[ID(Prims::q2, i, j, k)]);
-        source[ID(Y3, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_q) * (aux[ID(Aux::q1NS, i, j, k)] - prims[ID(Prims::q3, i, j, k)]);        
-        // U
-        source[ID(U, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_Pi) * (aux[ID(Aux::PiNS, i, j, k)] - prims[ID(Prims::Pi, i, j, k)]);
-        // Z11,12,13,22,23,33
-        source[ID(Z11, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi11NS, i, j, k)] - prims[ID(Prims::pi11, i, j, k)]);
-        source[ID(Z12, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi12NS, i, j, k)] - prims[ID(Prims::pi12, i, j, k)]);
-        source[ID(Z13, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi13NS, i, j, k)] - prims[ID(Prims::pi13, i, j, k)]);
-        source[ID(Z22, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi22NS, i, j, k)] - prims[ID(Prims::pi22, i, j, k)]); 
-        source[ID(Z23, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi23NS, i, j, k)] - prims[ID(Prims::pi23, i, j, k)]);
-        source[ID(Z33, i, j, k)] = (prims[ID(Prims::n, i, j, k)] / tau_pi) * (aux[ID(Aux::pi33NS, i, j, k)] - prims[ID(Prims::pi33, i, j, k)]);                       
-        
       }
     }
   }
@@ -1153,8 +1119,7 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
         for (int nvar(0); nvar < 3; nvar++) {
-          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( prims[ID(Prims::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
-            - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
+          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)];
           // (p+Pi)delta_ij
           if (dir == nvar) {
             f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::Pi, i, j, k)]);
@@ -1181,79 +1146,8 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
           + (prims[ID(Prims::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
           + aux[ID(Aux::pi01+dir, i, j, k)];
-        // Y1-3,U,Z11-33 *v
-        for (int ndissvar(0); ndissvar < 10; ndissvar++) {                
-          f[ID(Y1+ndissvar, i, j, k)] = cons[ID(Cons::Y1+ndissvar, i, j, k)]*prims[ID(dir, i, j, k)];
-        }
       } // End k loop
     } // End j loop
   } // End i loop
 }
-
-
-
-/* Model with functional kappa dependence */
-
-/*
-
-ToyQFunctional::ToyQFunctional() : ToyQ()
-{
-}
-
-ToyQFunctional::ToyQFunctional(Data * data) : ToyQ(data)
-{
-}
-
-ToyQFunctional::~ToyQFunctional()
-{
-}
-
-double kappa_of_T(double T, double kappa_0) {
-  // return kappa_0 / (0.1 + T + T*T);
-  // return kappa_0 / (1.0 + 1e-2*T);
-  double kT = kappa_0 * T;
-  return kT * T / (kT * kT + 0.25); // Andreas' Slides (bulk viscosity!!!)
-}
-
-double tau_q_of_T(double T, double tau_q_0) {
-  // return tau_q_0 / (0.1 + 0.5 * T + T*T);
-  // return tau_q_0 / (1.0 + 1e-3*T);
-  double tT = tau_q_0 * T;
-  return tT * T / (tT * tT + 0.25);
-}
-
-void ToyQFunctional::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
-{
-  
-  double kappa_0 = this->data->optionalSimArgs[0];
-  double tau_q_0 = this->data->optionalSimArgs[1];
-
-  source[0] = 0.0;
-  for (int dir(0); dir < 3; dir++) {
-    source[1+dir] = -(kappa_of_T(cons[0], kappa_0) * aux[dir] + prims[1+dir]) / tau_q_of_T(cons[0], tau_q_0);
-  }
-}
-
-void ToyQFunctional::sourceTerm(double *cons, double *prims, double *aux, double *source)
-{
-  // Syntax
-  Data * d(this->data);
-
-  double kappa_0 = d->optionalSimArgs[0]; 
-  double tau_q_0 = d->optionalSimArgs[1];
-
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        source[ID(0, i, j, k)] = 0.0;
-        for (int dir(0); dir < 3; dir++) {
-          source[ID(1+dir, i, j, k)] = -(kappa_of_T(cons[ID(Cons::0, i, j, k)], kappa_0) * aux[ID(Aux::dir, i, j, k)] +
-                                         prims[ID(Prims::v2+dir, i, j, k)]) / tau_q_of_T(cons[ID(Cons::0, i, j, k)], tau_q_0);
-        }
-      }
-    }
-  }
-}
-
-*/
 
