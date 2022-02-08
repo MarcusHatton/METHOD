@@ -181,11 +181,17 @@ class IS : public Model
             aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
             aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
             aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
+            aux[ID(Aux::dpdt, i, j, k)] = (prims[ID(Prims::p, i, j, k)] - prev_vars[ID(4, i, j, k)])/dt;
+            aux[ID(Aux::drhodt, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] - prev_vars[ID(5, i, j, k)])/dt;
+            aux[ID(Aux::dndt, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(6, i, j, k)])/dt;
             // Update previous values
             prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
             prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
             prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
             prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
+            prev_vars[ID(4, i, j, k)] = prims[ID(Prims::p, i, j, k)]; 
+            prev_vars[ID(5, i, j, k)] = prims[ID(Prims::rho, i, j, k)];
+            prev_vars[ID(6, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
           } // End k-loop
         } // End j-loop
       } // End i-loop
@@ -212,6 +218,7 @@ class IS : public Model
       S2_rf,
       S3_rf,
       Tau_rf,
+      A_rf,
       q1_rf,
       q2_rf,
       q3_rf,
