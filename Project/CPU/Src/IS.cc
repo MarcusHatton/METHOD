@@ -12,16 +12,16 @@ T sqr(T x) { return ((x) * (x)); }
 
 IS::IS() : Model()
 {
-  this->Ncons = 15;
-  this->Nprims = 16;
-  this->Naux = 30;
+  this->Ncons = 5;
+  this->Nprims = 6;
+  this->Naux = 34;
 }
 
 IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 {
-  this->Ncons = (this->data)->Ncons = 15;
-  this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 30;
+  this->Ncons = (this->data)->Ncons = 5;
+  this->Nprims = (this->data)->Nprims = 6;
+  this->Naux = (this->data)->Naux = 34;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
@@ -51,28 +51,26 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("e");      this->data->auxLabels.push_back("W");
   // 4
   this->data->auxLabels.push_back("A");      this->data->auxLabels.push_back("Pi");
-  
+  // 6
   this->data->auxLabels.push_back("q0");     this->data->auxLabels.push_back("q1");
   this->data->auxLabels.push_back("q2");     this->data->auxLabels.push_back("q3");   
   this->data->auxLabels.push_back("qv");
-
-  // 14
+  // 11
   this->data->auxLabels.push_back("pi11");   this->data->auxLabels.push_back("pi12");
   this->data->auxLabels.push_back("pi13");   this->data->auxLabels.push_back("pi22");
   this->data->auxLabels.push_back("pi23");   this->data->auxLabels.push_back("pi33");
   this->data->auxLabels.push_back("pi00");   this->data->auxLabels.push_back("pi01");
   this->data->auxLabels.push_back("pi02");   this->data->auxLabels.push_back("pi03");
- 
-  // 20
+  // 21
   this->data->auxLabels.push_back("dpdt");   this->data->auxLabels.push_back("drhodt");
   this->data->auxLabels.push_back("dndt");   this->data->auxLabels.push_back("dv1dt");
   this->data->auxLabels.push_back("dv2dt");  this->data->auxLabels.push_back("dv3dt");
   this->data->auxLabels.push_back("dWdt");
-  
+  // 28
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("Theta");  
   this->data->auxLabels.push_back("vsqrd");  this->data->auxLabels.push_back("rho_plus_p");
-
+  // 34
 
 }
 
@@ -1057,7 +1055,8 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
         for (int nvar(0); nvar < 3; nvar++) {
-          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)];
+          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( prims[ID(Prims::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
+            - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
           // (p+Pi)delta_ij
           if (dir == nvar) {
             f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::Pi, i, j, k)]);
