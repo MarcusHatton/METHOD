@@ -111,31 +111,12 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
 
   Data * d(this->data);
 
-  bool thermo_timescales = false;
-
   double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
   double tau_epsilon = this->data->optionalSimArgs[5];
-
-  // Thermodynamic calculation of timescales
-  if (thermo_timescales) {
-    float gamma = d->gamma;
-    double h = aux[Aux::h];
-    double T = aux[Aux::T];
-    double beta = 1/T;
-    double p = prims[Prims::p];
-    double Omega = 3*gamma - 5 + ((3*gamma)/(h*beta));
-    double OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(h/beta);
-    double beta0 = (3*OmegaStar)/(sqr(h) * sqr(Omega) * p);
-    double beta1 = sqr((gamma-1)/gamma) * (beta/(h*p)) * (5*sqr(h) - (gamma/(gamma-1)));
-    double beta2 = ((1 + 6*h*(1/beta))/(2*sqr(h)*p));
-    tau_q = kappa*T*beta1;
-    tau_Pi = zeta*beta0;
-    tau_pi = 2*eta*beta2;
-  }
 
   // D
   source[0] = 0.0;
@@ -154,14 +135,12 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   // Syntax
   Data * d(this->data);
 
-  bool thermo_timescales = false;
-
   double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
-  double tau_pi = this->data->optionalSimArgs[5];
+  double tau_epsilon = this->data->optionalSimArgs[5];
 
   double dxT;
   double dyT;
@@ -253,54 +232,34 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         // Theta 20 then Pi,NS 13 
         aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + dxux + dyuy + dzuz;
         // Pi,NS = -zeta*Theta
-        aux[ID(Aux::PiNS, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)];
+        aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)];
   
         // pi^l_j,NS 14
         // 11
-        aux[ID(Aux::pi11NS, i, j, k)] = -2*eta*( 2*dxux 
+        aux[ID(Aux::pi11, i, j, k)] = -2*eta*( 2*dxux 
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
         // 12
-        aux[ID(Aux::pi12NS, i, j, k)] = -2*eta*( dxuy + dyux
+        aux[ID(Aux::pi12, i, j, k)] = -2*eta*( dxuy + dyux
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
         // 13
-        aux[ID(Aux::pi13NS, i, j, k)] = -2*eta*( dxuz + dzux
+        aux[ID(Aux::pi13, i, j, k)] = -2*eta*( dxuz + dzux
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
         // 22
-        aux[ID(Aux::pi22NS, i, j, k)] = -2*eta*( 2*dyuy
+        aux[ID(Aux::pi22, i, j, k)] = -2*eta*( 2*dyuy
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
         // 23
-        aux[ID(Aux::pi23NS, i, j, k)] = -2*eta*( dyuz + dzuy
+        aux[ID(Aux::pi23, i, j, k)] = -2*eta*( dyuz + dzuy
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
         // 33
-        aux[ID(Aux::pi33NS, i, j, k)] = -2*eta*( 2*dzuz
+        aux[ID(Aux::pi33, i, j, k)] = -2*eta*( 2*dzuz
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
       }
     }
   }   
 
-  // Avoid constant re-allocation
-  float gamma = d->gamma;
-  double beta;
-  double Omega, OmegaStar;
-  double beta0, beta1, beta2;
-
-
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
-
-        // Thermodynamic calculation of timescales
-        if(thermo_timescales) {
-          beta = 1/aux[ID(Aux::T, i, j, k)];
-          Omega = 3*gamma - 5 + ((3*gamma)/(aux[ID(Aux::h, i, j, k)]*beta));
-          OmegaStar = 5 - 3*gamma + 3*(10 - 7*gamma)*(aux[ID(Aux::h, i, j, k)]/beta);
-          beta0 = (3*OmegaStar)/(sqr(aux[ID(Aux::h, i, j, k)]) * sqr(Omega) * prims[ID(Prims::p, i, j, k)]);
-          beta1 = sqr((gamma-1)/gamma) * (beta/(aux[ID(Aux::h, i, j, k)]*prims[ID(Prims::p, i, j, k)])) * (5*sqr(aux[ID(Aux::h, i, j, k)]) - (gamma/(gamma-1)));
-          beta2 = ((1 + 6*aux[ID(Aux::h, i, j, k)]*(1/beta))/(2*sqr(aux[ID(Aux::h, i, j, k)])*prims[ID(Prims::p, i, j, k)]));
-          tau_q = kappa*aux[ID(Aux::T, i, j, k)]*beta1;
-          tau_Pi = zeta*beta0;
-          tau_pi = 2*eta*beta2;
-        }
         // D
         source[ID(D, i, j, k)] = 0.0;
         // S1,2,3
