@@ -346,7 +346,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.S2_rf = cons[Cons::S2];
   args.S3_rf = cons[Cons::S3];
   args.Tau_rf = cons[Cons::Tau];
-  args.A_rf = aux[Aux::A]
+  args.A_rf = aux[Aux::A];
   args.q1_rf = aux[Aux::q1];
   args.q2_rf = aux[Aux::q2];
   args.q3_rf = aux[Aux::q3];
@@ -633,9 +633,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           prims[ID(Prims::v3, i, j, k)]*(prims[ID(Prims::rho, i, j, k+1)] - prims[ID(Prims::rho, i, j, k-1)])/(2*d->dz) ) +
           (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*aux[ID(Aux::Theta, i, j, k)]  );
 
-          (prims[ID(Prims::rho, i+1, j, k)] - prims[ID(Prims::rho, i-1, j, k)])/(2*d->dx)
-          (prims[ID(Prims::rho, i, j+1, k)] - prims[ID(Prims::rho, i, j-1, k)])/(2*d->dy)
-          (prims[ID(Prims::rho, i, j, k+1)] - prims[ID(Prims::rho, i, j, k-1)])/(2*d->dz)
+          // (prims[ID(Prims::rho, i+1, j, k)] - prims[ID(Prims::rho, i-1, j, k)])/(2*d->dx)
+          // (prims[ID(Prims::rho, i, j+1, k)] - prims[ID(Prims::rho, i, j-1, k)])/(2*d->dy)
+          // (prims[ID(Prims::rho, i, j, k+1)] - prims[ID(Prims::rho, i, j, k-1)])/(2*d->dz)
 
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
