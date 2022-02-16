@@ -106,18 +106,6 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
 
 void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
-  // printf("ToyQ model does not implement sourceTermSingleCell\n");
-  // exit(1);
-
-  Data * d(this->data);
-
-  double kappa = this->data->optionalSimArgs[0];
-  double tau_q = this->data->optionalSimArgs[1];
-  double zeta = this->data->optionalSimArgs[2];
-  double tau_Pi = this->data->optionalSimArgs[3];
-  double eta = this->data->optionalSimArgs[4];
-  double tau_epsilon = this->data->optionalSimArgs[5];
-
   // D
   source[0] = 0.0;
   // S1,2,3
@@ -126,8 +114,6 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   source[3] = 0.0; 
   // Tau
   source[4] = 0.0;
-
-  
 }
 
 void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
@@ -135,12 +121,14 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   // Syntax
   Data * d(this->data);
 
-  double kappa = this->data->optionalSimArgs[0];
-  double tau_q = this->data->optionalSimArgs[1];
-  double zeta = this->data->optionalSimArgs[2];
-  double tau_Pi = this->data->optionalSimArgs[3];
-  double eta = this->data->optionalSimArgs[4];
-  double tau_epsilon = this->data->optionalSimArgs[5];
+  // double kappa = this->data->optionalSimArgs[0];
+  // double tau_q = this->data->optionalSimArgs[1];
+  // double zeta = this->data->optionalSimArgs[2];
+  // double tau_Pi = this->data->optionalSimArgs[3];
+  // double eta = this->data->optionalSimArgs[4];
+  // double tau_epsilon = this->data->optionalSimArgs[5];
+
+/*
 
   double dxT;
   double dyT;
@@ -188,6 +176,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
         dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
                             aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
 
+      }
+    }
+  }
+
+*/
 
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
