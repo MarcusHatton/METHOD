@@ -323,12 +323,12 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
 
   // Do what we can first before root-find
 
-  aux[Aux::pi00] = prims[Prims::pi11] + prims[Prims::pi22] + prims[Prims::pi33]; // this one can be done here fine
+  aux[Aux::pi00] = aux[Aux::pi11] + aux[Aux::pi22] + aux[Aux::pi33]; // this one can be done here fine
   // what about these? need them in the guesses...
-  aux[Aux::qv] = prims[Prims::q1]*prims[Prims::v1] + prims[Prims::q2]*prims[Prims::v2] + prims[Prims::q3]*prims[Prims::v3];
-  aux[Aux::pi01] = prims[Prims::pi11]*prims[Prims::v1] + prims[Prims::pi12]*prims[Prims::v2] + prims[Prims::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
-  aux[Aux::pi02] = prims[Prims::pi12]*prims[Prims::v1] + prims[Prims::pi22]*prims[Prims::v2] + prims[Prims::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
-  aux[Aux::pi03] = prims[Prims::pi13]*prims[Prims::v1] + prims[Prims::pi23]*prims[Prims::v2] + prims[Prims::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+  aux[Aux::qv] = aux[Aux::q1]*prims[Prims::v1] + aux[Aux::q2]*prims[Prims::v2] + aux[Aux::q3]*prims[Prims::v3];
+  aux[Aux::pi01] = aux[Aux::pi11]*prims[Prims::v1] + aux[Aux::pi12]*prims[Prims::v2] + aux[Aux::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+  aux[Aux::pi02] = aux[Aux::pi12]*prims[Prims::v1] + aux[Aux::pi22]*prims[Prims::v2] + aux[Aux::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+  aux[Aux::pi03] = aux[Aux::pi13]*prims[Prims::v1] + aux[Aux::pi23]*prims[Prims::v2] + aux[Aux::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
 
   // Hybrd1 set-up
   Args args;                      // Additional arguments structure
@@ -346,25 +346,25 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   args.S2_rf = cons[Cons::S2];
   args.S3_rf = cons[Cons::S3];
   args.Tau_rf = cons[Cons::Tau];
-  args.A_rf = prims[Prims::A]
-  args.q1_rf = prims[Prims::q1];
-  args.q2_rf = prims[Prims::q2];
-  args.q3_rf = prims[Prims::q3];
-  args.Pi_rf = prims[Prims::Pi];
-  args.pi11_rf = prims[Prims::pi11];
-  args.pi12_rf = prims[Prims::pi12];
-  args.pi13_rf = prims[Prims::pi13];
-  args.pi22_rf = prims[Prims::pi22];
-  args.pi23_rf = prims[Prims::pi23];
-  args.pi33_rf = prims[Prims::pi33];
+  args.A_rf = aux[Aux::A]
+  args.q1_rf = aux[Aux::q1];
+  args.q2_rf = aux[Aux::q2];
+  args.q3_rf = aux[Aux::q3];
+  args.Pi_rf = aux[Aux::Pi];
+  args.pi11_rf = aux[Aux::pi11];
+  args.pi12_rf = aux[Aux::pi12];
+  args.pi13_rf = aux[Aux::pi13];
+  args.pi22_rf = aux[Aux::pi22];
+  args.pi23_rf = aux[Aux::pi23];
+  args.pi33_rf = aux[Aux::pi33];
   args.gamma = d->gamma;
   
   if (alternative_C2P) {
   
-    sol[0] = 1/(aux[Aux::W]*(1 + (prims[Prims::p]*(d->gamma/(d->gamma-1)) + prims[Prims::Pi])/prims[Prims::n]));
-    sol[1] = (prims[Prims::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
-    sol[2] = (prims[Prims::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
-    sol[3] = (prims[Prims::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
+    sol[0] = 1/(aux[Aux::W]*(1 + (prims[Prims::p]*(d->gamma/(d->gamma-1)) + aux[Aux::Pi])/prims[Prims::n]));
+    sol[1] = (aux[Aux::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
+    sol[2] = (aux[Aux::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
+    sol[3] = (aux[Aux::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
   
     // Solve residual = 0
     info = __cminpack_func__(hybrd1) (&ISAlternativeResidual, &args, sys_size, sol, res,
@@ -381,15 +381,15 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
     prims[Prims::v1] = sol[0]*(cons[Cons::S1] - sol[1])/cons[Cons::D];
     prims[Prims::v2] = sol[0]*(cons[Cons::S2] - sol[2])/cons[Cons::D];
     prims[Prims::v3] = sol[0]*(cons[Cons::S3] - sol[3])/cons[Cons::D];
-    aux[Aux::pi00] = prims[Prims::pi11] + prims[Prims::pi22] + prims[Prims::pi33]; // not sure we need this again here tbh
-    aux[Aux::qv] = prims[Prims::q1]*prims[Prims::v1] + prims[Prims::q2]*prims[Prims::v2] + prims[Prims::q3]*prims[Prims::v3];
-    prims[Prims::p] = cons[Cons::D]*(1/sol[0] -1) - prims[Prims::Pi] + 2*aux[Aux::qv]*aux[Aux::W] + aux[Aux::pi00] - cons[Cons::Tau];
+    aux[Aux::pi00] = aux[Aux::pi11] + aux[Aux::pi22] + aux[Aux::pi33]; // not sure we need this again here tbh
+    aux[Aux::qv] = aux[Aux::q1]*prims[Prims::v1] + aux[Aux::q2]*prims[Prims::v2] + aux[Aux::q3]*prims[Prims::v3];
+    prims[Prims::p] = cons[Cons::D]*(1/sol[0] -1) - aux[Aux::Pi] + 2*aux[Aux::qv]*aux[Aux::W] + aux[Aux::pi00] - cons[Cons::Tau];
     prims[Prims::rho] = prims[Prims::n] + prims[Prims::p]/(d->gamma-1);
     
     // Repeating the ones here that depend on v1,v2,v3...
-    aux[Aux::pi01] = prims[Prims::pi11]*prims[Prims::v1] + prims[Prims::pi12]*prims[Prims::v2] + prims[Prims::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
-    aux[Aux::pi02] = prims[Prims::pi12]*prims[Prims::v1] + prims[Prims::pi22]*prims[Prims::v2] + prims[Prims::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
-    aux[Aux::pi03] = prims[Prims::pi13]*prims[Prims::v1] + prims[Prims::pi23]*prims[Prims::v2] + prims[Prims::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+    aux[Aux::pi01] = aux[Aux::pi11]*prims[Prims::v1] + aux[Aux::pi12]*prims[Prims::v2] + aux[Aux::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+    aux[Aux::pi02] = aux[Aux::pi12]*prims[Prims::v1] + aux[Aux::pi22]*prims[Prims::v2] + aux[Aux::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+    aux[Aux::pi03] = aux[Aux::pi13]*prims[Prims::v1] + aux[Aux::pi23]*prims[Prims::v2] + aux[Aux::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
           
     aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
     aux[Aux::T] = prims[Prims::p] / prims[Prims::n]; 
@@ -397,10 +397,10 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   
   } else {
   
-    sol[0] = prims[Prims::p] + prims[Prims::Pi] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
-    sol[1] = (prims[Prims::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
-    sol[2] = (prims[Prims::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
-    sol[3] = (prims[Prims::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
+    sol[0] = prims[Prims::p] + aux[Aux::Pi] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
+    sol[1] = (aux[Aux::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
+    sol[2] = (aux[Aux::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
+    sol[3] = (aux[Aux::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
   
     // Solve residual = 0
     info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
@@ -415,18 +415,18 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
                        /((cons[Cons::Tau] + cons[Cons::D] + sol[0])*(cons[Cons::Tau]  + cons[Cons::D] + sol[0]));
     aux[Aux::W] = 1 / sqrt((1-aux[Aux::vsqrd]));
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
-    aux[Aux::rho_plus_p] = (cons[Cons::Tau] + cons[Cons::D] + sol[0])/(aux[Aux::W]*aux[Aux::W]) - (prims[Prims::Pi] + prims[Prims::A]);
-    prims[Prims::v1] = (cons[Cons::S1] - sol[1])/((aux[Aux::rho_plus_p] + prims[Prims::Pi] + prims[Prims::A])*aux[Aux::W]*aux[Aux::W]);
-    prims[Prims::v2] = (cons[Cons::S2] - sol[2])/((aux[Aux::rho_plus_p] + prims[Prims::Pi] + prims[Prims::A])*aux[Aux::W]*aux[Aux::W]);  
-    prims[Prims::v3] = (cons[Cons::S3] - sol[3])/((aux[Aux::rho_plus_p] + prims[Prims::Pi] + prims[Prims::A])*aux[Aux::W]*aux[Aux::W]);  
+    aux[Aux::rho_plus_p] = (cons[Cons::Tau] + cons[Cons::D] + sol[0])/(aux[Aux::W]*aux[Aux::W]) - (aux[Aux::Pi] + aux[Aux::A]);
+    prims[Prims::v1] = (cons[Cons::S1] - sol[1])/((aux[Aux::rho_plus_p] + aux[Aux::Pi] + aux[Aux::A])*aux[Aux::W]*aux[Aux::W]);
+    prims[Prims::v2] = (cons[Cons::S2] - sol[2])/((aux[Aux::rho_plus_p] + aux[Aux::Pi] + aux[Aux::A])*aux[Aux::W]*aux[Aux::W]);  
+    prims[Prims::v3] = (cons[Cons::S3] - sol[3])/((aux[Aux::rho_plus_p] + aux[Aux::Pi] + aux[Aux::A])*aux[Aux::W]*aux[Aux::W]);  
     prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n])*((d->gamma-1)/d->gamma);
     prims[Prims::rho] = aux[Aux::rho_plus_p] - prims[Prims::p];
     
     // Repeating the ones here that depend on v1,v2,v3...
-    aux[Aux::qv] = prims[Prims::q1]*prims[Prims::v1] + prims[Prims::q2]*prims[Prims::v2] + prims[Prims::q3]*prims[Prims::v3];
-    aux[Aux::pi01] = prims[Prims::pi11]*prims[Prims::v1] + prims[Prims::pi12]*prims[Prims::v2] + prims[Prims::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
-    aux[Aux::pi02] = prims[Prims::pi12]*prims[Prims::v1] + prims[Prims::pi22]*prims[Prims::v2] + prims[Prims::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
-    aux[Aux::pi03] = prims[Prims::pi13]*prims[Prims::v1] + prims[Prims::pi23]*prims[Prims::v2] + prims[Prims::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+    aux[Aux::qv] = aux[Aux::q1]*prims[Prims::v1] + aux[Aux::q2]*prims[Prims::v2] + aux[Aux::q3]*prims[Prims::v3];
+    aux[Aux::pi01] = aux[Aux::pi11]*prims[Prims::v1] + aux[Aux::pi12]*prims[Prims::v2] + aux[Aux::pi13]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+    aux[Aux::pi02] = aux[Aux::pi12]*prims[Prims::v1] + aux[Aux::pi22]*prims[Prims::v2] + aux[Aux::pi23]*prims[Prims::v3]; // dbl check sign on orthogonality relation
+    aux[Aux::pi03] = aux[Aux::pi13]*prims[Prims::v1] + aux[Aux::pi23]*prims[Prims::v2] + aux[Aux::pi33]*prims[Prims::v3]; // dbl check sign on orthogonality relation
           
     aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
     aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
