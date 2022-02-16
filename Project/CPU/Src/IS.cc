@@ -237,7 +237,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double vsqrd_rf = ((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((E_rf + x[0])*(E_rf + x[0]));
   double W_rf(1 / sqrt(1 - vsqrd_rf));
   double n_rf(args->D_rf / W_rf);
-  double rho_plus_p_rf = ((E_rf + x[0])/(W_rf*W_rf)) - (args->Pi_rf + args->A_rf;
+  double rho_plus_p_rf = ((E_rf + x[0])/(W_rf*W_rf)) - (args->Pi_rf + args->A_rf);
   double v1_rf = (args->S1_rf - x[1])/((rho_plus_p_rf + args->Pi_rf + args->A_rf)*W_rf*W_rf);
   double v2_rf = (args->S2_rf - x[2])/((rho_plus_p_rf + args->Pi_rf + args->A_rf)*W_rf*W_rf);
   double v3_rf = (args->S3_rf - x[3])/((rho_plus_p_rf + args->Pi_rf + args->A_rf)*W_rf*W_rf);
@@ -477,7 +477,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
 
-        aux[ID(Aux::W, i, j, k)] = 1 / ( 1 - (prims[ID(Prims::v1, i, j, k)]**2 + prims[ID(Prims::v2, i, j, k)]**2 + prims[ID(Prims::v3, i, j, k)]**2) )**0.5; // Point in re-calcing this here?
+        aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
+          + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
+          + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) ); // Point in re-calcing this here?
         aux[ID(Aux::qv, i, j, k)] = (aux[ID(Aux::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) 
                                + (aux[ID(Aux::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
                                + (aux[ID(Aux::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
@@ -492,7 +494,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                  + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                  + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
 
-        sol[0] = prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)] - 2*aux[ID(Aux::qv, i, j, k)]*aux[ID(Aux::W, i, j, k)] - aux[ID(Aux::pi00, i, j, k)];
+        sol[0] = prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)] - 2*aux[ID(Aux::qv, i, j, k)]*aux[ID(Aux::W, i, j, k)] - aux[ID(Aux::pi00, i, j, k)];
         sol[1] = (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
         sol[2] = (aux[ID(Aux::q2, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi02, i, j, k)];
         sol[3] = (aux[ID(Aux::q3, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi03, i, j, k)];
@@ -503,7 +505,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         args.S2_rf = cons[ID(Cons::S2, i, j, k)];
         args.S3_rf = cons[ID(Cons::S3, i, j, k)];
         args.Tau_rf = cons[ID(Cons::Tau, i, j, k)];
-        args.A_rf = prims[ID(Prims::A, i, j, k)];
+        args.A_rf = aux[ID(Aux::A, i, j, k)];
         args.q1_rf = aux[ID(Aux::q1, i, j, k)];
         args.q2_rf = aux[ID(Aux::q2, i, j, k)];
         args.q3_rf = aux[ID(Aux::q3, i, j, k)];
@@ -576,13 +578,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt((1-aux[ID(Aux::vsqrd, i, j, k)]));
         prims[ID(Prims::n, i, j, k)] = cons[ID(Cons::D, i, j, k)] / aux[ID(Aux::W, i, j, k)];
         aux[ID(Aux::rho_plus_p, i, j, k)] = ((cons[ID(Cons::Tau, i, j, k)] + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)])
-                                            /(aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)])) - (aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)]);
+                                            /(aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)])) - (aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]);
         prims[ID(Prims::v1, i, j, k)] = (cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
-                                  + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);
+                                  + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);
         prims[ID(Prims::v2, i, j, k)] = (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
-                                  + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
+                                  + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
         prims[ID(Prims::v3, i, j, k)] = (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
-                                  + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
+                                  + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
         prims[ID(Prims::p, i, j, k)] = (aux[ID(Aux::rho_plus_p, i, j, k)] - prims[ID(Prims::n, i, j, k)])*((d->gamma-1)/d->gamma);
         prims[ID(Prims::rho, i, j, k)] = aux[ID(Aux::rho_plus_p, i, j, k)] - prims[ID(Prims::p, i, j, k)];
 
@@ -819,14 +821,14 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         // D
         cons[ID(Cons::D, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)];
         // S1,2,3
-        cons[ID(Cons::S1, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)] 
+        cons[ID(Cons::S1, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)] 
           + (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
-        cons[ID(Cons::S2, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)] 
+        cons[ID(Cons::S2, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)] 
           + (aux[ID(Aux::q2, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi02, i, j, k)];
-        cons[ID(Cons::S3, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v3, i, j, k)] 
+        cons[ID(Cons::S3, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v3, i, j, k)] 
           + (aux[ID(Aux::q3, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v3, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi03, i, j, k)];
         // Tau
-        cons[ID(Cons::Tau, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] 
+        cons[ID(Cons::Tau, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] 
         - (prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)]) 
         + 2*aux[ID(Aux::qv, i, j, k)]*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi00, i, j, k)];
       }  
