@@ -167,16 +167,16 @@ int main(int argc, char *argv[]) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
-//          if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
+          if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
 //          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
-          if ( abs(d->cons[ID(v, i, j, k)] - ConsValues[v]) > 1e-5 * abs(ConsValues[v]) ) {
+//          if ( abs(d->cons[ID(v, i, j, k)] - ConsValues[v]) > 1e-5 * abs(ConsValues[v]) ) {
             
             // Prims comparison
             cout << "\nFails (nprim/con, i, j, k) " << v << " " << i << " " << j << " " << k << endl;
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
-//              cout << orig_prims[ID(vz, i, j, k)] << " ";
-              cout << PrimsValues[vz] << " ";
+              cout << orig_prims[ID(vz, i, j, k)] << " ";
+//              cout << PrimsValues[vz] << " ";
             }
             cout << endl;
             cout << "Prims ";
@@ -186,27 +186,27 @@ int main(int argc, char *argv[]) {
             cout << endl;
             cout << "Diffs ";
             for (int vz(0); vz < d->Nprims; vz++) {
-  //            cout << orig_prims[ID(vz, i, j, k)] - d->prims[ID(vz, i, j, k)] << " ";
-              cout << PrimsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
+              cout << orig_prims[ID(vz, i, j, k)] - d->prims[ID(vz, i, j, k)] << " ";
+  //            cout << PrimsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
 
             // Cons comparison
-            cout << "\nOrigs ";
-            for (int vz(0); vz < d->Ncons; vz++) {
-              cout << ConsValues[vz] << " ";
-            }
-            cout << endl;
+            // cout << "\nOrigs ";
+            // for (int vz(0); vz < d->Ncons; vz++) {
+            //   cout << ConsValues[vz] << " ";
+            // }
+            // cout << endl;
             cout << "Cons ";
             for (int vz(0); vz < d->Ncons; vz++) {
               cout << d->cons[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
-            cout << "Diffs ";
-            for (int vz(0); vz < d->Ncons; vz++) {
-              cout << ConsValues[vz] - d->cons[ID(vz, i, j, k)] << " ";
-            }
-            cout << endl;
+            // cout << "Diffs ";
+            // for (int vz(0); vz < d->Ncons; vz++) {
+            //   cout << ConsValues[vz] - d->cons[ID(vz, i, j, k)] << " ";
+            // }
+            // cout << endl;
 
             exit(0);
           }
