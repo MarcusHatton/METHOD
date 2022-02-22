@@ -735,6 +735,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(1); i < d->Nx-1; i++) {
     for (int j(1); j < d->Ny-1; j++) {
       for (int k(1); k < d->Nz-1; k++) {
+
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx) 
             + (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v2, i, j+1, k)] - aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j-1, k)])/(2*d->dy)
             + (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v3, i, j, k+1)] - aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k-1)])/(2*d->dz);
@@ -799,6 +800,31 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
       }
     }
   }  
+
+  // Addition BDNK variables
+ for (int aux_count(0); aux_count < d->Naux; aux_count++) {
+
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
+        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
+      }
+    }
+
+    for (int i(0); i < d->Nx; i++) {
+          for (int k(1); k < d->Nz-1; k++) {
+            aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
+            aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
+          }
+        }
+
+    for (int i(0); i < d->Nx; i++) {
+          for (int j(0); j < d->Ny; j++) {
+            aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
+            aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
+          }
+        }
+ }
 
   // pi^0_j
   for (int i(0); i < d->Nx; i++) {
