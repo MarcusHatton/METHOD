@@ -129,33 +129,33 @@ int main(int argc, char *argv[]) {
   // }
 
 
-/*
+
   //P2C
   model.primsToAll(d->cons, d->prims, d->aux);
-*/
-  //Perturb prims
+
+  // Perturb prims
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        for (int v(0); v < d->Nprims; v++) {
+          d->prims[ID(v, i, j, k)] *= 1.3;
+        }
+      }
+    }
+  }
+
+
+  // // Check nearby Cons stability
   // for (int i(d->is); i < d->ie; i++) {
   //   for (int j(d->js); j < d->je; j++) {
   //     for (int k(d->ks); k < d->ke; k++) {
-  //       for (int v(0); v < d->Nprims; v++) {
-  //         d->prims[ID(v, i, j, k)] *= 1.3;
+  //       for (int v(0); v < d->Ncons; v++) {
+  //         d->cons[ID(v, i, j, k)] *= 1.2 - (double(v)/50.0);
   //       }
   //     }
   //   }
   // }
 
-/*
-  // Check nearby Cons stability
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        for (int v(0); v < d->Ncons; v++) {
-          d->cons[ID(v, i, j, k)] *= 1.2 - (double(v)/50.0);
-        }
-      }
-    }
-  }
-*/
 
   //C2P
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
