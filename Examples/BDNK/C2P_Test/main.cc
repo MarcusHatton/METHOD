@@ -97,9 +97,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) {
         for (int count(0); count < d->Nprims; count++) {
           d->prims[ID(count, i, j, k)] = orig_prims[ID(count, i, j, k)];
         }
