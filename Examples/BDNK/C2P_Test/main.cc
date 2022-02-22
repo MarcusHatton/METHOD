@@ -15,12 +15,12 @@ int main(int argc, char *argv[]) {
   bool alt_C2P = false;
 
   // Set up domain
-  int Ng(4);
+  int Ng(2);
   // int nx(65536);
   // int nx(32768);
-  int nx(1);
-  int ny(1);
-  int nz(1);
+  int nx(8);
+  int ny(8);
+  int nz(8);
   double xmin(-0.5);
   double xmax(0.5);
   double ymin(-1.0);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   // const std::vector<double> toy_params { {0.0e-2, 2.0e-1, 2.0e-2, 2.0e-1, 0, 2.0e-1} };
-  const std::vector<double> toy_params { {0.0, 2.0e-1, 0.0, 2.0e-1, 0, 2.0e-1} };
+  const std::vector<double> toy_params { {1.0e-15, 1.0e-15, 1.0e-15, 1.0e-15, 1.0e-15, 1.0e-15} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -62,11 +62,11 @@ int main(int argc, char *argv[]) {
   orig_prims = new double[d->Ntot * d->Nprims]();
 
   double v_base = 1e-6;
-  double v_max = 2.5e-1;
+  double v_max = 0.8;
   double n_base = 1e-8;
-  double n_max = 1e-1;
+  double n_max = 100;
   double p_base = 1e-6;
-  double p_max = 1e-1;
+  double p_max = 50;
 
   double dn = pow(n_max/n_base,1/nx);
   double dv = pow(v_max/v_base,1/nz);
@@ -75,22 +75,23 @@ int main(int argc, char *argv[]) {
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        orig_prims[ID(5, i, j, k)] = n_base * pow(dn, i-Ng); // n
-        orig_prims[ID(3, i, j, k)] = p_base * pow(dp, j-Ng); // p
-        orig_prims[ID(4, i, j, k)] = orig_prims[ID(5, i, j, k)] + orig_prims[ID(3, i, j, k)]/(d->gamma-1); // rho
         orig_prims[ID(0, i, j, k)] = v_base * pow(dv, k-Ng); // v1
         orig_prims[ID(1, i, j, k)] = -2*v_base * pow(dv, k-Ng); // v2
         orig_prims[ID(2, i, j, k)] = -3*v_base * pow(dv, k-Ng); // v3
-        orig_prims[ID(9, i, j, k)] = 1e-2 * n_base * pow(dn/1.5, i-Ng); // Pi
-        orig_prims[ID(6, i, j, k)] = 1e-2 * v_base * pow(dv/1.2, k-Ng); // q1
-        orig_prims[ID(7, i, j, k)] = 2e-2 * v_base * pow(dv/1.2, k-Ng); // q2
-        orig_prims[ID(8, i, j, k)] = -3e-2 * v_base * pow(dv/1.2, k-Ng); // q3
-        orig_prims[ID(10, i, j, k)] = 1e-2 * n_base * pow(dn/1.4, i-Ng); // pi11
-        orig_prims[ID(11, i, j, k)] = 2e-2 * n_base * pow(dn/1.4, i-Ng); // pi12
-        orig_prims[ID(12, i, j, k)] = 3e-2 * n_base * pow(dn/1.4, i-Ng); // pi13
-        orig_prims[ID(13, i, j, k)] =-1e-2 * n_base * pow(dn/1.4, i-Ng); // pi22
-        orig_prims[ID(14, i, j, k)] =-2e-2 * n_base * pow(dn/1.4, i-Ng); // pi23
-        orig_prims[ID(15, i, j, k)] =-3e-2 * n_base * pow(dn/1.4, i-Ng); // pi33
+        orig_prims[ID(3, i, j, k)] = p_base * pow(dp, j-Ng); // p
+        orig_prims[ID(5, i, j, k)] = n_base * pow(dn, i-Ng); // n
+        orig_prims[ID(4, i, j, k)] = orig_prims[ID(5, i, j, k)] + orig_prims[ID(3, i, j, k)]/(d->gamma-1); // rho
+
+        // orig_prims[ID(9, i, j, k)] = 1e-2 * n_base * pow(dn/1.5, i-Ng); // Pi
+        // orig_prims[ID(6, i, j, k)] = 1e-2 * v_base * pow(dv/1.2, k-Ng); // q1
+        // orig_prims[ID(7, i, j, k)] = 2e-2 * v_base * pow(dv/1.2, k-Ng); // q2
+        // orig_prims[ID(8, i, j, k)] = -3e-2 * v_base * pow(dv/1.2, k-Ng); // q3
+        // orig_prims[ID(10, i, j, k)] = 1e-2 * n_base * pow(dn/1.4, i-Ng); // pi11
+        // orig_prims[ID(11, i, j, k)] = 2e-2 * n_base * pow(dn/1.4, i-Ng); // pi12
+        // orig_prims[ID(12, i, j, k)] = 3e-2 * n_base * pow(dn/1.4, i-Ng); // pi13
+        // orig_prims[ID(13, i, j, k)] =-1e-2 * n_base * pow(dn/1.4, i-Ng); // pi22
+        // orig_prims[ID(14, i, j, k)] =-2e-2 * n_base * pow(dn/1.4, i-Ng); // pi23
+        // orig_prims[ID(15, i, j, k)] =-3e-2 * n_base * pow(dn/1.4, i-Ng); // pi33
         
       }
     }
@@ -99,8 +100,8 @@ int main(int argc, char *argv[]) {
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        for (int v(0); v < d->Nprims; v++) {
-          d->prims[ID(v, i, j, k)] = orig_prims[ID(v, i, j, k)];
+        for (int count(0); count < d->Nprims; count++) {
+          d->prims[ID(count, i, j, k)] = orig_prims[ID(count, i, j, k)];
         }
       }
     }
@@ -166,8 +167,8 @@ int main(int argc, char *argv[]) {
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        for (int v(0); v < d->Nprims; v++) {
-          if ( abs(d->prims[ID(v, i, j, k)] - orig_prims[ID(v, i, j, k)]) > 1e-5 * abs(orig_prims[ID(v, i, j, k)]) ) {
+        for (int count(0); count < d->Nprims; count++) {
+          if ( abs(d->prims[ID(count, i, j, k)] - orig_prims[ID(count, i, j, k)]) > 1e-5 * abs(orig_prims[ID(count, i, j, k)]) ) {
 //          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
 //          if ( abs(d->cons[ID(v, i, j, k)] - ConsValues[v]) > 1e-5 * abs(ConsValues[v]) ) {
             
