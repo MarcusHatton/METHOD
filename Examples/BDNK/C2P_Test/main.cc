@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
   //P2C
-  model.primsToAll(d->cons, d->prims, d->aux);
+  //model.primsToAll(d->cons, d->prims, d->aux);
 
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
