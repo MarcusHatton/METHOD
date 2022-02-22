@@ -756,6 +756,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
             std::cout << prims[ID(Prims::rho, i+1, j, k)] << " \t " << prims[ID(Prims::rho, i-1, j, k)] << std::endl;
             std::cout << prims[ID(Prims::rho, i, j+1, k)] << " \t " << prims[ID(Prims::rho, i, j-1, k)] << std::endl;
             std::cout << prims[ID(Prims::rho, i, j, k+1)] << " \t " << prims[ID(Prims::rho, i, j, k-1)] << std::endl;
+            std::cout <<  prims[ID(Prims::n, i-1, j, k)] << std::endl;
+            std::cout <<  prims[ID(Prims::p, i, j-1, k)] << std::endl;
+            std::cout <<  aux[ID(Aux::e, i, j, k-1)] << std::endl;
           }
 
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
