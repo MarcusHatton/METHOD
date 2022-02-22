@@ -615,8 +615,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   // double eta = d->optionalSimArgs[4];
   // double tau_epsilon = d->optionalSimArgs[5];
 
-  // double beta_epsilon { tau_q*(d->gamma -1) };
-  // double beta_n;  
+  double beta_epsilon { tau_q*(d->gamma -1) };
+  double beta_n;  
 
   double kappa;
   double tau_q;
@@ -754,8 +754,8 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   // double eta = this->data->optionalSimArgs[4];
   // double tau_epsilon = this->data->optionalSimArgs[5];
 
-  // double beta_epsilon { tau_q*(d->gamma -1) };
-  // double beta_n;  
+  double beta_epsilon { tau_q*(d->gamma -1) };
+  double beta_n;  
 
   // Addition BDNK variables
   for (int i(1); i < d->Nx-1; i++) {
