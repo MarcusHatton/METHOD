@@ -615,7 +615,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   // double eta = d->optionalSimArgs[4];
   // double tau_epsilon = d->optionalSimArgs[5];
 
-  double beta_epsilon { tau_q*(d->gamma -1) };
+  double beta_epsilon;
   double beta_n;  
 
   double kappa;
@@ -637,6 +637,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_epsilon = (3/4)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3;
+          beta_epsilon = tau_q*(d->gamma -1);
 
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx) 
             + (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v2, i, j+1, k)] - aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j-1, k)])/(2*d->dy)
@@ -740,13 +741,6 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     }
   }
 
-  double kappa;
-  double tau_q;
-  double zeta;
-  double eta;
-  double tau_epsilon;
-  double tau_Pi;
-
   // double kappa = this->data->optionalSimArgs[0];
   // double tau_q = this->data->optionalSimArgs[1];
   // double zeta = this->data->optionalSimArgs[2];
@@ -754,7 +748,14 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   // double eta = this->data->optionalSimArgs[4];
   // double tau_epsilon = this->data->optionalSimArgs[5];
 
-  double beta_epsilon { tau_q*(d->gamma -1) };
+  double kappa;
+  double tau_q;
+  double zeta;
+  double eta;
+  double tau_epsilon;
+  double tau_Pi;
+
+  double beta_epsilon;
   double beta_n;  
 
   // Addition BDNK variables
@@ -769,6 +770,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_epsilon = (3/4)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3;
+          beta_epsilon = tau_q*(d->gamma -1);
 
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx) 
             + (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v2, i, j+1, k)] - aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j-1, k)])/(2*d->dy)
