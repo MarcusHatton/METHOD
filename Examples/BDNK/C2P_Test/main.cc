@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 //          if ( abs(d->cons[ID(v, i, j, k)] - ConsValues[v]) > 1e-5 * abs(ConsValues[v]) ) {
             
             // Prims comparison
-            cout << "\nFails (nprim/con, i, j, k) " << v << " " << i << " " << j << " " << k << endl;
+            cout << "\nFails (nprim/con, i, j, k) " << count << " " << i << " " << j << " " << k << endl;
             cout << "Origs ";
             for (int vz(0); vz < d->Nprims; vz++) {
               cout << orig_prims[ID(vz, i, j, k)] << " ";
