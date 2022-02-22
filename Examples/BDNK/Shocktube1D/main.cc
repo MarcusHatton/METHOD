@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
+  int nx(80);
   int ny(0);
   int nz(0);
   double xmin(0.0);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-1, 1.0e-1,  1.0e-15, 1.0e-15} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-3, 1.0e-1,  1.0e-15, 1.0e-15} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_epsilon"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
