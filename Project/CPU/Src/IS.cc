@@ -709,6 +709,12 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
                                   + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - aux[ID(Aux::vsqrd, i, j, k)] );
         prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
+        prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
+        prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
+        prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
+        prev_vars[ID(4, i, j, k)] = prims[ID(Prims::p, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
+        prev_vars[ID(5, i, j, k)] = prims[ID(Prims::rho, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
+        prev_vars[ID(6, i, j, k)] = prims[ID(Prims::n, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
         aux[ID(Aux::qv, i, j, k)] = (aux[ID(Aux::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (aux[ID(Aux::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
                                + (aux[ID(Aux::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
         aux[ID(Aux::pi00, i, j, k)] = aux[ID(Aux::pi11, i, j, k)] + aux[ID(Aux::pi22, i, j, k)] + aux[ID(Aux::pi33, i, j, k)];
