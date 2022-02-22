@@ -627,8 +627,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
             + (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v2, i, j+1, k)] - aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j-1, k)])/(2*d->dy)
             + (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v3, i, j, k+1)] - aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k-1)])/(2*d->dz);
 
-          std::cout << aux[ID(Aux::Theta, i, j, k)] << std::endl;
-
           aux[ID(Aux::A, i, j, k)] = -tau_epsilon * ( aux[ID(Aux::W, i, j, k)]*(-aux[ID(Aux::drhodt, i, j, k)] + 
           prims[ID(Prims::v1, i, j, k)]*(prims[ID(Prims::rho, i+1, j, k)] - prims[ID(Prims::rho, i-1, j, k)])/(2*d->dx) + 
           prims[ID(Prims::v2, i, j, k)]*(prims[ID(Prims::rho, i, j+1, k)] - prims[ID(Prims::rho, i, j-1, k)])/(2*d->dy) + 
@@ -752,14 +750,14 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           prims[ID(Prims::v3, i, j, k)]*(prims[ID(Prims::rho, i, j, k+1)] - prims[ID(Prims::rho, i, j, k-1)])/(2*d->dz) ) +
           (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*aux[ID(Aux::Theta, i, j, k)]  );
 
-          if (i==4 && j==4 && k==4) {
-            std::cout << prims[ID(Prims::rho, i+1, j, k)] << " \t " << prims[ID(Prims::rho, i-1, j, k)] << std::endl;
-            std::cout << prims[ID(Prims::rho, i, j+1, k)] << " \t " << prims[ID(Prims::rho, i, j-1, k)] << std::endl;
-            std::cout << prims[ID(Prims::rho, i, j, k+1)] << " \t " << prims[ID(Prims::rho, i, j, k-1)] << std::endl;
-            std::cout <<  prims[ID(Prims::n, i-1, j, k)] << std::endl;
-            std::cout <<  prims[ID(Prims::p, i, j-1, k)] << std::endl;
-            std::cout <<  aux[ID(Aux::e, i, j, k-1)] << std::endl;
-          }
+          // if (i==4 && j==4 && k==4) {
+          //   std::cout << prims[ID(Prims::rho, i+1, j, k)] << " \t " << prims[ID(Prims::rho, i-1, j, k)] << std::endl;
+          //   std::cout << prims[ID(Prims::rho, i, j+1, k)] << " \t " << prims[ID(Prims::rho, i, j-1, k)] << std::endl;
+          //   std::cout << prims[ID(Prims::rho, i, j, k+1)] << " \t " << prims[ID(Prims::rho, i, j, k-1)] << std::endl;
+          //   std::cout <<  prims[ID(Prims::n, i-1, j, k)] << std::endl;
+          //   std::cout <<  prims[ID(Prims::p, i, j-1, k)] << std::endl;
+          //   std::cout <<  aux[ID(Aux::e, i, j, k-1)] << std::endl;
+          // }
 
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
