@@ -72,9 +72,9 @@ int main(int argc, char *argv[]) {
   double dv = pow(v_max/v_base,1/nz);
   double dp = pow(p_max/p_base,1/ny);
   
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) {
         orig_prims[ID(0, i, j, k)] = v_base * pow(dv, k-Ng); // v1
         orig_prims[ID(1, i, j, k)] = -2*v_base * pow(dv, k-Ng); // v2
         orig_prims[ID(2, i, j, k)] = -3*v_base * pow(dv, k-Ng); // v3
