@@ -61,12 +61,12 @@ int main(int argc, char *argv[]) {
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
-  double v_base = 1e-6;
+  double v_base = 1e-3;
   double v_max = 0.8;
-  double n_base = 1e-8;
-  double n_max = 100;
-  double p_base = 1e-6;
-  double p_max = 50;
+  double n_base = 1;
+  double n_max = 30;
+  double p_base = 1;
+  double p_max = 20;
 
   double dn = pow(n_max/n_base,1/nx);
   double dv = pow(v_max/v_base,1/nz);
