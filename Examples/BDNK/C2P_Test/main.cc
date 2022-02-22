@@ -128,8 +128,6 @@ int main(int argc, char *argv[]) {
   //   }
   // }
 
-
-
   //P2C
   model.primsToAll(d->cons, d->prims, d->aux);
 
@@ -138,7 +136,7 @@ int main(int argc, char *argv[]) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
-          d->prims[ID(v, i, j, k)] *= 1.3;
+          d->prims[ID(v, i, j, k)] *= 1.05;
         }
       }
     }
