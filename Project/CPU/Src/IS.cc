@@ -500,7 +500,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
         if (i==4 && j ==0 && k==0)
           std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::rho, i, j, k)] << "\t" << prims[ID(Prims::p, i, j, k)] << "\t" 
-          << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << aux[ID(Aux::qv, i, j, k)] << 
+          << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << 
          "\t" <<  prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::pi01, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
 
 // aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)]
@@ -744,7 +744,32 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
       }
     }
   }  
-  
+
+  // Fix edge cases for BDNK variables (due to derivatives...)
+  for (int aux_count(0); aux_count < d->Naux; aux_count++) {
+
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
+        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
+      }
+    }
+
+    for (int i(0); i < d->Nx; i++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
+        aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
+      }
+    }
+
+    for (int i(0); i < d->Nx; i++) {
+      for (int j(0); j < d->Ny; j++) {
+        aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
+        aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
+      }
+    }
+ }
+
   
 }
 
