@@ -46,30 +46,32 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->primsLabels.push_back("p");   this->data->primsLabels.push_back("rho");
   this->data->primsLabels.push_back("n");
 
+
   // 0
-  this->data->auxLabels.push_back("h");      this->data->auxLabels.push_back("T");
-  this->data->auxLabels.push_back("e");      this->data->auxLabels.push_back("W");
-  // 4
-  this->data->auxLabels.push_back("A");      this->data->auxLabels.push_back("Pi");
-  // 6
+  this->data->auxLabels.push_back("A");      this->data->auxLabels.push_back("Theta");
+  this->data->auxLabels.push_back("Pi");
+  // 3
   this->data->auxLabels.push_back("q0");     this->data->auxLabels.push_back("q1");
   this->data->auxLabels.push_back("q2");     this->data->auxLabels.push_back("q3");   
   this->data->auxLabels.push_back("qv");
-  // 11
+  // 8
   this->data->auxLabels.push_back("pi11");   this->data->auxLabels.push_back("pi12");
   this->data->auxLabels.push_back("pi13");   this->data->auxLabels.push_back("pi22");
   this->data->auxLabels.push_back("pi23");   this->data->auxLabels.push_back("pi33");
   this->data->auxLabels.push_back("pi00");   this->data->auxLabels.push_back("pi01");
   this->data->auxLabels.push_back("pi02");   this->data->auxLabels.push_back("pi03");
-  // 21
+  // 18
+  this->data->auxLabels.push_back("h");      this->data->auxLabels.push_back("T");
+  this->data->auxLabels.push_back("e");      this->data->auxLabels.push_back("W");
+  // 22
   this->data->auxLabels.push_back("dpdt");   this->data->auxLabels.push_back("drhodt");
   this->data->auxLabels.push_back("dndt");   this->data->auxLabels.push_back("dv1dt");
   this->data->auxLabels.push_back("dv2dt");  this->data->auxLabels.push_back("dv3dt");
   this->data->auxLabels.push_back("dWdt");
-  // 28
+  // 29
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
-  this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("Theta");  
-  this->data->auxLabels.push_back("vsqrd");  this->data->auxLabels.push_back("rho_plus_p");
+  this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
+  this->data->auxLabels.push_back("rho_plus_p");
   // 34
 
 }
@@ -746,7 +748,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   }  
 
   // Fix edge cases for BDNK variables (due to derivatives...)
-  for (int aux_count(0); aux_count < d->Naux; aux_count++) {
+  for (int aux_count(0); aux_count < 18; aux_count++) {
 
     for (int j(1); j < d->Ny-1; j++) {
       for (int k(1); k < d->Nz-1; k++) {
@@ -942,31 +944,6 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     }
   }  
 
-  // Addition BDNK variables
- for (int aux_count(0); aux_count < d->Naux; aux_count++) {
-
-    for (int j(1); j < d->Ny-1; j++) {
-      for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
-        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
-      }
-    }
-
-    for (int i(0); i < d->Nx; i++) {
-          for (int k(1); k < d->Nz-1; k++) {
-            aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
-            aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
-          }
-        }
-
-    for (int i(0); i < d->Nx; i++) {
-          for (int j(0); j < d->Ny; j++) {
-            aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
-            aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
-          }
-        }
- }
-
   // pi^0_j
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
@@ -983,6 +960,31 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
       }
     }
   }
+
+  // Edge cases for derivative-containing aux
+  for (int aux_count(0); aux_count < 18; aux_count++) {
+
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
+        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
+      }
+    }
+
+    for (int i(0); i < d->Nx; i++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
+        aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
+      }
+    }
+
+    for (int i(0); i < d->Nx; i++) {
+      for (int j(0); j < d->Ny; j++) {
+        aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
+        aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
+      }
+    }
+ }
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
