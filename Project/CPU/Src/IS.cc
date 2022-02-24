@@ -1055,7 +1055,7 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
           + aux[ID(Aux::pi01+dir, i, j, k)];
       
         if (i==4 && j==0 && k==0)
-          std::cout << f[ID(1, i, j, k)] << "\t" << "\t" << prims[ID(v1, i, j, k)] << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::pi11, i, j, k)] << std::endl;
+          std::cout << f[ID(1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::pi11, i, j, k)] << std::endl;
       
       } // End k loop
     } // End j loop
