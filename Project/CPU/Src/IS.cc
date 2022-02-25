@@ -995,7 +995,8 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         cons[ID(Cons::S1, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)] 
           + (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
 
-        // if (i==4 && j ==0 && k==0)
+        if (i==4 && j ==0 && k==0)
+          std::cout << aux[ID(Aux::Pi, i, j, k)] << std::endl;
         //   std::cout << cons[ID(Cons::S1, i, j, k)] << std::endl;
 
         cons[ID(Cons::S2, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)] 
@@ -1055,10 +1056,10 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
           + (aux[ID(Aux::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
           + aux[ID(Aux::pi01+dir, i, j, k)];
       
-        if (i==4 && j==0 && k==0)
-          std::cout << f[ID(1, i, j, k)] << "\t" << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" 
-          << aux[ID(Aux::W, i, j, k)] <<  "\t" << aux[ID(Aux::Pi, i, j, k)] <<  "\t" << aux[ID(Aux::pi11, i, j, k)] <<  "\t" << aux[ID(Aux::pi12, i, j, k)] << "\t" 
-          << aux[ID(Aux::pi13, i, j, k)] << "\t" <<  prims[ID(Prims::p, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << std::endl;
+        // if (i==4 && j==0 && k==0)
+        //   std::cout << f[ID(1, i, j, k)] << "\t" << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" 
+        //   << aux[ID(Aux::W, i, j, k)] <<  "\t" << aux[ID(Aux::Pi, i, j, k)] <<  "\t" << aux[ID(Aux::pi11, i, j, k)] <<  "\t" << aux[ID(Aux::pi12, i, j, k)] << "\t" 
+        //   << aux[ID(Aux::pi13, i, j, k)] << "\t" <<  prims[ID(Prims::p, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << std::endl;
       
       } // End k loop
     } // End j loop
