@@ -25,9 +25,9 @@ class IS : public Model
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n };
-    enum Aux { h, T, e, W, A, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
-               pi00, pi01, pi02, pi03, dpdt, drhodt, dndt,  dv1dt, 
-               dv2dt, dv3dt, dWdt, a1, a2, a3, Theta, vsqrd, rho_plus_p };
+    enum Aux { A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
+               pi00, pi01, pi02, pi03, h, T, e, W,  dpdt, drhodt, dndt, dv1dt, 
+               dv2dt, dv3dt, dWdt, a1, a2, a3, vsqrd, rho_plus_p };
 
 
     int smartGuesses;     //!< Number of smart guess required
