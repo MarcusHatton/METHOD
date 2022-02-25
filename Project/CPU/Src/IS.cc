@@ -1021,6 +1021,10 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
+
+        if (i==4 && j==0 && k==0)
+          std::cout << f[ID(1, i, j, k)] << "\t" << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
+
         // Dv
         f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
