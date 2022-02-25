@@ -640,7 +640,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
       for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
           
           tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          zeta = ;
           // double tau_Pi = d->optionalSimArgs[3];
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_epsilon = (3/4)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
