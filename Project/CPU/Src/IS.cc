@@ -816,10 +816,6 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         prev_vars[ID(4, i, j, k)] = prims[ID(Prims::p, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
         prev_vars[ID(5, i, j, k)] = prims[ID(Prims::rho, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
         prev_vars[ID(6, i, j, k)] = prims[ID(Prims::n, i, j, k)]; // Set here for time-differencing - necessary? what about the others?
-        aux[ID(Aux::qv, i, j, k)] = (aux[ID(Aux::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (aux[ID(Aux::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
-                               + (aux[ID(Aux::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
-        aux[ID(Aux::pi00, i, j, k)] = aux[ID(Aux::pi11, i, j, k)] + aux[ID(Aux::pi22, i, j, k)] + aux[ID(Aux::pi33, i, j, k)];
-
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
         prims[ID(Prims::rho, i, j, k)] = prims[ID(Prims::n, i, j, k)]*(1+aux[ID(Aux::e, i, j, k)]);
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
@@ -846,13 +842,13 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   double beta_n;  
 
   // Addition BDNK variables
-  // for (int i(1); i < d->Nx-1; i++) {
-  //   for (int j(1); j < d->Ny-1; j++) {
-  //     for (int k(1); k < d->Nz-1; k++) {
+  for (int i(1); i < d->Nx-1; i++) {
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
 
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  // for (int i(d->is); i < d->ie; i++) {
+  //   for (int j(d->js); j < d->je; j++) {
+  //     for (int k(d->ks); k < d->ke; k++) {
  
           tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           // double tau_Pi = d->optionalSimArgs[3];
@@ -965,7 +961,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     }
   }  
 
-  // pi^0_j
+  // pi^0_mu, qv
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) { // Minus signs here (?)
@@ -978,34 +974,38 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
          aux[ID(Aux::pi03, i, j, k)] = aux[ID(Aux::pi13, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
                                   + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                   + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
+        aux[ID(Aux::qv, i, j, k)] = (aux[ID(Aux::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (aux[ID(Aux::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
+                               + (aux[ID(Aux::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
+        aux[ID(Aux::pi00, i, j, k)] = aux[ID(Aux::pi11, i, j, k)] + aux[ID(Aux::pi22, i, j, k)] + aux[ID(Aux::pi33, i, j, k)];
+
       }
     }
   }
 
-//   // Edge cases for derivative-containing aux
-//   for (int aux_count(0); aux_count < 18; aux_count++) {
+  // Edge cases for derivative-containing aux
+  for (int aux_count(0); aux_count < 18; aux_count++) {
 
-//     for (int j(1); j < d->Ny-1; j++) {
-//       for (int k(1); k < d->Nz-1; k++) {
-//         aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
-//         aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
-//       }
-//     }
+    for (int j(1); j < d->Ny-1; j++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
+        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
+      }
+    }
 
-//     for (int i(0); i < d->Nx; i++) {
-//       for (int k(1); k < d->Nz-1; k++) {
-//         aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
-//         aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
-//       }
-//     }
+    for (int i(0); i < d->Nx; i++) {
+      for (int k(1); k < d->Nz-1; k++) {
+        aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
+        aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
+      }
+    }
 
-//     for (int i(0); i < d->Nx; i++) {
-//       for (int j(0); j < d->Ny; j++) {
-//         aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
-//         aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
-//       }
-//     }
-//  }
+    for (int i(0); i < d->Nx; i++) {
+      for (int j(0); j < d->Ny; j++) {
+        aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
+        aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
+      }
+    }
+ }
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
