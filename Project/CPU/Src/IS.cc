@@ -473,10 +473,14 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa3[n];                     // Work array
   double wa4[n];                     // Work array
   */
-  
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+
+  // for (int i(d->is); i < d->ie; i++) {
+  //   for (int j(d->js); j < d->je; j++) {
+  //     for (int k(d->ks); k < d->ke; k++) {
+
+  for (int i(d->is-1); i < d->ie+1; i++) {
+    for (int j(d->js-1); j < d->je+1; j++) {
+      for (int k(d->ks-1); k < d->ke+1; k++) {
 
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
           + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
@@ -504,8 +508,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::rho, i, j, k)] << "\t" << prims[ID(Prims::p, i, j, k)] << "\t" 
           << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << 
          "\t" <<  prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::pi01, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
-
-// aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)]
 
         // Set additional args for rootfind
         args.D_rf = cons[ID(Cons::D, i, j, k)];
@@ -572,10 +574,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     } // End j-loop
   } // End i-loop
   
+  for (int i(d->is-1); i < d->ie+1; i++) {
+    for (int j(d->js-1); j < d->je+1; j++) {
+      for (int k(d->ks-1); k < d->ke+1; k++) {
 
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  // for (int i(d->is); i < d->ie; i++) {
+  //   for (int j(d->js); j < d->je; j++) {
+  //     for (int k(d->ks); k < d->ke; k++) {
 
         // C2P Scheme as outlined in HP/FYR
         aux[ID(Aux::vsqrd, i, j, k)] = ((cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)]) 
@@ -642,10 +647,14 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   //   for (int j(d->js+1); j < d->je-1; j++) {
   //     for (int k(d->ks+1); k < d->ke-1; k++) {
 
-  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
-    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
-      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
+  // for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
+  //   for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
+  //     for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
           
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+
           tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           // double tau_Pi = d->optionalSimArgs[3];
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
@@ -755,30 +764,30 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     }
   }  
 
-  // Fix edge cases for BDNK variables (due to derivatives...)
-  for (int aux_count(0); aux_count < 18; aux_count++) {
+//   // Fix edge cases for BDNK variables (due to derivatives...)
+//   for (int aux_count(0); aux_count < 18; aux_count++) {
 
-    for (int j(1); j < d->Ny-1; j++) {
-      for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
-        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
-      }
-    }
+//     for (int j(1); j < d->Ny-1; j++) {
+//       for (int k(1); k < d->Nz-1; k++) {
+//         aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
+//         aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
+//       }
+//     }
 
-    for (int i(0); i < d->Nx; i++) {
-      for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
-        aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
-      }
-    }
+//     for (int i(0); i < d->Nx; i++) {
+//       for (int k(1); k < d->Nz-1; k++) {
+//         aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
+//         aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
+//       }
+//     }
 
-    for (int i(0); i < d->Nx; i++) {
-      for (int j(0); j < d->Ny; j++) {
-        aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
-        aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
-      }
-    }
- }
+//     for (int i(0); i < d->Nx; i++) {
+//       for (int j(0); j < d->Ny; j++) {
+//         aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
+//         aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
+//       }
+//     }
+//  }
 
   //if (i==4 && j ==0 && k==0)
   std::cout << zeta << "\t" << aux[ID(Aux::Pi, 4, 0, 0)] << "\t" << aux[ID(Aux::A, 4, 0, 0)] << "\t" << aux[ID(Aux::Theta, 4, 0, 0)] << "\t" << std::endl;
@@ -969,30 +978,30 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     }
   }
 
-  // Edge cases for derivative-containing aux
-  for (int aux_count(0); aux_count < 18; aux_count++) {
+//   // Edge cases for derivative-containing aux
+//   for (int aux_count(0); aux_count < 18; aux_count++) {
 
-    for (int j(1); j < d->Ny-1; j++) {
-      for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
-        aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
-      }
-    }
+//     for (int j(1); j < d->Ny-1; j++) {
+//       for (int k(1); k < d->Nz-1; k++) {
+//         aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
+//         aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
+//       }
+//     }
 
-    for (int i(0); i < d->Nx; i++) {
-      for (int k(1); k < d->Nz-1; k++) {
-        aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
-        aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
-      }
-    }
+//     for (int i(0); i < d->Nx; i++) {
+//       for (int k(1); k < d->Nz-1; k++) {
+//         aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
+//         aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
+//       }
+//     }
 
-    for (int i(0); i < d->Nx; i++) {
-      for (int j(0); j < d->Ny; j++) {
-        aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
-        aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
-      }
-    }
- }
+//     for (int i(0); i < d->Nx; i++) {
+//       for (int j(0); j < d->Ny; j++) {
+//         aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
+//         aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
+//       }
+//     }
+//  }
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
