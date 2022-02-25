@@ -634,6 +634,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double tau_epsilon;
   double tau_Pi;
 
+  std::cout << d->is_minus.at(0) << std::endl;
+
   // Addition BDNK variables
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
