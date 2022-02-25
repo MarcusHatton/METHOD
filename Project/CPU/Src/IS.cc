@@ -638,6 +638,10 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   std::cout << d->is << std::endl;
 
   // Addition BDNK variables
+  // for (int i(d->is+1); i < d->ie-1; i++) {
+  //   for (int j(d->js+1); j < d->je-1; j++) {
+  //     for (int k(d->ks+1); k < d->ke-1; k++) {
+
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
       for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
@@ -665,8 +669,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
-          // if (i==4 && j ==0 && k==0)
-          //   std::cout << zeta << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << "\t" << std::endl;
+          if (i==4 && j ==0 && k==0)
+            std::cout << zeta << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << "\t" << std::endl;
 
           beta_n = -tau_q*(d->gamma - 1) - kappa*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]
             *(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) / (prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]);
@@ -822,9 +826,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   // double eta = this->data->optionalSimArgs[4];
   // double tau_epsilon = this->data->optionalSimArgs[5];
 
-  double kappa;
+  double kappa { d->optionalSimArgs[0] };
   double tau_q;
-  double zeta;
+  double zeta { d->optionalSimArgs[2] };
   double eta;
   double tau_epsilon;
   double tau_Pi;
@@ -837,9 +841,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     for (int j(1); j < d->Ny-1; j++) {
       for (int k(1); k < d->Nz-1; k++) {
 
-          kappa = d->optionalSimArgs[0];
           tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          zeta = d->optionalSimArgs[2];
           // double tau_Pi = d->optionalSimArgs[3];
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_epsilon = (3/4)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
