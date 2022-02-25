@@ -1022,9 +1022,6 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
 
-        if (i==4 && j==0 && k==0)
-          std::cout << f[ID(1, i, j, k)] << "\t" << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
-
         // Dv
         f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
@@ -1059,7 +1056,9 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
           + aux[ID(Aux::pi01+dir, i, j, k)];
       
         if (i==4 && j==0 && k==0)
-          std::cout << f[ID(1, i, j, k)] << "\t" << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
+          std::cout << f[ID(1, i, j, k)] << "\t" << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" 
+          << aux[ID(Aux::W, i, j, k)] <<  "\t" << aux[ID(Aux::Pi, i, j, k)] <<  "\t" << aux[ID(Aux::pi11+nvar, i, j, k)] <<  "\t" << aux[ID(Aux::pi12, i, j, k)] << "\t" << 
+          << aux[ID(Aux::pi13, i, j, k)] << "\t" <<  prims[ID(Prims::p, i, j, k)] << std::endl;
       
       } // End k loop
     } // End j loop
