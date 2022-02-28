@@ -678,8 +678,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
-          if (i==4 && j ==0 && k==0)
-            std::cout << zeta << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << "\t" << std::endl;
+          // if (i==4 && j ==0 && k==0)
+          //   std::cout << zeta << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << "\t" << std::endl;
 
           beta_n = -tau_q*(d->gamma - 1) - kappa*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]
             *(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) / (prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]);
@@ -790,7 +790,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 //  }
 
   //if (i==4 && j ==0 && k==0)
-  std::cout << zeta << "\t" << aux[ID(Aux::Pi, 4, 0, 0)] << "\t" << aux[ID(Aux::A, 4, 0, 0)] << "\t" << aux[ID(Aux::Theta, 4, 0, 0)] << "\t" << std::endl;
+  // std::cout << zeta << "\t" << aux[ID(Aux::Pi, 4, 0, 0)] << "\t" << aux[ID(Aux::A, 4, 0, 0)] << "\t" << aux[ID(Aux::Theta, 4, 0, 0)] << "\t" << std::endl;
   
 }
 
