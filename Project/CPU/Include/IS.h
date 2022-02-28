@@ -176,7 +176,7 @@ class IS : public Model
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
-            // dW/dt \equiv du0/dt
+            // calc derivatives
             aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
             aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
             aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
@@ -196,8 +196,7 @@ class IS : public Model
         } // End j-loop
       } // End i-loop
 
-//      -calc derivatives
-      };
+    };
 
     //! <b> Additional arguments for the IS residual function </b>
     /*!

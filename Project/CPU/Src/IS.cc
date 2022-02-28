@@ -643,17 +643,17 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   std::cout << d->is << std::endl;
 
   // Addition BDNK variables
-  // for (int i(d->is+1); i < d->ie-1; i++) {
-  //   for (int j(d->js+1); j < d->je-1; j++) {
-  //     for (int k(d->ks+1); k < d->ke-1; k++) {
+  for (int i(d->is+1); i < d->ie-1; i++) {
+    for (int j(d->js+1); j < d->je-1; j++) {
+      for (int k(d->ks+1); k < d->ke-1; k++) {
 
   // for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
   //   for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
   //     for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
           
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  // for (int i(d->is); i < d->ie; i++) {
+  //   for (int j(d->js); j < d->je; j++) {
+  //     for (int k(d->ks); k < d->ke; k++) {
 
           tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           // double tau_Pi = d->optionalSimArgs[3];
