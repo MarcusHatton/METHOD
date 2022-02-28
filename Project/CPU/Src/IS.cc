@@ -873,7 +873,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
           if (i==3 && j==3 && k==3) {
-            std::cout << prims[ID(Prims::rho, i, j, k)] << "\t" << d->optionalSimArgs[5] << "\t" << tau_Pi << "\t" << tau_epsilon "\t" << zeta 
+            std::cout << prims[ID(Prims::rho, i, j, k)] << "\t" << d->optionalSimArgs[5] << "\t" << tau_Pi << "\t" << tau_epsilon << "\t" << zeta 
             << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << std::endl;
 
 
