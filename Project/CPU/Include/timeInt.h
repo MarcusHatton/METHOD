@@ -116,8 +116,8 @@ class TimeIntegrator : public TimeIntegratorBase
     */
     void finalise(double * cons, double * prims, double * aux, bool final_step=false)
     {
-//      // Apply BCs
-//      this->bcs->apply(cons, prims, aux);
+     // Apply BCs
+     this->bcs->apply(cons, prims, aux);
     
       // Perfrom C2P
       try {
