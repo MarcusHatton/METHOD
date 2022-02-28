@@ -870,8 +870,13 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           prims[ID(Prims::v3, i, j, k)]*(prims[ID(Prims::rho, i, j, k+1)] - prims[ID(Prims::rho, i, j, k-1)])/(2*d->dz) ) +
           (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*aux[ID(Aux::Theta, i, j, k)]  );
 
+          aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
+
           if (i==3 && j==3 && k==3) {
-            std::cout << prims[ID(Prims::rho, i, j, k)] << "\t" << d->optionalSimArgs[5] << "\t" << tau_Pi << "\t" << tau_epsilon << std::endl;
+            std::cout << prims[ID(Prims::rho, i, j, k)] << "\t" << d->optionalSimArgs[5] << "\t" << tau_Pi << "\t" << tau_epsilon 
+            << "\t" << aux[ID(Aux::Pi, i, j, k)] << std::endl;
+
+
           //   std::cout << prims[ID(Prims::rho, i+1, j, k)] << " \t " << prims[ID(Prims::rho, i-1, j, k)] << std::endl;
           //   std::cout << prims[ID(Prims::rho, i, j+1, k)] << " \t " << prims[ID(Prims::rho, i, j-1, k)] << std::endl;
           //   std::cout << prims[ID(Prims::rho, i, j, k+1)] << " \t " << prims[ID(Prims::rho, i, j, k-1)] << std::endl;
@@ -879,8 +884,6 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           //   std::cout <<  prims[ID(Prims::p, i, j-1, k)] << std::endl;
           //   std::cout <<  aux[ID(Aux::e, i, j, k-1)] << std::endl;
           }
-
-          aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
           beta_n = -tau_q*(d->gamma - 1) - kappa*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]
             *(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) / (prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]);
