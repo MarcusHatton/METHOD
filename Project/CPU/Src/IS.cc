@@ -643,11 +643,11 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
 
-          tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          tau_q = (3.0/4.0)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           // double tau_Pi = d->optionalSimArgs[3];
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          tau_epsilon = (3/4)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          tau_Pi = tau_epsilon/3;
+          tau_epsilon = (3.0/4.0)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1);
 
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx) 
@@ -853,11 +853,11 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   //   for (int j(d->js); j < d->je; j++) {
   //     for (int k(d->ks); k < d->ke; k++) {
  
-          tau_q = (3/4)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          tau_q = (3.0/4.0)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           // double tau_Pi = d->optionalSimArgs[3];
           eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          tau_epsilon = d->optionalSimArgs[5]*(3/4)*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          tau_Pi = tau_epsilon/3;
+          tau_epsilon = (3.0/4.0)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1);
 
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx) 
@@ -874,7 +874,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
 
           if (i==3 && j==3 && k==3) {
             std::cout << prims[ID(Prims::rho, i, j, k)] << "\t" << d->optionalSimArgs[5] << "\t" << tau_Pi << "\t" << tau_epsilon << "\t" << zeta 
-            << "\t" << d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25)
+            << "\t" << (3.0/4.0)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25)
             << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << std::endl;
           //   std::cout << prims[ID(Prims::rho, i+1, j, k)] << " \t " << prims[ID(Prims::rho, i-1, j, k)] << std::endl;
           //   std::cout << prims[ID(Prims::rho, i, j+1, k)] << " \t " << prims[ID(Prims::rho, i, j-1, k)] << std::endl;
