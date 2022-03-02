@@ -632,9 +632,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
   // Addition BDNK variables
 
-  for (int i(d->is+1); i < d->ie-1; i++) {
-    for (int j(d->js+1); j < d->je-1; j++) {
-      for (int k(d->ks+1); k < d->ke-1; k++) {
+  // for (int i(d->is+1); i < d->ie-1; i++) {
+  //   for (int j(d->js+1); j < d->je-1; j++) {
+  //     for (int k(d->ks+1); k < d->ke-1; k++) {
+
+  for (int i(d->is_plus.at(0)); i < d->ie_plus.at(0); i++) {
+    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
+      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
 
   // for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
   //   for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
@@ -763,7 +767,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                     + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                     + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
 
-      std::cout << "Running!" << std::endl;
+          std::cout << "Running!" << std::endl;
 
       }
     }
