@@ -511,10 +511,10 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         sol[2] = (aux[ID(Aux::q2, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi02, i, j, k)];
         sol[3] = (aux[ID(Aux::q3, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi03, i, j, k)];
 
-        if (i==3 && j ==0 && k==0)
-          std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::rho, i, j, k)] << "\t" << prims[ID(Prims::p, i, j, k)] << "\t" 
-          << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << 
-         "\t" <<  prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::pi01, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
+        // if (i==3 && j ==0 && k==0)
+        //   std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::rho, i, j, k)] << "\t" << prims[ID(Prims::p, i, j, k)] << "\t" 
+        //   << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << 
+        //  "\t" <<  prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::pi01, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
 
         // Set additional args for rootfind
         args.D_rf = cons[ID(Cons::D, i, j, k)];
