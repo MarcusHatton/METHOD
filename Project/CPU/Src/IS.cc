@@ -474,7 +474,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa4[n];                     // Work array
   */
 
-  std::cout << d->is << "\t" << d->ie << d->js << "\t" << d->je << std::endl;
+  std::cout << d->is << "\t" << d->ie << "\t" << d->js << "\t" << d->je << std::endl;
 
 
   for (int i(d->is); i < d->ie; i++) {
