@@ -645,9 +645,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   //     for (int k(d->ks); k < d->ke; k++) {
 
           tau_q = (3.0/4.0)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          // double tau_Pi = d->optionalSimArgs[3];
-          eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          tau_epsilon = (3.0/4.0)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          eta = d->optionalSimArgs[3]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          tau_epsilon = (3.0/4.0)*d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1);
 
@@ -768,6 +767,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     }
   }  
 
+
+
   // Fix edge cases for BDNK variables (due to derivatives...)
   for (int aux_count(0); aux_count < 18; aux_count++) {
 
@@ -855,9 +856,8 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   //     for (int k(d->ks); k < d->ke; k++) {
  
           tau_q = (3.0/4.0)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          // double tau_Pi = d->optionalSimArgs[3];
-          eta = d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
-          tau_epsilon = (3.0/4.0)*d->optionalSimArgs[5]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          eta = d->optionalSimArgs[3]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+          tau_epsilon = (3.0/4.0)*d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1);
 
