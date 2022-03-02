@@ -763,11 +763,11 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                     + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                     + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
 
+      std::cout << "Running!" << std::endl;
+
       }
     }
   }  
-
-
 
   // Fix edge cases for BDNK variables (due to derivatives...)
   for (int aux_count(0); aux_count < 18; aux_count++) {
