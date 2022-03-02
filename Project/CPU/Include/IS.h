@@ -172,6 +172,9 @@ class IS : public Model
 
       // Get timestep
       double dt=d->dt;
+      double dx=d->dx;
+      if (dt < 1e-2*dx) return;
+      
       //printf("dt: %.17g", dt);
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {
