@@ -865,13 +865,14 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   double beta_n;  
 
   // Addition BDNK variables
-  for (int i(1); i < d->Nx-1; i++) {
-    for (int j(1); j < d->Ny-1; j++) {
-      for (int k(1); k < d->Nz-1; k++) {
 
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
+  // for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
+  //   for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
+  //     for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
+
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
  
           tau_q = (3.0/4.0)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           eta = d->optionalSimArgs[3]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
