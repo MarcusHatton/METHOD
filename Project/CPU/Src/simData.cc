@@ -120,11 +120,11 @@ void Data::initData(PlatformEnv *env, int nOptionalSimArgs, std::vector<double> 
 
   // Setup loop endings mainly for derivative loop in C2P
   this->is_plus = is+1; 
-  this->ie_minus = ie+-1;
+  this->ie_minus = ie-1;
   this->js_plus = js+1; 
-  this->je_minus = je+-1;
+  this->je_minus = je-1;
   this->ks_plus = ks+1; 
-  this->ke_minus = ke+-1;
+  this->ke_minus = ke-1;
 
   if (dims < 3) {
     this->ks_plus = 0;
