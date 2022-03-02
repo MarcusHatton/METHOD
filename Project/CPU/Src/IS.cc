@@ -636,11 +636,11 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
   // Addition BDNK variables
 
-  // for (int i(d->is+1); i < d->ie-1; i++) {
-  //   for (int j(d->js+1); j < d->je-1; j++) {
-  //     for (int k(d->ks+1); k < d->ke-1; k++) {
-
   std::cout << d->is_minus.at(0) << "\t" << d->is_minus.at(0) << "\t" << d->js_minus.at(0) << "\t" << d->js_minus.at(0) << "\t" << std::endl;
+
+  for (int i(d->is+1); i < d->ie-1; i++) {
+    for (int j(d->js+1); j < d->je-1; j++) {
+      for (int k(d->ks+1); k < d->ke-1; k++) {
 
   // for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
   //   for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
