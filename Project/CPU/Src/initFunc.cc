@@ -1242,11 +1242,12 @@ Blob2dToyQ_CE::Blob2dToyQ_CE(Data * data) : InitialFunc(data)
 }
 
 // Should match the enums in IS.cc
-enum Cons { D, S1, S2, S3, Tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33 };
-enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
-enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-           pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-           dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
+enum Cons { D, S1, S2, S3, Tau };
+enum Prims { v1, v2, v3, p, rho, n };
+enum Aux { A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
+            pi00, pi01, pi02, pi03, h, T, e, W,  dpdt, drhodt, dndt, dv1dt, 
+            dv2dt, dv3dt, dWdt, a1, a2, a3, vsqrd, rho_plus_p };
+
 
 IS_Shocktube_1D_Perp::IS_Shocktube_1D_Perp(Data * data, int dir) : InitialFunc(data)
 {
@@ -1283,9 +1284,6 @@ IS_Shocktube_1D_Perp::IS_Shocktube_1D_Perp(Data * data, int dir) : InitialFunc(d
 
         d->prims[ID(v1, i, j, k)] = 0;
         d->prims[ID(v3, i, j, k)] = 0;
-        for (int ndissvar(0); ndissvar < 10; ndissvar++) {
-          d->prims[ID(q1+ndissvar, i, j, k)] = 0;
-        }
 
       }
     }
@@ -1406,11 +1404,6 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : I
           d->prims[ID(v2, i, j, k)] = - A0 * vShear * sin(2*PI*d->x[i]) * (exp(-pow((d->y[j] + 0.5), 2)/(sig*sig)));
         }
 
-        // If we have electric fields, set to the ideal values
-        for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(q1+nvar, i, j, k)] = 0;
-        }
-
       }
     }
   }
@@ -1447,11 +1440,6 @@ ISKHInstabilityTIIdeal::ISKHInstabilityTIIdeal(Data * data) : InitialFunc(data)
           d->prims[ID(v2, i, j, k)] = 0.0;
         }
 
-        // Set all the dissipative variables to zero
-        for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(6+nvar, i, j, k)] = 0;
-        }
-
       }
     }
   }
@@ -1480,11 +1468,6 @@ ISKHInstabilityTIShear::ISKHInstabilityTIShear(Data * data) : InitialFunc(data)
         d->prims[ID(v1, i, j, k)] = vShear * tanh(d->y[j]/a);
         d->prims[ID(n, i, j, k)] = rho0 + rho1 * tanh(d->y[j]/a);
         d->prims[ID(v2, i, j, k)] = 0.0;
-
-        // Set all the dissipative variables to zero
-        for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(6+nvar, i, j, k)] = 0;
-        }
 
       }
     }
@@ -1515,9 +1498,6 @@ Shocktube_Chab21::Shocktube_Chab21(Data * data) : InitialFunc(data)
 
         d->prims[ID(v1, i, j, k)] = 0;
         d->prims[ID(v3, i, j, k)] = 0;
-        for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(q1+nvar, i, j, k)] = 0;
-        }
 
       }
     }
@@ -1549,10 +1529,6 @@ IS_C2PStressTest::IS_C2PStressTest(Data * data) : InitialFunc(data)
           d->prims[ID(v1, i, j, k)] = (rand() % 10) / 15;
           d->prims[ID(v2, i, j, k)] = (rand() % 10) / -20;
           d->prims[ID(v3, i, j, k)] = (rand() % 10) / 50;
-
-        for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(q1+nvar, i, j, k)] = 0; // (rand() % 10) / 10;
-        }
 
       }
     }
@@ -1622,6 +1598,30 @@ IS_BulkHeatTest::IS_BulkHeatTest(Data * data) : InitialFunc(data)
 
 }
 
+Smeared_Shocktube_1D_Para::Smeared_Shocktube_1D_Para(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  //if ((d->xmin != 0.0 || d->xmax != 1.0) && dir==0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  //if ((d->ymin != 0.0 || d->ymax != 1.0) && dir==1) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  //if ((d->zmin != 0.0 || d->zmax != 1.0) && dir==2) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        d->prims[ID(3, i, j, k)] = 5.5 + 4.5*tanh(100*(d->x[i] - 0.5));
+        d->prims[ID(5, i, j, k)] = 5.5 + 4.5*tanh(100*(d->x[i] - 0.5));
+        d->prims[ID(0, i, j, k)] = 0.2*tanh(100*(d->x[i] - 0.5));
+        d->prims[ID(1, i, j, k)] = 0;
+        d->prims[ID(2, i, j, k)] = 0;
+      }
+    }
+  }
+
+}
 
 
 
