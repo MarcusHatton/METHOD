@@ -1612,9 +1612,9 @@ Smeared_Shocktube_1D_Para::Smeared_Shocktube_1D_Para(Data * data) : InitialFunc(
   for (int i(0); i<d->Nx; i++) {
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
-        d->prims[ID(3, i, j, k)] = 5.5 + 4.5*tanh(-abs(100*(d->x[i] - 0.5)));
-        d->prims[ID(5, i, j, k)] = 5.5 + 4.5*tanh(-abs(100*(d->x[i] - 0.5)));
-        d->prims[ID(0, i, j, k)] = 0.2*tanh(-abs(100*(d->x[i] - 0.5)));
+        d->prims[ID(3, i, j, k)] = 5.5 + 4.5*tanh(-100*(d->x[i] - 0.5));
+        d->prims[ID(5, i, j, k)] = 5.5 + 4.5*tanh(-100*(d->x[i] - 0.5));
+        d->prims[ID(0, i, j, k)] = 0.2*tanh(-100*(d->x[i] - 0.5));
         d->prims[ID(1, i, j, k)] = 0;
         d->prims[ID(2, i, j, k)] = 0;
       }
