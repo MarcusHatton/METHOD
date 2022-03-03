@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  //double endTime(2.0);
   double endTime(2.0);
+  //double endTime(5.0);
   
   double cfl(0.1);
   // double gamma(0.001);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
   double eta_0 = 1.0e-15;
-  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-15, eta_0, (25/4)*eta_0} };
+  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-2, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -78,7 +78,8 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  IS_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
+  Smeared_Shocktube_1D_Para init(&data);
+  //IS_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
