@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(2.0);
+  double endTime(5.0);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-1, 1.0e-1,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -75,7 +75,8 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  IS_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
+  Smeared_Shocktube_1D_Para init(&data);
+  //IS_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
