@@ -22,16 +22,16 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
+  int nx(2000);
   int ny(0);
   int nz(0);
   double xmin(0.0);
-  double xmax(5.0);
+  double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(2.0);
+  double endTime(1.0e-3);
   //double endTime(5.0);
   
   double cfl(0.1);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(20);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -98,6 +98,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
+    //data.endTime = 4.0e-3; // HACK
     SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/all/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
