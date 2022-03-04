@@ -187,6 +187,12 @@ class IS : public Model
             aux[ID(Aux::dpdt, i, j, k)] = (prims[ID(Prims::p, i, j, k)] - prev_vars[ID(4, i, j, k)])/dt;
             aux[ID(Aux::drhodt, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] - prev_vars[ID(5, i, j, k)])/dt;
             aux[ID(Aux::dndt, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(6, i, j, k)])/dt;
+          } // End k-loop
+        } // End j-loop
+      } // End i-loop
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {      
             // Update previous values
             prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
             prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
