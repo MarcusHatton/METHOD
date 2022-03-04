@@ -547,5 +547,16 @@ class IS_BulkHeatTest : public InitialFunc
     virtual ~IS_BulkHeatTest() { }     //!< Destructor
 };
 
+class Smeared_Shocktube_1D_Para : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    Smeared_Shocktube_1D_Para(Data * data);
+
+    virtual ~Smeared_Shocktube_1D_Para() { }     //!< Destructor
+};
 
 #endif
