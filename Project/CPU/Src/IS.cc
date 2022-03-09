@@ -14,14 +14,14 @@ IS::IS() : Model()
 {
   this->Ncons = 9;
   this->Nprims = 10;
-  this->Naux = 23;
+  this->Naux = 25;
 }
 
 IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 9;
   this->Nprims = (this->data)->Nprims = 10;
-  this->Naux = (this->data)->Naux = 23;
+  this->Naux = (this->data)->Naux = 25;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
@@ -32,9 +32,9 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->consLabels.push_back("S1");  this->data->consLabels.push_back("S2");  
   this->data->consLabels.push_back("S3");  this->data->consLabels.push_back("Tau");
   // 4
-  this->data->consLabels.push_back("v1");  this->data->consLabels.push_back("v2");
-  this->data->consLabels.push_back("v3");  this->data->consLabels.push_back("p");
-  this->data->consLabels.push_back("rho");
+  this->data->consLabels.push_back("v1_C");  this->data->consLabels.push_back("v2_C");
+  this->data->consLabels.push_back("v3_C");  this->data->consLabels.push_back("p_C");
+  this->data->consLabels.push_back("rho_C");
   
   // 0
   this->data->primsLabels.push_back("v1");   this->data->primsLabels.push_back("v2");
@@ -67,11 +67,6 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("e");      this->data->auxLabels.push_back("W");
   // 23
   this->data->auxLabels.push_back("dndt"); this->data->auxLabels.push_back("dWdt");     
-  // 25
-  this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
-  this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
-  this->data->auxLabels.push_back("rho_plus_p");
-  // 34
 
 }
 
