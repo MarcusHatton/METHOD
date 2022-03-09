@@ -232,8 +232,9 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   return;
   Data * d(this->data);
 
-  // Do what we can first before root-find
+  /*
 
+  // Do what we can first before root-find
   aux[Aux::pi00] = aux[Aux::pi11] + aux[Aux::pi22] + aux[Aux::pi33]; // this one can be done here fine
   // what about these? need them in the guesses...
   aux[Aux::qv] = aux[Aux::q1]*prims[Prims::v1] + aux[Aux::q2]*prims[Prims::v2] + aux[Aux::q3]*prims[Prims::v3];
@@ -303,7 +304,8 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
         
   aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
   aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
-   
+  */
+ 
 }
 
 void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
