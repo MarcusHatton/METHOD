@@ -192,12 +192,12 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                   args->v1_rf*args->dxuz_rf + args->v2_rf*args->dyuz_rf + args->v3_rf*args->dzuz_rf );
   
   // These expressions still need improvement!
-  double pi11_rf = -2*args->eta_rf*( 2*args->dxux_rf - (2/3)*(1 + (W_rf*args->v1_rf)*(W_rf*args->v1_rf))*Theta_rf );
-  double pi12_rf = -2*args->eta_rf*( args->dxuy_rf + args->dyux_rf - (2/3)*(W_rf*args->v1_rf)*(W_rf*args->v2_rf)*Theta_rf );
-  double pi13_rf = -2*args->eta_rf*( args->dxuz_rf + args->dzux_rf - (2/3)*(W_rf*args->v1_rf)*(W_rf*args->v3_rf)*Theta_rf );
-  double pi22_rf = -2*args->eta_rf*( 2*args->dyuy_rf - (2/3)*(1 + (W_rf*args->v2_rf)*(W_rf*args->v2_rf))*Theta_rf );
-  double pi23_rf = -2*args->eta_rf*( args->dyuz_rf + args->dzuy_rf - (2/3)*(W_rf*args->v2_rf)*(W_rf*args->v3_rf)*Theta_rf );
-  double pi33_rf = -2*args->eta_rf*( 2*args->dzuz_rf - (2/3)*(1 + (W_rf*args->v3_rf)*(W_rf*args->v3_rf))*Theta_rf );
+  double pi11_rf = -2*args->eta_rf*( 2*args->dxux_rf - (2/3)*(1 + (args->W_rf*args->v1_rf)*(args->W_rf*args->v1_rf))*Theta_rf );
+  double pi12_rf = -2*args->eta_rf*( args->dxuy_rf + args->dyux_rf - (2/3)*(args->W_rf*args->v1_rf)*(args->W_rf*args->v2_rf)*Theta_rf );
+  double pi13_rf = -2*args->eta_rf*( args->dxuz_rf + args->dzux_rf - (2/3)*(args->W_rf*args->v1_rf)*(args->W_rf*args->v3_rf)*Theta_rf );
+  double pi22_rf = -2*args->eta_rf*( 2*args->dyuy_rf - (2/3)*(1 + (args->W_rf*args->v2_rf)*(args->W_rf*args->v2_rf))*Theta_rf );
+  double pi23_rf = -2*args->eta_rf*( args->dyuz_rf + args->dzuy_rf - (2/3)*(args->W_rf*args->v2_rf)*(args->W_rf*args->v3_rf)*Theta_rf );
+  double pi33_rf = -2*args->eta_rf*( 2*args->dzuz_rf - (2/3)*(1 + (args->W_rf*args->v3_rf)*(args->W_rf*args->v3_rf))*Theta_rf );
 
   // Values should be sensible    
   if (args->p_rf < 0 || args->rho_rf < 0 || args->W_rf < 1 || args->n_rf < 0 || abs(args->v1_rf) >= 1 || abs(args->v2_rf) >= 1 || abs(args->v3_rf) >= 1 ) {
