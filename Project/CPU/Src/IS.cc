@@ -173,20 +173,23 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   }
   */
   
-
-  double dWdt = f(W)*x[0] + f(W)*x[1] etc.
+  // Chain rule on W to get dWdt
+  double dWdt = pow(args->W_rf,3)*args->v1_rf*x[0] + pow(args->W_rf,3)*args->v2_rf*x[1]
+                + pow(args->W_rf,3)*args->v3_rf*x[2]; 
   double dndt = dndx orthogonality
 
   double E_rf = args->Tau_rf + args->D_rf;
-  double vsqrd_rf = ((args->S1_rf - x[1])*(args->S1_rf - x[1]) + (args->S2_rf - x[2])*(args->S2_rf - x[2]) + (args->S3_rf - x[3])*(args->S3_rf - x[3]))/((E_rf + x[0])*(E_rf + x[0]));
-  double W_rf(1 / sqrt(1 - vsqrd_rf));
-  double n_rf(args->D_rf / W_rf);
-  double rho_plus_p_rf = ((E_rf + x[0])/(W_rf*W_rf)) - (args->Pi_rf + args->A_rf);
-  double v1_rf = (args->S1_rf - x[1])/((rho_plus_p_rf + args->Pi_rf + args->A_rf)*W_rf*W_rf);
-  double v2_rf = (args->S2_rf - x[2])/((rho_plus_p_rf + args->Pi_rf + args->A_rf)*W_rf*W_rf);
-  double v3_rf = (args->S3_rf - x[3])/((rho_plus_p_rf + args->Pi_rf + args->A_rf)*W_rf*W_rf);
-  double p_rf = (rho_plus_p_rf - n_rf)*((args->gamma-1)/args->gamma);
-  double rho_rf = rho_plus_p_rf - p_rf;
+  double A_rf = ((E_rf + x[0])/(W_rf*W_rf)) - (args->Pi_rf + args->A_rf);
+  double Pi_rf = 
+  double q1_rf = 
+  double q2_rf = 
+  double q3_rf = 
+  double pi11_rf = 
+  double pi12_rf = 
+  double pi13_rf = 
+  double pi22_rf = 
+  double pi23_rf = 
+  double pi33_rf = 
 
   // Values should be sensible    
   if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
@@ -201,10 +204,14 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi02_rf = args->pi12_rf*v1_rf + args->pi22_rf*v2_rf + args->pi23_rf*v3_rf;
   double pi03_rf = args->pi13_rf*v1_rf + args->pi23_rf*v2_rf + args->pi33_rf*v3_rf;
 
-  fvec[0] = dv1dt_rf - x[0];
-  fvec[1] = dv2dt_rf - x[1];
-  fvec[2] = dv3dt_rf - x[2];
-  fvec[3] = dpdt - x[3];
+  fvec[0] = args->S1_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf*v1_rf 
+            + (q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf );
+  fvec[1] = args->S2_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf*v2_rf 
+            + (q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf );
+  fvec[2] = args->S3_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf*v3_rf 
+            + (q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf );
+  fvec[3] = E_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf - (p_rf + Pi_rf + A_rf) 
+            + 2*qv_rf**W_rf + pi00_rf );
 
   return 0;
 }
@@ -311,145 +318,6 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   //   for (int j(d->js); j < d->je; j++) {
   //     for (int k(d->ks); k < d->ke; k++) {
 
-  // for (int i(d->is-1); i < d->ie+1; i++) {
-  //   for (int j(d->js-1); j < d->je+1; j++) {
-  //     for (int k(d->ks-1); k < d->ke+1; k++) {
-
-  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
-    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
-      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
-
-        for(int nbasic(0); nbasic < 5; nbasic++) {
-          prims[ID(Prims::v1+nbasic, i, j, k)] = cons[ID(Cons::v1+nbasic, i, j, k)];
-        }
-
-        aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-          + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
-          + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) ); // Point in re-calcing this here?
-        aux[ID(Aux::qv, i, j, k)] = (aux[ID(Aux::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) 
-                               + (aux[ID(Aux::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
-                               + (aux[ID(Aux::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
-        aux[ID(Aux::pi00, i, j, k)] = aux[ID(Aux::pi11, i, j, k)] + aux[ID(Aux::pi22, i, j, k)] + aux[ID(Aux::pi33, i, j, k)];
-        aux[ID(Aux::pi01, i, j, k)] = aux[ID(Aux::pi11, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-                                 + aux[ID(Aux::pi12, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                 + aux[ID(Aux::pi13, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
-        aux[ID(Aux::pi02, i, j, k)] = aux[ID(Aux::pi12, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-                                 + aux[ID(Aux::pi22, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                 + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
-        aux[ID(Aux::pi03, i, j, k)] = aux[ID(Aux::pi13, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
-                                 + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                 + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
-
-        sol[0] = prims[ID(Prims::dv1dt, i, j, k)];
-        sol[1] = prims[ID(Prims::dv2dt, i, j, k)];
-        sol[2] = prims[ID(Prims::dv3dt, i, j, k)];
-        sol[3] = prims[ID(Prims::dpdt, i, j, k)];
-
-        // Set additional args for rootfind
-        args.S1_rf = cons[ID(Cons::S1, i, j, k)];
-        args.S2_rf = cons[ID(Cons::S2, i, j, k)];
-        args.S3_rf = cons[ID(Cons::S3, i, j, k)];
-        args.Tau_rf = cons[ID(Cons::Tau, i, j, k)];
-        args.A_rf = aux[ID(Aux::A, i, j, k)];
-        args.q1_rf = aux[ID(Aux::q1, i, j, k)];
-        args.q2_rf = aux[ID(Aux::q2, i, j, k)];
-        args.q3_rf = aux[ID(Aux::q3, i, j, k)];
-        args.Pi_rf = aux[ID(Aux::Pi, i, j, k)];
-        args.pi11_rf = aux[ID(Aux::pi11, i, j, k)];
-        args.pi12_rf = aux[ID(Aux::pi12, i, j, k)];
-        args.pi13_rf = aux[ID(Aux::pi13, i, j, k)];
-        args.pi22_rf = aux[ID(Aux::pi22, i, j, k)];
-        args.pi23_rf = aux[ID(Aux::pi23, i, j, k)];
-        args.pi33_rf = aux[ID(Aux::pi33, i, j, k)];
-        args.gamma = d->gamma;
- 
-        // Solve residual = 0
-        info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
-                                          tol, wa, lwa);
-                                                                   
-        // If root find fails, add failed cell to the list
-        if (info!=1) {
-          printf("%i info\n",info);
-          printf("(%i, %i, %i) failed\n", i, j, k);
-          printf("(%g, %g, %g, %g) res\n", res[0], res[1], res[2], res[3]);
-          printf("(%g, %g, %g, %g) sol\n", sol[0], sol[1], sol[2], sol[3]);
-          std::cout << "Prims ";
-          for (int vz(0); vz < d->Nprims; vz++) {
-            std::cout << d->prims[ID(vz, i, j, k)] << " ";
-          }
-          std::cout << std::endl;
-          std::cout << "Cons  ";
-          for (int vz(0); vz < d->Ncons; vz++) {
-            std::cout << d->cons[ID(vz, i, j, k)] << " ";
-          }
-          std::cout << std::endl;
-          std::cout << "Aux   ";
-          for (int vz(0); vz < d->Naux; vz++) {
-            std::cout << d->aux[ID(vz, i, j, k)] << " ";
-          }
-          std::cout << std::endl;
-          //printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], aux[ID(Aux::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], aux[ID(Aux::q1, i, j, k)]);
-          //printf("(%f, %f, %f, %f) aux  \n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
-          //printf("(%f, %f, %f, %f) cons \n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
-          exit(0);
-          Failed fail = {i, j, k};
-          fails.push_back(fail);
-        } else {
-          // Now have the correct values for Chi, Sigma123
-          solution[ID(0, i, j, k)] = sol[0];
-          solution[ID(1, i, j, k)] = sol[1];
-          solution[ID(2, i, j, k)] = sol[2];
-          solution[ID(3, i, j, k)] = sol[3];
-        }      
-      
-      } // End k-loop
-    } // End j-loop
-  } // End i-loop
-  
-  // for (int i(d->is-1); i < d->ie+1; i++) {
-  //   for (int j(d->js-1); j < d->je+1; j++) {
-  //     for (int k(d->ks-1); k < d->ke+1; k++) {
-
-  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
-    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
-      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
-
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
-
-        // C2P Scheme as outlined in HP/FYR
-        aux[ID(Aux::vsqrd, i, j, k)] = ((cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)]) 
-                                  + (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])*(cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])
-                                  + (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])*(cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)]))
-                                  /((cons[ID(Cons::Tau, i, j, k)] + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)])*(cons[ID(Cons::Tau, i, j, k)] 
-                                  + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)]));
-        aux[ID(Aux::W, i, j, k)] = 1 / sqrt((1-aux[ID(Aux::vsqrd, i, j, k)]));
-        prims[ID(Prims::n, i, j, k)] = cons[ID(Cons::D, i, j, k)] / aux[ID(Aux::W, i, j, k)];
-        aux[ID(Aux::rho_plus_p, i, j, k)] = ((cons[ID(Cons::Tau, i, j, k)] + cons[ID(Cons::D, i, j, k)] + solution[ID(0, i, j, k)])
-                                            /(aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)])) - (aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]);
-        prims[ID(Prims::v1, i, j, k)] = (cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
-                                  + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);
-        prims[ID(Prims::v2, i, j, k)] = (cons[ID(Cons::S2, i, j, k)] - solution[ID(2, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
-                                  + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
-        prims[ID(Prims::v3, i, j, k)] = (cons[ID(Cons::S3, i, j, k)] - solution[ID(3, i, j, k)])/((aux[ID(Aux::rho_plus_p, i, j, k)] 
-                                  + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)])*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]);  
-        prims[ID(Prims::p, i, j, k)] = (aux[ID(Aux::rho_plus_p, i, j, k)] - prims[ID(Prims::n, i, j, k)])*((d->gamma-1)/d->gamma);
-        prims[ID(Prims::rho, i, j, k)] = aux[ID(Aux::rho_plus_p, i, j, k)] - prims[ID(Prims::p, i, j, k)];
-        aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
-        aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
-
-      } // End k-loop
-    } // End j-loop
-  } // End i-loop  
-
-  // double kappa = d->optionalSimArgs[0];
-  // double tau_q = d->optionalSimArgs[1];
-  // double zeta = d->optionalSimArgs[2];
-  // double tau_Pi = d->optionalSimArgs[3];
-  // double eta = d->optionalSimArgs[4];
-  // double tau_epsilon = d->optionalSimArgs[5];
-
   double beta_epsilon;
   double beta_n;  
 
@@ -479,6 +347,27 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double dzux;
   double dzuy;
 
+  for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
+    for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
+      for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
+
+        // Trivially recover basic variables
+        for(int nbasic(0); nbasic < 5; nbasic++) {
+          prims[ID(Prims::v1+nbasic, i, j, k)] = cons[ID(Cons::v1+nbasic, i, j, k)];
+        }
+
+        aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
+          + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
+          + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) );
+        aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]*(d->gamma-1);
+        aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
+        aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
+        aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
+
+      }
+    }
+  }          
+           
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
@@ -624,36 +513,81 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                     + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                     + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
 
-          // std::cout << "Running!" << std::endl;
 
-      }
-    }
-  }  
+        sol[0] = prims[ID(Prims::dv1dt, i, j, k)];
+        sol[1] = prims[ID(Prims::dv2dt, i, j, k)];
+        sol[2] = prims[ID(Prims::dv3dt, i, j, k)];
+        sol[3] = prims[ID(Prims::dpdt, i, j, k)];
 
-  // Fix edge cases for BDNK variables (due to derivatives...)
-//   for (int aux_count(0); aux_count < 18; aux_count++) {
+        // Set additional args for rootfind
+        args.S1_rf = cons[ID(Cons::S1, i, j, k)];
+        args.S2_rf = cons[ID(Cons::S2, i, j, k)];
+        args.S3_rf = cons[ID(Cons::S3, i, j, k)];
+        args.Tau_rf = cons[ID(Cons::Tau, i, j, k)];
+        args.A_rf = aux[ID(Aux::A, i, j, k)];
+        args.q1_rf = aux[ID(Aux::q1, i, j, k)];
+        args.q2_rf = aux[ID(Aux::q2, i, j, k)];
+        args.q3_rf = aux[ID(Aux::q3, i, j, k)];
+        args.Pi_rf = aux[ID(Aux::Pi, i, j, k)];
+        args.pi11_rf = aux[ID(Aux::pi11, i, j, k)];
+        args.pi12_rf = aux[ID(Aux::pi12, i, j, k)];
+        args.pi13_rf = aux[ID(Aux::pi13, i, j, k)];
+        args.pi22_rf = aux[ID(Aux::pi22, i, j, k)];
+        args.pi23_rf = aux[ID(Aux::pi23, i, j, k)];
+        args.pi33_rf = aux[ID(Aux::pi33, i, j, k)];
+        args.gamma = d->gamma;
+ 
+        // Solve residual = 0
+        info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
+                                          tol, wa, lwa);
+                                                                   
+        // If root find fails, add failed cell to the list
+        if (info!=1) {
+          printf("%i info\n",info);
+          printf("(%i, %i, %i) failed\n", i, j, k);
+          printf("(%g, %g, %g, %g) res\n", res[0], res[1], res[2], res[3]);
+          printf("(%g, %g, %g, %g) sol\n", sol[0], sol[1], sol[2], sol[3]);
+          std::cout << "Prims ";
+          for (int vz(0); vz < d->Nprims; vz++) {
+            std::cout << d->prims[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          std::cout << "Cons  ";
+          for (int vz(0); vz < d->Ncons; vz++) {
+            std::cout << d->cons[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          std::cout << "Aux   ";
+          for (int vz(0); vz < d->Naux; vz++) {
+            std::cout << d->aux[ID(vz, i, j, k)] << " ";
+          }
+          std::cout << std::endl;
+          //printf("(%f, %f, %f, %f, %f) prims\n",  prims[ID(Prims::p, i, j, k)], aux[ID(Aux::Pi, i, j, k)], prims[ID(Prims::n, i, j, k)], prims[ID(Prims::v1, i, j, k)], aux[ID(Aux::q1, i, j, k)]);
+          //printf("(%f, %f, %f, %f) aux  \n",  aux[ID(Aux::W, i, j, k)], aux[ID(Aux::qv, i, j, k)], aux[ID(Aux::pi00, i, j, k)], aux[ID(Aux::pi01, i, j, k)]);
+          //printf("(%f, %f, %f, %f) cons \n",  cons[ID(Cons::Y1, i, j, k)], cons[ID(Cons::D, i, j, k)], cons[ID(Cons::S1, i, j, k)], cons[ID(Cons::Tau, i, j, k)]);
+          exit(0);
+          Failed fail = {i, j, k};
+          fails.push_back(fail);
+        } else {
+          // Now have the correct values for Chi, Sigma123
+          solution[ID(0, i, j, k)] = sol[0];
+          solution[ID(1, i, j, k)] = sol[1];
+          solution[ID(2, i, j, k)] = sol[2];
+          solution[ID(3, i, j, k)] = sol[3];
+        }      
+      
+      } // End k-loop
+    } // End j-loop
+  } // End i-loop
 
-//     for (int j(1); j < d->Ny-1; j++) {
-//       for (int k(1); k < d->Nz-1; k++) {
-//         aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
-//         aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
-//       }
-//     }
+  // double kappa = d->optionalSimArgs[0];
+  // double tau_q = d->optionalSimArgs[1];
+  // double zeta = d->optionalSimArgs[2];
+  // double tau_Pi = d->optionalSimArgs[3];
+  // double eta = d->optionalSimArgs[4];
+  // double tau_epsilon = d->optionalSimArgs[5];
 
-//     for (int i(0); i < d->Nx; i++) {
-//       for (int k(1); k < d->Nz-1; k++) {
-//         aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
-//         aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
-//       }
-//     }
 
-//     for (int i(0); i < d->Nx; i++) {
-//       for (int j(0); j < d->Ny; j++) {
-//         aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
-//         aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
-//       }
-//     }
-//  }
 
   //if (i==4 && j ==0 && k==0)
   // std::cout << zeta << "\t" << aux[ID(Aux::Pi, 4, 0, 0)] << "\t" << aux[ID(Aux::A, 4, 0, 0)] << "\t" << aux[ID(Aux::Theta, 4, 0, 0)] << "\t" << std::endl;
