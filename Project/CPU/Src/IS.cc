@@ -174,22 +174,37 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   */
   
   // Chain rule on W to get dWdt
-  double dWdt = pow(args->W_rf,3)*args->v1_rf*x[0] + pow(args->W_rf,3)*args->v2_rf*x[1]
+  double dWdt_rf = pow(args->W_rf,3)*args->v1_rf*x[0] + pow(args->W_rf,3)*args->v2_rf*x[1]
                 + pow(args->W_rf,3)*args->v3_rf*x[2]; 
-  double dndt = dndx orthogonality
+  double dndt_rf = dndx orthogonality
+  double drhodt_rf = chain rule on the other 2
 
   double E_rf = args->Tau_rf + args->D_rf;
-  double A_rf = ((E_rf + x[0])/(W_rf*W_rf)) - (args->Pi_rf + args->A_rf);
-  double Pi_rf = 
-  double q1_rf = 
-  double q2_rf = 
-  double q3_rf = 
-  double pi11_rf = 
+  double Theta_rf = dWdt_rf + args->dxux_rf + args->dyuy_rf + args->dzuz_rf;
+  double A_rf = -args->tau_epsilon_rf * ( W_rf*(-drhodt_rf + 
+                args->v1_rf*args->dxrho + args->v2_rf*args->dyrho + args->v3_rf*args->dzrho ) +
+                (args->p_rf + args->rho_rf)*Theta_rf  );
+  double Pi_rf = -args->zeta_rf*Theta_rf + (args->tau_Pi_rf/args->tau_epsilon_rf)*A_rf;
+  double q1_rf = -args->tau_q * (args->rho_rf + args->p_rf) * 
+                  W_rf*( -(W_rf*x[0] + dWdt_rf*args->v1_rf) + // chain rule
+                  args->v1_rf*args->dxux_rf + args->v2_rf*args->dyux_rf + args->v3_rf*args->dzux_rf );
+  double q2_rf = -args->tau_q * (args->rho_rf + args->p_rf) * 
+                  W_rf*( -(W_rf*x[1] + dWdt_rf*args->v2_rf) + // chain rule
+                  args->v1_rf*args->dxuy_rf + args->v2_rf*args->dyuy_rf + args->v3_rf*args->dzuy_rf );
+  double q3_rf = -args->tau_q * (args->rho_rf + args->p_rf) * 
+                  W_rf*( -(W_rf*x[2] + dWdt_rf*args->v3_rf) + // chain rule
+                  args->v1_rf*args->dxuz_rf + args->v2_rf*args->dyuz_rf + args->v3_rf*args->dzuz_rf );
+  
+  // These expressions still need improvement!
+  double pi11_rf = 2*args->eta_rf*( 2*args->dxux_rf - (2/3)*(1 + (W_rf*args->v1_rf)*(W_rf*args->v1_rf))*Theta_rf );
+
   double pi12_rf = 
   double pi13_rf = 
   double pi22_rf = 
   double pi23_rf = 
   double pi33_rf = 
+
+          aux[ID(Aux::pi11, i, j, k)] = -
 
   // Values should be sensible    
   if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
@@ -524,17 +539,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         args.S2_rf = cons[ID(Cons::S2, i, j, k)];
         args.S3_rf = cons[ID(Cons::S3, i, j, k)];
         args.Tau_rf = cons[ID(Cons::Tau, i, j, k)];
-        args.A_rf = aux[ID(Aux::A, i, j, k)];
-        args.q1_rf = aux[ID(Aux::q1, i, j, k)];
-        args.q2_rf = aux[ID(Aux::q2, i, j, k)];
-        args.q3_rf = aux[ID(Aux::q3, i, j, k)];
-        args.Pi_rf = aux[ID(Aux::Pi, i, j, k)];
-        args.pi11_rf = aux[ID(Aux::pi11, i, j, k)];
-        args.pi12_rf = aux[ID(Aux::pi12, i, j, k)];
-        args.pi13_rf = aux[ID(Aux::pi13, i, j, k)];
-        args.pi22_rf = aux[ID(Aux::pi22, i, j, k)];
-        args.pi23_rf = aux[ID(Aux::pi23, i, j, k)];
-        args.pi33_rf = aux[ID(Aux::pi33, i, j, k)];
+        args.v1_rf = prims[ID(Prims::v1, i, j, k)];
+        args.v2_rf = prims[ID(Prims::v2, i, j, k)];
+        args.v3_rf = prims[ID(Prims::v3, i, j, k)];
+        args.p_rf = prims[ID(Prims::p, i, j, k)];
+        args.rho_rf = prims[ID(Prims::rho, i, j, k)];
+        args.n_rf = aux[ID(Aux::Pi, i, j, k)];
+
         args.gamma = d->gamma;
  
         // Solve residual = 0
@@ -569,7 +580,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           Failed fail = {i, j, k};
           fails.push_back(fail);
         } else {
-          // Now have the correct values for Chi, Sigma123
+          // Now have the correct values for time derivs
           solution[ID(0, i, j, k)] = sol[0];
           solution[ID(1, i, j, k)] = sol[1];
           solution[ID(2, i, j, k)] = sol[2];
@@ -809,31 +820,6 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
       }
     }
   }  
-
-  // Edge cases for derivative-containing aux
-//   for (int aux_count(0); aux_count < 18; aux_count++) {
-
-//     for (int j(1); j < d->Ny-1; j++) {
-//       for (int k(1); k < d->Nz-1; k++) {
-//         aux[ID(aux_count, 0, j, k)] = aux[ID(aux_count, 1, j, k)];
-//         aux[ID(aux_count, d->Nx, j, k)] = aux[ID(aux_count, d->Nx-1, j, k)];
-//       }
-//     }
-
-//     for (int i(0); i < d->Nx; i++) {
-//       for (int k(1); k < d->Nz-1; k++) {
-//         aux[ID(aux_count, i, 0, k)] = aux[ID(aux_count, i, 1, k)];
-//         aux[ID(aux_count, i, d->Ny, k)] = aux[ID(aux_count, i, d->Ny-1, k)];
-//       }
-//     }
-
-//     for (int i(0); i < d->Nx; i++) {
-//       for (int j(0); j < d->Ny; j++) {
-//         aux[ID(aux_count, i, j, 0)] = aux[ID(aux_count, i, j, 1)];
-//         aux[ID(aux_count, i, j, d->Nz)] = aux[ID(aux_count, i, j, d->Nz-1)];
-//       }
-//     }
-//  }
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
