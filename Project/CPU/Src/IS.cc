@@ -182,7 +182,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                 (args->p_rf + args->rho_rf)*Theta_rf  );
   double Pi_rf = -args->zeta_rf*Theta_rf + (args->tau_Pi_rf/args->tau_epsilon_rf)*A_rf;
   double q1_rf = -args->tau_q_rf * (args->rho_rf + args->p_rf) * 
-                  W_rf*( -(W_rf*x[0] + dWdt_rf*args->v1_rf) + // chain rule
+                  args->W_rf*( -(args->W_rf*x[0] + dWdt_rf*args->v1_rf) + // chain rule
                   args->v1_rf*args->dxux_rf + args->v2_rf*args->dyux_rf + args->v3_rf*args->dzux_rf );
   double q2_rf = -args->tau_q_rf * (args->rho_rf + args->p_rf) * 
                   W_rf*( -(W_rf*x[1] + dWdt_rf*args->v2_rf) + // chain rule
@@ -212,11 +212,11 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi02_rf = pi12_rf*args->v1_rf + pi22_rf*args->v2_rf + pi23_rf*args->v3_rf;
   double pi03_rf = pi13_rf*args->v1_rf + pi23_rf*args->v2_rf + pi33_rf*args->v3_rf;
 
-  fvec[0] = args->S1_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v1_rf 
+  fvec[0] = args->S1_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v1_rf 
             + (q1_rf + qv_rf*args->v1_rf)*args->W_rf + pi01_rf );
-  fvec[1] = args->S2_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v2_rf 
+  fvec[1] = args->S2_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v2_rf 
             + (q2_rf + qv_rf*args->v2_rf)*args->W_rf + pi02_rf );
-  fvec[2] = args->S3_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v3_rf 
+  fvec[2] = args->S3_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v3_rf 
             + (q3_rf + qv_rf*args->v3_rf)*args->W_rf + pi03_rf );
   fvec[3] = E_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf - (args->p_rf + Pi_rf + A_rf) 
             + 2*qv_rf*args->W_rf + pi00_rf );
