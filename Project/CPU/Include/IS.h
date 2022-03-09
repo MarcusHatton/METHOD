@@ -3,41 +3,22 @@
 
 #include "model.h"
 
-
-/*
-This is the human readable description of this models variables.
-
-  IS has 15 conserved variables:
-    D, Sx, Sy, Sz, tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33
-  16 primitive variables:
-    v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
-  30 auxiliary variables:
-    h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-    pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p 
-*/
-
 class IS : public Model
 {
 
   public:
 
     // enums to save looking up numbering of C/P/As when using ID accessor.
-    enum Cons { D, S1, S2, S3, Tau };
-    enum Prims { v1, v2, v3, p, rho, n };
+    enum Cons { S1, S2, S3, Tau, v1, v2, v3, p, rho };
+    enum Prims { v1, v2, v3, p, rho, dv1dt, dv2dt, dv3dt, dpdt, drhodt };
     enum Aux { A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
-               pi00, pi01, pi02, pi03, h, T, e, W,  dpdt, drhodt, dndt, dv1dt, 
-               dv2dt, dv3dt, dWdt, a1, a2, a3, vsqrd, rho_plus_p };
+               pi00, pi01, pi02, pi03, h, T, e, W, dndt, dWdt };
 
 
     int smartGuesses;     //!< Number of smart guess required
 
     double * solution;    //!< Pointer to array to hold solution of C2P for every cell. Size is 2*Nx*Ny*Nz
-
-    double * prev_vars;   //!< Store variable at previous time-step for time derivatives' calculations
     
-    bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
-
     IS();     //!< Default constructor
 
     //! Parameterized constructor
@@ -163,49 +144,7 @@ class IS : public Model
         Mostly, this probably wont be needed, but if there is any final steps to finish
       off a timestep, this can be done here.
     */
-    void finalise(double *cons, double *prims, double *aux, bool final_step=false) { 
-
-      //printf("final_step: %d", final_step);
-      if (!final_step) return;
-
-      Data * d(this->data);
-
-      // Get timestep
-      double dt=d->dt;
-      double dx=d->dx;
-      if (dt < 1e-3*dx) return;
-      
-      //printf("dt: %.17g", dt);
-      for (int i(d->is); i < d->ie; i++) {
-        for (int j(d->js); j < d->je; j++) {
-          for (int k(d->ks); k < d->ke; k++) {
-            // calc derivatives
-            aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
-            aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
-            aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
-            aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
-            aux[ID(Aux::dpdt, i, j, k)] = (prims[ID(Prims::p, i, j, k)] - prev_vars[ID(4, i, j, k)])/dt;
-            aux[ID(Aux::drhodt, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] - prev_vars[ID(5, i, j, k)])/dt;
-            aux[ID(Aux::dndt, i, j, k)] = (prims[ID(Prims::n, i, j, k)] - prev_vars[ID(6, i, j, k)])/dt;
-          } // End k-loop
-        } // End j-loop
-      } // End i-loop
-      for (int i(d->is); i < d->ie; i++) {
-        for (int j(d->js); j < d->je; j++) {
-          for (int k(d->ks); k < d->ke; k++) {      
-            // Update previous values
-            prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
-            prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
-            prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
-            prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
-            prev_vars[ID(4, i, j, k)] = prims[ID(Prims::p, i, j, k)]; 
-            prev_vars[ID(5, i, j, k)] = prims[ID(Prims::rho, i, j, k)];
-            prev_vars[ID(6, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
-          } // End k-loop
-        } // End j-loop
-      } // End i-loop
-
-    };
+    void finalise(double *cons, double *prims, double *aux, bool final_step=false) {};
 
     //! <b> Additional arguments for the IS residual function </b>
     /*!
@@ -221,26 +160,19 @@ class IS : public Model
     typedef struct
     {
       double
-      D_rf,
       S1_rf,
       S2_rf,
       S3_rf,
       Tau_rf,
-      A_rf,
-      q1_rf,
-      q2_rf,
-      q3_rf,
-      Pi_rf,
-      pi11_rf,
-      pi12_rf,
-      pi13_rf,
-      pi22_rf,
-      pi23_rf,
-      pi33_rf,
+      v1_rf,
+      v2_rf,
+      v3_rf,
+      p_rf,
+      rho_rf,
+      n_rf,
       gamma;
       int i;
     } Args;
-    
     
     //! <b> Stores data of the failed cons2prims rootfinder </b>
     /*!
