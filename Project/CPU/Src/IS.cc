@@ -200,25 +200,25 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi33_rf = -2*args->eta_rf*( 2*args->dzuz_rf - (2/3)*(1 + (W_rf*args->v3_rf)*(W_rf*args->v3_rf))*Theta_rf );
 
   // Values should be sensible    
-  if (p_rf < 0 || rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
+  if (p_rf < 0 || args->rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
     printf("EEK");
     fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
   }
   
-  double pi00_rf = args->pi11_rf + args->pi22_rf + args->pi33_rf;
-  double qv_rf = args->q1_rf*v1_rf + args->q2_rf*v2_rf + args->q3_rf*v3_rf;
-  double pi01_rf = args->pi11_rf*v1_rf + args->pi12_rf*v2_rf + args->pi13_rf*v3_rf; // dbl check sign on orthogonality relation
-  double pi02_rf = args->pi12_rf*v1_rf + args->pi22_rf*v2_rf + args->pi23_rf*v3_rf;
-  double pi03_rf = args->pi13_rf*v1_rf + args->pi23_rf*v2_rf + args->pi33_rf*v3_rf;
+  double pi00_rf = pi11_rf + pi22_rf + pi33_rf;
+  double qv_rf = q1_rf*v1_rf + q2_rf*v2_rf + q3_rf*v3_rf;
+  double pi01_rf = pi11_rf*v1_rf + pi12_rf*v2_rf + pi13_rf*v3_rf; // dbl check sign on orthogonality relation
+  double pi02_rf = pi12_rf*v1_rf + pi22_rf*v2_rf + pi23_rf*v3_rf;
+  double pi03_rf = pi13_rf*v1_rf + pi23_rf*v2_rf + pi33_rf*v3_rf;
 
-  fvec[0] = args->S1_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf*v1_rf 
+  fvec[0] = args->S1_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v1_rf 
             + (q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf );
-  fvec[1] = args->S2_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf*v2_rf 
+  fvec[1] = args->S2_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v2_rf 
             + (q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf );
-  fvec[2] = args->S3_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf*v3_rf 
+  fvec[2] = args->S3_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v3_rf 
             + (q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf );
-  fvec[3] = E_rf - ( (rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf - (p_rf + Pi_rf + A_rf) 
+  fvec[3] = E_rf - ( (args->rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf - (args->p_rf + Pi_rf + A_rf) 
             + 2*qv_rf**W_rf + pi00_rf );
 
   return 0;
@@ -305,7 +305,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
   aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
   */
- 
+
 }
 
 void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
@@ -653,10 +653,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        aux[ID(Aux::vsqrd, i, j, k)] = prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
+        aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
                                   + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
-        aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - aux[ID(Aux::vsqrd, i, j, k)] );
+                                  + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)] );
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (aux[ID(Aux::n, i, j, k)]*(d->gamma-1));
         prims[ID(Prims::rho, i, j, k)] = aux[ID(Aux::n, i, j, k)]*(1+aux[ID(Aux::e, i, j, k)]);
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
