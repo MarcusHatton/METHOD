@@ -170,10 +170,30 @@ class IS : public Model
       p_rf,
       rho_rf,
       n_rf,
+      dndx_rf,
+      dndy_rf,
+      dndz_rf,
+      dxrho_rf,
+      dyrho_rf,
+      dzrho_rf,
+      dxux_rf,
+      dxuy_rf,
+      dxuz_rf,
+      dyux_rf,
+      dyuy_rf,
+      dyuz_rf,
+      dzux_rf,
+      dzuy_rf,
+      dzuz_rf,
+      tau_epsilon_rf,
+      tau_Pi_rf,
+      tau_q_rf,
+      eta_rf,
+      zeta_rf,
       gamma;
       int i;
     } Args;
-    
+
     //! <b> Stores data of the failed cons2prims rootfinder </b>
     /*!
       @par
