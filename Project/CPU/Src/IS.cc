@@ -131,7 +131,7 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
           source[ID(ncon, i, j, k)] = 0;
         }
         for(int ncon(0); ncon < 5; ncon++) {
-          source[ID(Cons::v1+ncon, i, j, k)] = prims[ID(Prims::dv1dt+ncon)];
+          source[ID(Cons::v1_C+ncon, i, j, k)] = prims[ID(Prims::dv1dt+ncon)];
         }
       }
     }
@@ -366,7 +366,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
         // Trivially recover basic variables
         for(int nbasic(0); nbasic < 5; nbasic++) {
-          prims[ID(Prims::v1+nbasic, i, j, k)] = cons[ID(Cons::v1+nbasic, i, j, k)];
+          prims[ID(Prims::v1+nbasic, i, j, k)] = cons[ID(Cons::v1_C+nbasic, i, j, k)];
         }
 
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
@@ -876,11 +876,11 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         - (prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)] + aux[ID(Aux::n, i, j, k)] * aux[ID(Aux::W, i, j, k)]) 
         + 2*aux[ID(Aux::qv, i, j, k)]*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi00, i, j, k)];
      
-        cons[ID(Cons::v1, i, j, k)] = prims[ID(Prims::v1, i, j, k)];
-        cons[ID(Cons::v2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
-        cons[ID(Cons::v3, i, j, k)] = prims[ID(Prims::v3, i, j, k)];
-        cons[ID(Cons::p, i, j, k)] = prims[ID(Prims::p, i, j, k)];
-        cons[ID(Cons::rho, i, j, k)] = prims[ID(Prims::rho, i, j, k)];
+        cons[ID(Cons::v1_C, i, j, k)] = prims[ID(Prims::v1, i, j, k)];
+        cons[ID(Cons::v2_C, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
+        cons[ID(Cons::v3_C, i, j, k)] = prims[ID(Prims::v3, i, j, k)];
+        cons[ID(Cons::p_C, i, j, k)] = prims[ID(Prims::p, i, j, k)];
+        cons[ID(Cons::rho_C, i, j, k)] = prims[ID(Prims::rho, i, j, k)];
 
         // if (i==3 && j==3 && k==3)
           // std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" << "\t" << prims[ID(Prims::rho, i, j, k)]
