@@ -167,6 +167,7 @@ class IS : public Model
       v1_rf,
       v2_rf,
       v3_rf,
+      W_rf,
       p_rf,
       rho_rf,
       n_rf,

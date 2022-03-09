@@ -102,7 +102,7 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
 
 void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
-  for(int ncon(0); ncon < Ncons; ncons++) {
+  for(int ncon(0); ncon < Ncons; ncon++) {
     source[ncons] = 0.0;
   }
 }
@@ -126,7 +126,7 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
           source[ID(ncon, i, j, k)] = 0;
         }
         for(int ncon(0); ncon < 5; ncon++) {
-          source[ID(Cons::v1_C+ncon, i, j, k)] = prims[ID(Prims::dv1dt+ncon)];
+          source[ID(Cons::v1_C+ncon, i, j, k)] = prims[ID(Prims::dv1dt+ncon, i, j, k)];
         }
       }
     }
@@ -174,9 +174,9 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double Theta_rf = dWdt_rf + args->dxux_rf + args->dyuy_rf + args->dzuz_rf;
   double dndt_rf = args->v1_rf*args->dndx_rf + args->v2_rf*args->dndy_rf + args->v3_rf*args->dndz_rf 
                    + args->n_rf*Theta_rf/W_rf;
-  double drhodt_rf = dndt_rf + args->dpdt_rf/(args->gamma-1);
+  double drhodt_rf = dndt_rf + x[3]/(args->gamma-1);
 
-  double E_rf = args->Tau_rf + args->D_rf;
+  double E_rf = args->Tau_rf + args->n_rf*args->W_rf; // Replacement for D
   double A_rf = -args->tau_epsilon_rf * ( W_rf*(-drhodt_rf + 
                 args->v1_rf*args->dxrho_rf + args->v2_rf*args->dyrho_rf + args->v3_rf*args->dzrho_rf ) +
                 (args->p_rf + args->rho_rf)*Theta_rf  );
@@ -200,17 +200,17 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi33_rf = -2*args->eta_rf*( 2*args->dzuz_rf - (2/3)*(1 + (W_rf*args->v3_rf)*(W_rf*args->v3_rf))*Theta_rf );
 
   // Values should be sensible    
-  if (p_rf < 0 || args->rho_rf < 0 || W_rf < 1 || n_rf < 0 || abs(v1_rf) >= 1 || abs(v2_rf) >= 1 || abs(v3_rf) >= 1 || vsqrd_rf >= 1) {
+  if (args->p_rf < 0 || args->rho_rf < 0 || args->W_rf < 1 || args->n_rf < 0 || abs(args->v1_rf) >= 1 || abs(args->v2_rf) >= 1 || abs(args->v3_rf) >= 1 ) {
     printf("EEK");
     fvec[0] = fvec[1] = fvec[2] = fvec[3] = 1e6;
     return 0;
   }
   
   double pi00_rf = pi11_rf + pi22_rf + pi33_rf;
-  double qv_rf = q1_rf*v1_rf + q2_rf*v2_rf + q3_rf*v3_rf;
-  double pi01_rf = pi11_rf*v1_rf + pi12_rf*v2_rf + pi13_rf*v3_rf; // dbl check sign on orthogonality relation
-  double pi02_rf = pi12_rf*v1_rf + pi22_rf*v2_rf + pi23_rf*v3_rf;
-  double pi03_rf = pi13_rf*v1_rf + pi23_rf*v2_rf + pi33_rf*v3_rf;
+  double qv_rf = q1_rf*args->v1_rf + q2_rf*args->v2_rf + q3_rf*args->v3_rf;
+  double pi01_rf = pi11_rf*args->v1_rf + pi12_rf*args->v2_rf + pi13_rf*args->v3_rf; // dbl check sign on orthogonality relation
+  double pi02_rf = pi12_rf*args->v1_rf + pi22_rf*args->v2_rf + pi23_rf*args->v3_rf;
+  double pi03_rf = pi13_rf*args->v1_rf + pi23_rf*args->v2_rf + pi33_rf*args->v3_rf;
 
   fvec[0] = args->S1_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v1_rf 
             + (q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf );
@@ -431,6 +431,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           args.v1_rf = prims[ID(Prims::v1, i, j, k)];
           args.v2_rf = prims[ID(Prims::v2, i, j, k)];
           args.v3_rf = prims[ID(Prims::v3, i, j, k)];
+          args.W_rf = aux[ID(Aux::W, i, j, k)];
           args.p_rf = prims[ID(Prims::p, i, j, k)];
           args.rho_rf = prims[ID(Prims::rho, i, j, k)];
           args.n_rf = aux[ID(Aux::n, i, j, k)];
