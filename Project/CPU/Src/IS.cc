@@ -185,10 +185,10 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                   args->W_rf*( -(args->W_rf*x[0] + dWdt_rf*args->v1_rf) + // chain rule
                   args->v1_rf*args->dxux_rf + args->v2_rf*args->dyux_rf + args->v3_rf*args->dzux_rf );
   double q2_rf = -args->tau_q_rf * (args->rho_rf + args->p_rf) * 
-                  W_rf*( -(W_rf*x[1] + dWdt_rf*args->v2_rf) + // chain rule
+                  args->W_rf*( -(args->W_rf*x[1] + dWdt_rf*args->v2_rf) + // chain rule
                   args->v1_rf*args->dxuy_rf + args->v2_rf*args->dyuy_rf + args->v3_rf*args->dzuy_rf );
   double q3_rf = -args->tau_q_rf * (args->rho_rf + args->p_rf) * 
-                  W_rf*( -(W_rf*x[2] + dWdt_rf*args->v3_rf) + // chain rule
+                  args->W_rf*( -(args->W_rf*x[2] + dWdt_rf*args->v3_rf) + // chain rule
                   args->v1_rf*args->dxuz_rf + args->v2_rf*args->dyuz_rf + args->v3_rf*args->dzuz_rf );
   
   // These expressions still need improvement!
