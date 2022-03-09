@@ -103,7 +103,7 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
 void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
   for(int ncon(0); ncon < Ncons; ncon++) {
-    source[ncons] = 0.0;
+    source[ncon] = 0.0;
   }
 }
 
@@ -173,7 +173,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                 + pow(args->W_rf,3)*args->v3_rf*x[2]; 
   double Theta_rf = dWdt_rf + args->dxux_rf + args->dyuy_rf + args->dzuz_rf;
   double dndt_rf = args->v1_rf*args->dndx_rf + args->v2_rf*args->dndy_rf + args->v3_rf*args->dndz_rf 
-                   + args->n_rf*Theta_rf/W_rf;
+                   + args->n_rf*Theta_rf/args->W_rf;
   double drhodt_rf = dndt_rf + x[3]/(args->gamma-1);
 
   double E_rf = args->Tau_rf + args->n_rf*args->W_rf; // Replacement for D
@@ -213,13 +213,13 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi03_rf = pi13_rf*args->v1_rf + pi23_rf*args->v2_rf + pi33_rf*args->v3_rf;
 
   fvec[0] = args->S1_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v1_rf 
-            + (q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf );
+            + (q1_rf + qv_rf*args->v1_rf)*W_rf + pi01_rf );
   fvec[1] = args->S2_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v2_rf 
-            + (q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf );
+            + (q2_rf + qv_rf*args->v2_rf)*W_rf + pi02_rf );
   fvec[2] = args->S3_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*W_rf*W_rf*v3_rf 
-            + (q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf );
+            + (q3_rf + qv_rf*args->v3_rf)*W_rf + pi03_rf );
   fvec[3] = E_rf - ( (args->rho_rf + p_rf + Pi_rf + A_rf)*W_rf*W_rf - (args->p_rf + Pi_rf + A_rf) 
-            + 2*qv_rf**W_rf + pi00_rf );
+            + 2*qv_rf*args->W_rf + pi00_rf );
 
   return 0;
 }
@@ -228,11 +228,12 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 
 void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
-  printf("Warning: Not implemented (or indeed implementable...) for BDNKvPP")
+  printf("Warning: Not implemented (or indeed implementable...) for BDNKvPP");
   return;
-  Data * d(this->data);
 
   /*
+
+  Data * d(this->data);
 
   // Do what we can first before root-find
   aux[Aux::pi00] = aux[Aux::pi11] + aux[Aux::pi22] + aux[Aux::pi33]; // this one can be done here fine
@@ -517,10 +518,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   //   for (int j(d->js); j < d->je; j++) {
   //     for (int k(d->ks); k < d->ke; k++) {
         
-        aux[ID(Aux::dWdt, i, j, k)] = pow(aux[ID(Aux::W, i, j, k)],3)*
-          (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::dv1dt, i, j, k)] + 
+        aux[ID(Aux::dWdt, i, j, k)] = pow(aux[ID(Aux::W, i, j, k)],3)*(prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::dv1dt, i, j, k)] + 
           prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::dv2dt, i, j, k)] + 
-          prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::dv3dt, i, j, k)] + );        
+          prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::dv3dt, i, j, k)]);        
 
         aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + dxux + dyuy + dzuz;
 
