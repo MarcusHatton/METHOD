@@ -370,7 +370,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
           + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
           + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) );
-        aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]*(d->gamma-1);
+        aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]/(d->gamma-1);
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (aux[ID(Aux::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
         aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
@@ -544,57 +544,57 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           aux[ID(Aux::W, i, j, k)]*( -(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::dv1dt, i, j, k)] + aux[ID(Aux::dWdt, i, j, k)]*prims[ID(Prims::v1, i, j, k)]) + // chain rule
           prims[ID(Prims::v1, i, j, k)]*dxux + 
           prims[ID(Prims::v2, i, j, k)]*dyux + 
-          prims[ID(Prims::v3, i, j, k)]*dzux )
+          prims[ID(Prims::v3, i, j, k)]*dzux );
           
-          + beta_epsilon*( dxrho 
-          + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
-          + prims[ID(Prims::v1, i, j, k)]*dxrho 
-          + prims[ID(Prims::v2, i, j, k)]*dyrho
-          + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
+          // + beta_epsilon*( dxrho 
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
+          // + prims[ID(Prims::v1, i, j, k)]*dxrho 
+          // + prims[ID(Prims::v2, i, j, k)]*dyrho
+          // + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
           
-          + beta_n*( (aux[ID(Aux::n, i+1, j, k)] - aux[ID(Aux::n, i-1, j, k)])/(2*d->dx) 
-          + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
-          + prims[ID(Prims::v1, i, j, k)]*dxn 
-          + prims[ID(Prims::v2, i, j, k)]*dyn
-          + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
+          // + beta_n*( (aux[ID(Aux::n, i+1, j, k)] - aux[ID(Aux::n, i-1, j, k)])/(2*d->dx) 
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
+          // + prims[ID(Prims::v1, i, j, k)]*dxn 
+          // + prims[ID(Prims::v2, i, j, k)]*dyn
+          // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
 
 
         aux[ID(Aux::q2, i, j, k)] = -tau_q * (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * 
           aux[ID(Aux::W, i, j, k)]*( -(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::dv2dt, i, j, k)] + aux[ID(Aux::dWdt, i, j, k)]*prims[ID(Prims::v2, i, j, k)]) + // chain rule
           prims[ID(Prims::v1, i, j, k)]*dxuy + 
           prims[ID(Prims::v2, i, j, k)]*dyuy + 
-          prims[ID(Prims::v3, i, j, k)]*dzuy )
+          prims[ID(Prims::v3, i, j, k)]*dzuy );
           
-          + beta_epsilon*( dyrho 
-          + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
-          + prims[ID(Prims::v1, i, j, k)]*dxrho 
-          + prims[ID(Prims::v2, i, j, k)]*dyrho
-          + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
+          // + beta_epsilon*( dyrho 
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
+          // + prims[ID(Prims::v1, i, j, k)]*dxrho 
+          // + prims[ID(Prims::v2, i, j, k)]*dyrho
+          // + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
           
-          + beta_n*( dyn
-          + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
-          + prims[ID(Prims::v1, i, j, k)]*dxn 
-          + prims[ID(Prims::v2, i, j, k)]*dyn
-          + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
+          // + beta_n*( dyn
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
+          // + prims[ID(Prims::v1, i, j, k)]*dxn 
+          // + prims[ID(Prims::v2, i, j, k)]*dyn
+          // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
 
 
         aux[ID(Aux::q3, i, j, k)] = -tau_q * (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * 
           aux[ID(Aux::W, i, j, k)]*( -(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::dv3dt, i, j, k)] + aux[ID(Aux::dWdt, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) + // chain rule
           prims[ID(Prims::v1, i, j, k)]*dxuz + 
           prims[ID(Prims::v2, i, j, k)]*dyuz + 
-          prims[ID(Prims::v3, i, j, k)]*dzuz )
+          prims[ID(Prims::v3, i, j, k)]*dzuz );
           
-          + beta_epsilon*( dzrho 
-          + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
-          + prims[ID(Prims::v1, i, j, k)]*dxrho 
-          + prims[ID(Prims::v2, i, j, k)]*dyrho
-          + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
+          // + beta_epsilon*( dzrho 
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
+          // + prims[ID(Prims::v1, i, j, k)]*dxrho 
+          // + prims[ID(Prims::v2, i, j, k)]*dyrho
+          // + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
           
-          + beta_n*( dzn 
-          + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
-          + prims[ID(Prims::v1, i, j, k)]*dxn 
-          + prims[ID(Prims::v2, i, j, k)]*dyn
-          + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
+          // + beta_n*( dzn 
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
+          // + prims[ID(Prims::v1, i, j, k)]*dxn 
+          // + prims[ID(Prims::v2, i, j, k)]*dyn
+          // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
 
         // These expressions need expanding and improving from HP!
         aux[ID(Aux::pi11, i, j, k)] = -2*eta*( 2*dxux
