@@ -1623,6 +1623,30 @@ Smeared_Shocktube_1D_Para::Smeared_Shocktube_1D_Para(Data * data) : InitialFunc(
 
 }
 
+BDNK_Smeared_Shocktube::BDNK_Smeared_Shocktube(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  //if ((d->xmin != 0.0 || d->xmax != 1.0) && dir==0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  //if ((d->ymin != 0.0 || d->ymax != 1.0) && dir==1) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  //if ((d->zmin != 0.0 || d->zmax != 1.0) && dir==2) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        d->prims[ID(3, i, j, k)] = 5.5 + 4.5*tanh(-10*(d->x[i] - 0.5)); // p
+        d->prims[ID(4, i, j, k)] = 5.5 + 4.5*tanh(-10*(d->x[i] - 0.5))*(1+1/(d->gamma-1)); // rho
+        d->prims[ID(0, i, j, k)] = 0.2*tanh(-10*(d->x[i] - 0.5));
+        d->prims[ID(1, i, j, k)] = 0;
+        d->prims[ID(2, i, j, k)] = 0;
+      }
+    }
+  }
+
+}
 
 
 
