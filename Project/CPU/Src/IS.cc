@@ -172,8 +172,8 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double dWdt_rf = pow(args->W_rf,3)*args->v1_rf*x[0] + pow(args->W_rf,3)*args->v2_rf*x[1]
                 + pow(args->W_rf,3)*args->v3_rf*x[2]; 
   double Theta_rf = dWdt_rf + args->dxux_rf + args->dyuy_rf + args->dzuz_rf;
-  double dndt_rf = args->v1_rf*args->dndx_rf + args->v2_rf*args->dndy_rf + args->v3_rf*args->dndz_rf 
-                   + args->n_rf*Theta_rf/args->W_rf;
+  double dndt_rf = -( args->v1_rf*args->dndx_rf + args->v2_rf*args->dndy_rf + args->v3_rf*args->dndz_rf 
+                   + args->n_rf*Theta_rf/args->W_rf );
   double drhodt_rf = dndt_rf + x[3]/(args->gamma-1);
 
   double E_rf = args->Tau_rf + args->n_rf*args->W_rf; // Replacement for D
