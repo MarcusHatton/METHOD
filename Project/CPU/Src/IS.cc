@@ -17,7 +17,7 @@ IS::IS() : Model()
   this->Naux = 25;
 }
 
-IS::IS(Data * data, bool alt_C2P=false) : Model(data)
+IS::IS(Data * data) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 10;
   this->Nprims = (this->data)->Nprims = 10;
