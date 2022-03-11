@@ -370,8 +370,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
           + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
           + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) );
-        // aux[ID(Aux::n, i, j, k)] = cons[ID(Cons::D, i, j, k)]/aux[ID(Aux::W, i, j, k)];
-        aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]/(d->gamma-1);
+        aux[ID(Aux::n, i, j, k)] = cons[ID(Cons::D, i, j, k)]/aux[ID(Aux::W, i, j, k)];
+        // aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]/(d->gamma-1);
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (aux[ID(Aux::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
         aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
@@ -659,6 +659,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
                                   + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                   + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)] );
         aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]/(d->gamma-1);                        
+        // aux[ID(Aux::n, i, j, k)] = cons[ID(Cons::D, i, j, k)]/aux[ID(Aux::W, i, j, k)];
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (aux[ID(Aux::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
         aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
@@ -862,6 +863,8 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
+        // D
+        cons[ID(Cons::D, i, j, k)] = aux[ID(Aux::n, i, j, k)]*aux[ID(Aux::W, i, j, k)];
         // S1,2,3
         cons[ID(Cons::S1, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)] 
           + (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
@@ -901,9 +904,11 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
+        // Dv
+        f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];;
         // Sv + ..
         for (int nvar(0); nvar < 3; nvar++) {
-          f[ID(nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( aux[ID(Aux::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
+          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)] + ( aux[ID(Aux::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
             - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
           // (p+Pi)delta_ij
           if (dir == nvar) {
