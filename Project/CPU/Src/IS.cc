@@ -370,6 +370,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
           + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
           + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)]) );
+        // aux[ID(Aux::n, i, j, k)] = cons[ID(Cons::D, i, j, k)]/aux[ID(Aux::W, i, j, k)];
         aux[ID(Aux::n, i, j, k)] = prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]/(d->gamma-1);
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (aux[ID(Aux::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
@@ -657,7 +658,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
                                   + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                   + prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v3, i, j, k)] );
-        aux[ID(Aux::n, i, j, k)] = (d->gamma-1)*prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)];                        
+        aux[ID(Aux::n, i, j, k)] = *prims[ID(Prims::rho, i, j, k)] - prims[ID(Prims::p, i, j, k)]/(d->gamma-1);                        
         aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (aux[ID(Aux::n, i, j, k)]*(d->gamma-1));
         aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
         aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / aux[ID(Aux::n, i, j, k)];
