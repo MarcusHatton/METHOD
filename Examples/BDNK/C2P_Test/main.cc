@@ -132,15 +132,15 @@ int main(int argc, char *argv[]) {
   model.primsToAll(d->cons, d->prims, d->aux);
 
   // Perturb prims
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
-  //       for (int v(0); v < d->Nprims; v++) {
-  //         d->prims[ID(v, i, j, k)] *= 0.95 + float(v)/100;
-  //       }
-  //     }
-  //   }
-  // }
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        for (int v(0); v < d->Nprims; v++) {
+          d->prims[ID(v, i, j, k)] *= 0.95 + float(v)/100;
+        }
+      }
+    }
+  }
 
 
   // // Check nearby Cons stability
@@ -173,15 +173,15 @@ int main(int argc, char *argv[]) {
   model.primsToAll(d->cons, d->prims, d->aux); // not actually necessary?
 
   // Perturb prims
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
-  //       for (int v(0); v < d->Nprims; v++) {
-  //         d->prims[ID(v, i, j, k)] *= 0.95 + float(v)/100;
-  //       }
-  //     }
-  //   }
-  // }
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        for (int v(0); v < d->Nprims; v++) {
+          d->prims[ID(v, i, j, k)] *= 0.95 + float(v)/100;
+        }
+      }
+    }
+  }
 
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
