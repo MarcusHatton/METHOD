@@ -1638,7 +1638,7 @@ BDNK_Smeared_Shocktube::BDNK_Smeared_Shocktube(Data * data) : InitialFunc(data)
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
         d->prims[ID(3, i, j, k)] = 5.5 + 4.5*tanh(-10*(d->x[i] - 0.5)); // p
-        d->prims[ID(4, i, j, k)] = 5.5 + 4.5*tanh(-10*(d->x[i] - 0.5))*(1+(1/(d->gamma-1))); // rho
+        d->prims[ID(4, i, j, k)] = d->prims[ID(3, i, j, k)]*(1+(1/(d->gamma-1))); // rho
         d->prims[ID(0, i, j, k)] = 0.2*tanh(-10*(d->x[i] - 0.5));
         d->prims[ID(1, i, j, k)] = 0;
         d->prims[ID(2, i, j, k)] = 0;
