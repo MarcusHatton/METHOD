@@ -450,9 +450,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           args.dyux_rf = dyux;
           args.dyuy_rf = dyuy;
           args.dyuz_rf = dyuz;
-          args.dxux_rf = dzux;
-          args.dxux_rf = dzuy;
-          args.dxux_rf = dzuz;
+          args.dzux_rf = dzux;
+          args.dzuy_rf = dzuy;
+          args.dzuz_rf = dzuz;
           args.tau_epsilon_rf = tau_epsilon;
           args.tau_Pi_rf = tau_Pi;
           args.tau_q_rf = tau_q;
