@@ -160,16 +160,16 @@ class IS : public Model
     typedef struct
     {
       double
-      S1_rf,
-      S2_rf,
-      S3_rf,
-      Tau_rf,
       v1_rf,
       v2_rf,
       v3_rf,
       W_rf,
       p_rf,
       rho_rf,
+      S1_NI_rf,
+      S2_NI_rf,
+      S3_NI_rf,
+      Tau_NI_rf,
       n_rf,
       dndx_rf,
       dndy_rf,

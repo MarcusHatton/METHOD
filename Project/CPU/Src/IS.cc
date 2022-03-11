@@ -177,7 +177,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                    + args->n_rf*Theta_rf/args->W_rf );
   double drhodt_rf = dndt_rf + x[3]/(args->gamma-1);
 
-  double E_rf = args->Tau_rf + args->n_rf*args->W_rf; // Replacement for D
+  double E_rf = args->Tau_NI_rf + args->n_rf*args->W_rf; // Replacement for D
   double A_rf = -args->tau_epsilon_rf * ( args->W_rf*(drhodt_rf + 
                 args->v1_rf*args->dxrho_rf + args->v2_rf*args->dyrho_rf + args->v3_rf*args->dzrho_rf ) +
                 (args->p_rf + args->rho_rf)*Theta_rf  );
@@ -213,13 +213,13 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi02_rf = pi12_rf*args->v1_rf + pi22_rf*args->v2_rf + pi23_rf*args->v3_rf;
   double pi03_rf = pi13_rf*args->v1_rf + pi23_rf*args->v2_rf + pi33_rf*args->v3_rf;
 
-  fvec[0] = args->S1_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v1_rf 
+  fvec[0] = args->S1_NI_rf - ( (Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v1_rf 
             + (q1_rf + qv_rf*args->v1_rf)*args->W_rf + pi01_rf );
-  fvec[1] = args->S2_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v2_rf 
+  fvec[1] = args->S2_NI_rf - ( (Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v2_rf 
             + (q2_rf + qv_rf*args->v2_rf)*args->W_rf + pi02_rf );
-  fvec[2] = args->S3_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v3_rf 
+  fvec[2] = args->S3_NI_rf - ( (Pi_rf + A_rf)*args->W_rf*args->W_rf*args->v3_rf 
             + (q3_rf + qv_rf*args->v3_rf)*args->W_rf + pi03_rf );
-  fvec[3] = E_rf - ( (args->rho_rf + args->p_rf + Pi_rf + A_rf)*args->W_rf*args->W_rf - (args->p_rf + Pi_rf + A_rf) 
+  fvec[3] = E_rf - ( (Pi_rf + A_rf)*args->W_rf*args->W_rf - (Pi_rf + A_rf) 
             + 2*qv_rf*args->W_rf + pi00_rf );
 
   return 0;
@@ -427,16 +427,16 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           sol[3] = prims[ID(Prims::dpdt, i, j, k)];
 
           // Set additional args for rootfind
-          args.S1_rf = cons[ID(Cons::S1, i, j, k)];
-          args.S2_rf = cons[ID(Cons::S2, i, j, k)];
-          args.S3_rf = cons[ID(Cons::S3, i, j, k)];
-          args.Tau_rf = cons[ID(Cons::Tau, i, j, k)];
           args.v1_rf = prims[ID(Prims::v1, i, j, k)];
           args.v2_rf = prims[ID(Prims::v2, i, j, k)];
           args.v3_rf = prims[ID(Prims::v3, i, j, k)];
           args.W_rf = aux[ID(Aux::W, i, j, k)];
           args.p_rf = prims[ID(Prims::p, i, j, k)];
           args.rho_rf = prims[ID(Prims::rho, i, j, k)];
+          args.S1_NI_rf = cons[ID(Cons::S1, i, j, k)]  - (args.rho_rf + args.p_rf)*args.W_rf*args.W_rf*args.v1_rf;
+          args.S2_NI_rf = cons[ID(Cons::S2, i, j, k)]  - (args.rho_rf + args.p_rf)*args.W_rf*args.W_rf*args.v2_rf;
+          args.S3_NI_rf = cons[ID(Cons::S3, i, j, k)]  - (args.rho_rf + args.p_rf)*args.W_rf*args.W_rf*args.v3_rf;
+          args.Tau_NI_rf = cons[ID(Cons::Tau, i, j, k)]  - ((args.rho_rf + args.p_rf)*args.W_rf*args.W_rf - args.p_rf);
           args.n_rf = aux[ID(Aux::n, i, j, k)];
           args.dndx_rf = dxn;
           args.dndy_rf = dyn;
