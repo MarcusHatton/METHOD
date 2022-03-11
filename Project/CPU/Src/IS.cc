@@ -520,6 +520,42 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
 
+        dxrho = minmodGradFO(prims[ID(Prims::rho, i-1, j, k)], prims[ID(Prims::rho, i, j, k)], prims[ID(Prims::rho, i+1, j, k)], d->dx);
+        dyrho = minmodGradFO(prims[ID(Prims::rho, i, j-1, k)], prims[ID(Prims::rho, i, j, k)], prims[ID(Prims::rho, i, j+1, k)], d->dy);
+        dzrho = minmodGradFO(prims[ID(Prims::rho, i, j, k-1)], prims[ID(Prims::rho, i, j, k)], prims[ID(Prims::rho, i, j, k+1)], d->dz);
+        
+        dxn = minmodGradFO(aux[ID(Aux::n, i-1, j, k)], aux[ID(Aux::n, i, j, k)], aux[ID(Aux::n, i+1, j, k)], d->dx);
+        dyn = minmodGradFO(aux[ID(Aux::n, i, j-1, k)], aux[ID(Aux::n, i, j, k)], aux[ID(Aux::n, i, j+1, k)], d->dy);
+        dzn = minmodGradFO(aux[ID(Aux::n, i, j, k-1)], aux[ID(Aux::n, i, j, k)], aux[ID(Aux::n, i, j, k+1)], d->dz);
+
+        dxux = minmodGradFO(aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)],
+                            aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)], d->dx);
+        dyuy = minmodGradFO(aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v2, i, j-1, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
+                            aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v2, i, j+1, k)], d->dy);
+        dzuz = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)],
+                            aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);                          
+
+        dxuy = minmodGradFO(aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v2, i-1, j, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
+                            aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v2, i+1, j, k)], d->dx);
+        dxuz = minmodGradFO(aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v3, i-1, j, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)],
+                            aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v3, i+1, j, k)], d->dx);
+      
+        dyux = minmodGradFO(aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v1, i, j-1, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)],
+                            aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v1, i, j+1, k)], d->dy);
+        dyuz = minmodGradFO(aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v3, i, j-1, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)],
+                            aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v3, i, j+1, k)], d->dy);
+
+        dzux = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v1, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)],
+                            aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v1, i, j, k+1)], d->dz);  
+        dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
+                            aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
+
+        tau_q = (3.0/4.0)*d->optionalSimArgs[1]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+        eta = d->optionalSimArgs[3]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+        tau_epsilon = (3.0/4.0)*d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
+        tau_Pi = tau_epsilon/3.0;
+        beta_epsilon = tau_q*(d->gamma -1);
+
         prims[ID(Prims::dv1dt, i, j, k)] = solution[ID(0, i, j, k)];
         prims[ID(Prims::dv2dt, i, j, k)] = solution[ID(1, i, j, k)];
         prims[ID(Prims::dv3dt, i, j, k)] = solution[ID(2, i, j, k)];
