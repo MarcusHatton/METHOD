@@ -12,8 +12,6 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  bool alt_C2P = false;
-
   // Set up domain
   int Ng(4);
   // int nx(65536);
@@ -50,7 +48,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, alt_C2P); // alt_C2P?
+  IS model(&data);
   Outflow bcs(&data);
   Simulation sim(&data, &env);
   
@@ -63,12 +61,12 @@ int main(int argc, char *argv[]) {
 
   double v_base = 1e-6;
   double v_max = 0.9;
-  double n_base = 1e-4;
-  double n_max = 100;
+  // double n_base = 1e-4;
+  // double n_max = 100;
   double p_base = 1e-2;
   double p_max = 50;
 
-  double dn = pow(n_max/n_base,1/nx);
+  //double dn = pow(n_max/n_base,1/nx);
   double dv = pow(v_max/v_base,1/nz);
   double dp = pow(p_max/p_base,1/ny);
   
@@ -79,8 +77,9 @@ int main(int argc, char *argv[]) {
         orig_prims[ID(1, i, j, k)] = -2*v_base * pow(dv, k-Ng); // v2
         orig_prims[ID(2, i, j, k)] = -3*v_base * pow(dv, k-Ng); // v3
         orig_prims[ID(3, i, j, k)] = p_base * pow(dp, j-Ng); // p
-        orig_prims[ID(5, i, j, k)] = n_base * pow(dn, i-Ng); // n
+        //orig_prims[ID(5, i, j, k)] = n_base * pow(dn, i-Ng); // n
         orig_prims[ID(4, i, j, k)] = orig_prims[ID(5, i, j, k)] + orig_prims[ID(3, i, j, k)]/(d->gamma-1); // rho
+
 
         // orig_prims[ID(9, i, j, k)] = 1e-2 * n_base * pow(dn/1.5, i-Ng); // Pi
         // orig_prims[ID(6, i, j, k)] = 1e-2 * v_base * pow(dv/1.2, k-Ng); // q1
@@ -100,7 +99,7 @@ int main(int argc, char *argv[]) {
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        for (int count(0); count < d->Nprims; count++) {
+        for (int count(0); count < 5; count++) {
           d->prims[ID(count, i, j, k)] = orig_prims[ID(count, i, j, k)];
         }
       }
