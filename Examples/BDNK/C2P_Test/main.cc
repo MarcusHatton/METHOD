@@ -208,12 +208,18 @@ int main(int argc, char *argv[]) {
               cout << d->prims[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
-            cout << "Diffs ";
+            cout << "Abs Diffs ";
             for (int vz(0); vz < d->Nprims; vz++) {
               cout << orig_prims[ID(vz, i, j, k)] - d->prims[ID(vz, i, j, k)] << " ";
   //            cout << PrimsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
             }
             cout << endl;
+            cout << "Rel Diffs ";
+            for (int vz(0); vz < d->Nprims; vz++) {
+              cout << orig_prims[ID(vz, i, j, k)] / d->prims[ID(vz, i, j, k)] << " ";
+  //            cout << PrimsValues[vz] - d->prims[ID(vz, i, j, k)] << " ";
+            }
+            cout << endl;           
 
             // Cons comparison
             // cout << "\nOrigs ";
