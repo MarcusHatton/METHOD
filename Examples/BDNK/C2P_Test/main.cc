@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
 
   Data * d(model.data);
 
-  std::cout << "dt: " << d->dt << std::endl;
+  double dt = d->dt;
+  std::cout << "dt: " << dt << std::endl;
 
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
@@ -164,8 +165,9 @@ int main(int argc, char *argv[]) {
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        for (int count(5); count < 10; count++) {
-          orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs!
+        for (int count(0); count < 5; count++) {
+          orig_prims[ID(5+count, i, j, k)] = d->prims[ID(5+count, i, j, k)]; // sets time-derivs!
+          d->prims[ID(count, i, j, k)] += dt*d->prims[ID(5+count, i, j, k)]; // progresses prims
         }
       }
     }
