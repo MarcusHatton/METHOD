@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  double eta_0 = 1.0e-2;
+  double eta_0 = 2.0e-8;
   const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-2, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, false);
+  IS model(&data);
 
   Weno3 weno(&data);
 
