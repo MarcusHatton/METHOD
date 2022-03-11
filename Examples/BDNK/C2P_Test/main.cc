@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         for (int v(0); v < d->Nprims; v++) {
-          d->prims[ID(v, i, j, k)] *= 1.05;
+          d->prims[ID(v, i, j, k)] *= 0.95 + float(v)/100;
         }
       }
     }
@@ -158,14 +158,38 @@ int main(int argc, char *argv[]) {
   //C2P
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
-  //P2C
-  //model.primsToAll(d->cons, d->prims, d->aux);
+  // NOW DOUBLE ROUND-TRIPPING!
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) {
+        for (int count(5); count < 10; count++) {
+          orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs!
+        }
+      }
+    }
+  }
+
+  // P2C
+  model.primsToAll(d->cons, d->prims, d->aux); // not actually necessary?
+
+  // Perturb prims
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        for (int v(0); v < d->Nprims; v++) {
+          d->prims[ID(v, i, j, k)] *= 0.95 + float(v)/100;
+        }
+      }
+    }
+  }
+
+  model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        int nprims = 5; // # prims to actually compare!
+        int nprims = d->Nprims; // # prims to actually compare!
         for (int count(0); count < nprims; count++) {
           if ( abs(d->prims[ID(count, i, j, k)] - orig_prims[ID(count, i, j, k)]) > 1e-5 * abs(orig_prims[ID(count, i, j, k)]) ) {
 //          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
