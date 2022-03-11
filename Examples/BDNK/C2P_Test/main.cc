@@ -63,11 +63,11 @@ int main(int argc, char *argv[]) {
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
-  double v_base = 1e-6;
-  double v_max = 0.9;
+  double v_base = 1e-1;
+  double v_max = 0.5;
   // double n_base = 1e-4;
   // double n_max = 100;
-  double p_base = 1e-2;
+  double p_base = 1;
   double p_max = 50;
 
   //double dn = pow(n_max/n_base,1/nx);
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
         }
         for (int count(0); count < d->Nprims; count++) {
           orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs!
-          std::cout << d->prims[ID(count, i, j, k)] << std::endl;
+          // std::cout << d->prims[ID(count, i, j, k)] << std::endl;
         }
       }
     }
