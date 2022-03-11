@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(2000);
+  int nx(40000);
   int ny(0);
   int nz(0);
   double xmin(0.0);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(1.0e-3);
+  double endTime(0.4);
   //double endTime(5.0);
   
   double cfl(0.1);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  double eta_0 = 1.0e-15;
+  double eta_0 = 1.0e-2;
   const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-2, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
@@ -78,11 +78,7 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  Smeared_Shocktube_1D_Para init(&data);
-  //IS_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
-  // Blob2dToyQ init(&data);
-  //ISKHInstabilitySingleFluid init(&data, 1);
-  //Shocktube_Chab21 init(&data);  
+  BDNK_Smeared_Shocktube init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
