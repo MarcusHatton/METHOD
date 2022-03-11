@@ -165,7 +165,8 @@ int main(int argc, char *argv[]) {
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
-        for (int count(0); count < d->Nprims; count++) {
+        int nprims = 5; // # prims to actually compare!
+        for (int count(0); count < nprims; count++) {
           if ( abs(d->prims[ID(count, i, j, k)] - orig_prims[ID(count, i, j, k)]) > 1e-5 * abs(orig_prims[ID(count, i, j, k)]) ) {
 //          if ( abs(d->prims[ID(v, i, j, k)] - PrimsValues[v]) > 1e-5 * abs(PrimsValues[v]) ) {
 //          if ( abs(d->cons[ID(v, i, j, k)] - ConsValues[v]) > 1e-5 * abs(ConsValues[v]) ) {
