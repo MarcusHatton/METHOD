@@ -170,6 +170,7 @@ int main(int argc, char *argv[]) {
         }
         for (int count(0); count < d->Nprims; count++) {
           orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs!
+        }
       }
     }
   }
