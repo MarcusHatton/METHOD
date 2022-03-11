@@ -12,14 +12,14 @@ T sqr(T x) { return ((x) * (x)); }
 
 IS::IS() : Model()
 {
-  this->Ncons = 9;
+  this->Ncons = 10;
   this->Nprims = 10;
   this->Naux = 25;
 }
 
 IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 {
-  this->Ncons = (this->data)->Ncons = 9;
+  this->Ncons = (this->data)->Ncons = 10;
   this->Nprims = (this->data)->Nprims = 10;
   this->Naux = (this->data)->Naux = 25;
 
@@ -29,9 +29,10 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   smartGuesses = 0;
   
   // 0  
+  this->data->consLabels.push_back("D");
   this->data->consLabels.push_back("S1");  this->data->consLabels.push_back("S2");  
   this->data->consLabels.push_back("S3");  this->data->consLabels.push_back("Tau");
-  // 4
+  // 5
   this->data->consLabels.push_back("v1_C");  this->data->consLabels.push_back("v2_C");
   this->data->consLabels.push_back("v3_C");  this->data->consLabels.push_back("p_C");
   this->data->consLabels.push_back("rho_C");
@@ -912,13 +913,13 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
             - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
           // (p+Pi)delta_ij
           if (dir == nvar) {
-            f[ID(nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)]);
+            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)]);
           }
         }
         //  pi^i_j  
         if (dir == 0) {
           for (int nvar(0); nvar < 3; nvar++) {
-            f[ID(nvar, i, j, k)] += aux[ID(Aux::pi11+nvar, i, j, k)];
+            f[ID(1+nvar, i, j, k)] += aux[ID(Aux::pi11+nvar, i, j, k)];
           }
         } else if (dir == 1) {
           f[ID(0, i, j, k)] += aux[ID(Aux::pi12, i, j, k)];
@@ -933,13 +934,13 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         }
 
         // (Tau+p)*v + ...
-        f[ID(3, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
+        f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
           + (aux[ID(Aux::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
           + aux[ID(Aux::pi01+dir, i, j, k)];
         
         // v1, v2, v3, p, rho
         for (int nvar(0); nvar < 5; nvar++) {
-          f[ID(4+nvar, i, j, k)] = 0;
+          f[ID(5+nvar, i, j, k)] = 0;
         }
 
       } // End k loop

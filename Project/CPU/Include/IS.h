@@ -9,7 +9,7 @@ class IS : public Model
   public:
 
     // enums to save looking up numbering of C/P/As when using ID accessor.
-    enum Cons { S1, S2, S3, Tau, v1_C, v2_C, v3_C, p_C, rho_C };
+    enum Cons { D, S1, S2, S3, Tau, v1_C, v2_C, v3_C, p_C, rho_C };
     enum Prims { v1, v2, v3, p, rho, dv1dt, dv2dt, dv3dt, dpdt, drhodt };
     enum Aux { A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
                pi00, pi01, pi02, pi03, n, h, T, e, W, dndt, dWdt };
