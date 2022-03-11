@@ -57,6 +57,8 @@ int main(int argc, char *argv[]) {
 
   Data * d(model.data);
 
+  std::cout << "dt: " << d->dt << std::endl;
+
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
