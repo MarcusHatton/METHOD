@@ -166,9 +166,10 @@ int main(int argc, char *argv[]) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
         for (int count(0); count < 5; count++) {
-          orig_prims[ID(5+count, i, j, k)] = d->prims[ID(5+count, i, j, k)]; // sets time-derivs!
           d->prims[ID(count, i, j, k)] += dt*d->prims[ID(5+count, i, j, k)]; // progresses prims
         }
+        for (int count(0); count < d->Nprims; count++) {
+          orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs!
       }
     }
   }
