@@ -494,19 +494,19 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
             fails.push_back(fail);
           } else {
             // Now have the correct values for time derivs
-            // solution[ID(0, i, j, k)] = sol[0];
-            // solution[ID(1, i, j, k)] = sol[1];
-            // solution[ID(2, i, j, k)] = sol[2];
-            // solution[ID(3, i, j, k)] = sol[3];
-            prims[ID(Prims::dv1dt, i, j, k)] = sol[0];
-            prims[ID(Prims::dv2dt, i, j, k)] = sol[1];
-            prims[ID(Prims::dv3dt, i, j, k)] = sol[2];
-            prims[ID(Prims::dpdt, i, j, k)] = sol[3];
+            solution[ID(0, i, j, k)] = sol[0];
+            solution[ID(1, i, j, k)] = sol[1];
+            solution[ID(2, i, j, k)] = sol[2];
+            solution[ID(3, i, j, k)] = sol[3];
+            // prims[ID(Prims::dv1dt, i, j, k)] = sol[0];
+            // prims[ID(Prims::dv2dt, i, j, k)] = sol[1];
+            // prims[ID(Prims::dv3dt, i, j, k)] = sol[2];
+            // prims[ID(Prims::dpdt, i, j, k)] = sol[3];
           }      
         
-  //       } // End k-loop
-  //     } // End j-loop
-  //   } // End i-loop
+        } // End k-loop
+      } // End j-loop
+    } // End i-loop
 
   // // double kappa = d->optionalSimArgs[0];
   // // double tau_q = d->optionalSimArgs[1];
@@ -516,9 +516,14 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
   // // double tau_epsilon = d->optionalSimArgs[5];
 
 
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+
+        prims[ID(Prims::dv1dt, i, j, k)] = solution[ID(0, i, j, k)];
+        prims[ID(Prims::dv2dt, i, j, k)] = solution[ID(1, i, j, k)];
+        prims[ID(Prims::dv3dt, i, j, k)] = solution[ID(2, i, j, k)];
+        prims[ID(Prims::dpdt, i, j, k)] = solution[ID(3, i, j, k)];
         
         aux[ID(Aux::dWdt, i, j, k)] = pow(aux[ID(Aux::W, i, j, k)],3)*(prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::dv1dt, i, j, k)] + 
           prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::dv2dt, i, j, k)] + 
