@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
   }
 
   // P2C
-  model.primsToAll(d->cons, d->prims, d->aux); // not actually necessary?
+  model.primsToAll(d->cons, d->prims, d->aux);
 
   // Perturb prims
   // for (int i(d->is); i < d->ie; i++) {
@@ -198,6 +198,11 @@ int main(int argc, char *argv[]) {
   // }
 
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
+
+  // Triple...
+  model.primsToAll(d->cons, d->prims, d->aux);
+  model.getPrimitiveVars(d->cons, d->prims, d->aux);
+
 
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
