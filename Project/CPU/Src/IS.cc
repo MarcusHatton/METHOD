@@ -14,14 +14,14 @@ IS::IS() : Model()
 {
   this->Ncons = 10;
   this->Nprims = 10;
-  this->Naux = 25;
+  this->Naux = 29;
 }
 
 IS::IS(Data * data) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 10;
   this->Nprims = (this->data)->Nprims = 10;
-  this->Naux = (this->data)->Naux = 25;
+  this->Naux = (this->data)->Naux = 29;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
@@ -68,7 +68,10 @@ IS::IS(Data * data) : Model(data)
   this->data->auxLabels.push_back("e");      this->data->auxLabels.push_back("W");
   // 23
   this->data->auxLabels.push_back("dndt"); this->data->auxLabels.push_back("dWdt");     
-
+  // 25
+  this->data->auxLabels.push_back("S1_PF");  this->data->auxLabels.push_back("S2_PF");  
+  this->data->auxLabels.push_back("S3_PF");  this->data->auxLabels.push_back("Tau_PF");
+  // 29
 }
 
 IS::~IS()
@@ -634,6 +637,10 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                   + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
                                   + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
 
+        aux[ID(Aux::S1_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)];  
+        aux[ID(Aux::S2_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)];  
+        aux[ID(Aux::S3_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v3, i, j, k)];  
+        aux[ID(Aux::Tau_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] - (prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::n, i, j, k)] * aux[ID(Aux::W, i, j, k)]);
 
         } // End k-loop
       } // End j-loop
@@ -883,6 +890,11 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         cons[ID(Cons::v3_C, i, j, k)] = prims[ID(Prims::v3, i, j, k)];
         cons[ID(Cons::p_C, i, j, k)] = prims[ID(Prims::p, i, j, k)];
         cons[ID(Cons::rho_C, i, j, k)] = prims[ID(Prims::rho, i, j, k)];
+
+        aux[ID(Aux::S1_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)];  
+        aux[ID(Aux::S2_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)];  
+        aux[ID(Aux::S3_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v3, i, j, k)];  
+        aux[ID(Aux::Tau_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] - (prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::n, i, j, k)] * aux[ID(Aux::W, i, j, k)]);
 
         // if (i==3 && j==3 && k==3)
           // std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << "\t" << "\t" << prims[ID(Prims::rho, i, j, k)]
