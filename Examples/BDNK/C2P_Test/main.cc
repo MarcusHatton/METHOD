@@ -63,14 +63,14 @@ int main(int argc, char *argv[]) {
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
-  double v_base = 0.1;
-  double v_max = 0.5;
-  // double n_base = 1e-4;
-  // double n_max = 100;
+  double v_base = 0.01;
+  double v_max = 0.1;
+  double rho_base = 1;
+  double rho_max = 30;
   double p_base = 2;
   double p_max = 50;
 
-  //double dn = pow(n_max/n_base,1/nx);
+  double drho = pow(rho_max/rho_base,1/nx);
   double dv = pow(v_max/v_base,1/nz);
   double dp = pow(p_max/p_base,1/ny);
   
@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
         orig_prims[ID(1, i, j, k)] = -2*v_base * pow(dv, k-Ng); // v2
         orig_prims[ID(2, i, j, k)] = -3*v_base * pow(dv, k-Ng); // v3
         orig_prims[ID(3, i, j, k)] = p_base * pow(dp, j-Ng); // p
-        //orig_prims[ID(5, i, j, k)] = n_base * pow(dn, i-Ng); // n
-        orig_prims[ID(4, i, j, k)] = orig_prims[ID(5, i, j, k)] + orig_prims[ID(3, i, j, k)]/(d->gamma-1); // rho
+        orig_prims[ID(4, i, j, k)] = rho_base * pow(drho, i-Ng); // rho
+        //orig_prims[ID(4, i, j, k)] = orig_prims[ID(5, i, j, k)] + orig_prims[ID(3, i, j, k)]/(d->gamma-1); // rho
 
 
         // orig_prims[ID(9, i, j, k)] = 1e-2 * n_base * pow(dn/1.5, i-Ng); // Pi
@@ -204,7 +204,7 @@ int main(int argc, char *argv[]) {
             
             // Prims comparison
             cout << "\nFails (nprim/con, i, j, k) " << count << " " << i << " " << j << " " << k << endl;
-            cout << "Origs ";
+            cout << "Orig Prims ";
             for (int vz(0); vz < d->Nprims; vz++) {
               cout << orig_prims[ID(vz, i, j, k)] << " ";
 //              cout << PrimsValues[vz] << " ";
