@@ -199,14 +199,6 @@ int main(int argc, char *argv[]) {
 
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
-  // Triple...
-  model.primsToAll(d->cons, d->prims, d->aux);
-  model.getPrimitiveVars(d->cons, d->prims, d->aux);
-  model.primsToAll(d->cons, d->prims, d->aux);
-  model.getPrimitiveVars(d->cons, d->prims, d->aux);  model.primsToAll(d->cons, d->prims, d->aux);
-  model.getPrimitiveVars(d->cons, d->prims, d->aux);  model.primsToAll(d->cons, d->prims, d->aux);
-  model.getPrimitiveVars(d->cons, d->prims, d->aux);
-
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
