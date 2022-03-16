@@ -165,11 +165,11 @@ int main(int argc, char *argv[]) {
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
-        for (int count(0); count < 5; count++) {
-          d->prims[ID(count, i, j, k)] += dt*d->prims[ID(5+count, i, j, k)]; // progresses prims
-        }
+        // for (int count(0); count < 5; count++) {
+        //   d->prims[ID(count, i, j, k)] += dt*d->prims[ID(5+count, i, j, k)]; // progresses prims
+        // }
         for (int count(0); count < d->Nprims; count++) {
-          orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs!
+          orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs, too!
           // std::cout << d->prims[ID(count, i, j, k)] << std::endl;
         }
       }
