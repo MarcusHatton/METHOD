@@ -63,12 +63,19 @@ int main(int argc, char *argv[]) {
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
-  double v_base = 0.01;
-  double v_max = 0.2;
+  // double v_base = 0.01;
+  // double v_max = 0.2;
+  // double rho_base = 5;
+  // double rho_max = 30;
+  // double p_base = 1;
+  // double p_max = 10;
+
+  double v_base = 0.1;
+  double v_max = 0.1;
   double rho_base = 5;
-  double rho_max = 30;
-  double p_base = 1;
-  double p_max = 10;
+  double rho_max = 5;
+  double p_base = 2;
+  double p_max = 2;
 
   double drho = pow(rho_max/rho_base,1/nx);
   double dv = pow(v_max/v_base,1/nz);
