@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  double eta_0 = 2.0e-2;
+  double eta_0 = 2.0e-1;
   const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-1, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
@@ -63,11 +63,11 @@ int main(int argc, char *argv[]) {
   double * orig_prims;
   orig_prims = new double[d->Ntot * d->Nprims]();
 
-  double v_base = 1e-1;
+  double v_base = 0.1;
   double v_max = 0.5;
   // double n_base = 1e-4;
   // double n_max = 100;
-  double p_base = 1;
+  double p_base = 2;
   double p_max = 50;
 
   //double dn = pow(n_max/n_base,1/nx);
