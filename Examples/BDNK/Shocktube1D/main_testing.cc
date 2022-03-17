@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
+  int nx(2000);
   int ny(0);
   int nz(0);
   double xmin(0.0);
@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  //double endTime(0.4);
-  double endTime(5.0);
+  double endTime(1.0e-3);
+  //double endTime(5.0);
   
   double cfl(0.1);
   // double gamma(0.001);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(50);
+  int nreports(20);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
   double eta_0 = 1.0e-15;
-  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  5.0e-3, eta_0, (25/4)*eta_0} };
+  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-2, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/all/data_serial_TIx_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
     //data.endTime = 4.0e-3; // HACK
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/bulk/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/all/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
