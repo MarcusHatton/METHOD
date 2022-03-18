@@ -169,22 +169,22 @@ int main(int argc, char *argv[]) {
   model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
   // NOW DOUBLE ROUND-TRIPPING!
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
+  // for (int i(0); i < d->Nx; i++) {
+  //   for (int j(0); j < d->Ny; j++) {
+  //     for (int k(0); k < d->Nz; k++) {
         // for (int count(0); count < 5; count++) {
         //   d->prims[ID(count, i, j, k)] += dt*d->prims[ID(5+count, i, j, k)]; // progresses prims
         // }
-        for (int count(0); count < d->Nprims; count++) {
-          orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs, too!
+        // for (int count(0); count < d->Nprims; count++) {
+        //   orig_prims[ID(count, i, j, k)] = d->prims[ID(count, i, j, k)]; // sets time-derivs, too!
           // std::cout << d->prims[ID(count, i, j, k)] << std::endl;
-        }
-      }
-    }
-  }
+  //       }
+  //     }
+  //   }
+  // }
 
   // P2C
-  model.primsToAll(d->cons, d->prims, d->aux);
+  // model.primsToAll(d->cons, d->prims, d->aux);
 
   // Perturb prims
   // for (int i(d->is); i < d->ie; i++) {
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
   //   }
   // }
 
-  model.getPrimitiveVars(d->cons, d->prims, d->aux);
+  // model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
   //Cross-check
   for (int i(d->is); i < d->ie; i++) {
