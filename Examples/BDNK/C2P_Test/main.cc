@@ -200,9 +200,9 @@ int main(int argc, char *argv[]) {
   // model.getPrimitiveVars(d->cons, d->prims, d->aux);
 
   //Cross-check
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
+  for (int i(d->is+4); i < d->ie-4; i++) {
+    for (int j(d->js+4); j < d->je-4; j++) {
+      for (int k(d->ks+4); k < d->ke-4; k++) {
         int nprims = d->Nprims; // # prims to actually compare!
         for (int count(0); count < nprims; count++) {
           if ( abs(d->prims[ID(count, i, j, k)] - orig_prims[ID(count, i, j, k)]) > 1e-5 * abs(orig_prims[ID(count, i, j, k)]) ) {
