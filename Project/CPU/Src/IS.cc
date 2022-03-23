@@ -7,9 +7,6 @@
 #include <stdexcept>
 #include "wenoUpwinds.h"
 
-template<typename T>
-T sqr(T x) { return ((x) * (x)); }
-
 IS::IS() : Model()
 {
   this->Ncons = 10;

@@ -3,6 +3,18 @@
 
 #include "model.h"
 
+template<typename T>
+T pow(T x, int N) { 
+  double result { 1.0 };
+  for(int n(0); n < N; n++) {
+    result *= (x);
+  }
+  return result; 
+}
+
+template<typename T>
+T sqr(T x) { return ((x) * (x)); }
+
 class IS : public Model
 {
 
