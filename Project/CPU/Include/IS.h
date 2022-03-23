@@ -173,8 +173,8 @@ class IS : public Model
 
       // Get timestep
       double dt=d->dt;
-      double dx=d->dx;
-      if (dt < 1e-3*dx) return;
+      // double dx=d->dx;
+      // if (dt < 1e-3*dx) return;
       
       //printf("dt: %.17g", dt);
       for (int i(d->is); i < d->ie; i++) {
@@ -202,6 +202,19 @@ class IS : public Model
             prev_vars[ID(4, i, j, k)] = prims[ID(Prims::p, i, j, k)]; 
             prev_vars[ID(5, i, j, k)] = prims[ID(Prims::rho, i, j, k)];
             prev_vars[ID(6, i, j, k)] = prims[ID(Prims::n, i, j, k)]; 
+
+            // Copy into the variables actually used to do the advancement - overwrite
+            aux[ID(Aux::dpdt, i, j, k)]  = aux[ID(Aux::dtp, i, j, k)];
+            aux[ID(Aux::drhodt, i, j, k)]  = aux[ID(Aux::dtrho, i, j, k)];
+            aux[ID(Aux::dv1dt, i, j, k)]  = aux[ID(Aux::dtv1, i, j, k)];
+            aux[ID(Aux::dv2dt, i, j, k)]  = aux[ID(Aux::dtv2, i, j, k)];
+            aux[ID(Aux::dv3dt, i, j, k)]  = aux[ID(Aux::dtv3, i, j, k)];
+            // Chain rule for these 2
+            aux[ID(Aux::dWdt, i, j, k)] = pow(aux[ID(Aux::W, i, j, k)],3)*(prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] + 
+                                          prims[ID(Prims::v2, i, j, k)]*aux[ID(Aux::dv2dt, i, j, k)] + 
+                                          prims[ID(Prims::v3, i, j, k)]*aux[ID(Aux::dv3dt, i, j, k)]);
+            aux[ID(Aux::dndt, i, j, k)] = aux[ID(Aux::drhodt, i, j, k)] - aux[ID(Aux::dpdt, i, j, k)]/(d->gamma-1);
+
           } // End k-loop
         } // End j-loop
       } // End i-loop
