@@ -3,6 +3,14 @@
 
 #include "model.h"
 
+template<typename T>
+T pow(T x) { 
+  double result { 1.0 };
+  for(int n(0); n < pow; n++) {
+    result *= (x);
+  }
+  return result; 
+}
 
 /*
 This is the human readable description of this models variables.
