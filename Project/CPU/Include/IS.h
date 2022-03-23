@@ -13,7 +13,7 @@ class IS : public Model
     enum Prims { v1, v2, v3, p, rho, dv1dt, dv2dt, dv3dt, dpdt, drhodt };
     enum Aux { A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
                pi00, pi01, pi02, pi03, n, h, T, e, W, dndt, dWdt, 
-               S1_PF, S2_PF, S3_PF, Tau_PF, dtp, dtrho, dtv1, dtv2, dtv3 };
+               S1_PF, S2_PF, S3_PF, Tau_PF, dtv1, dtv2, dtv3, dtp, dtrho,  };
 
 
     int smartGuesses;     //!< Number of smart guess required

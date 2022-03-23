@@ -72,9 +72,10 @@ IS::IS(Data * data) : Model(data)
   this->data->auxLabels.push_back("S1_PF");  this->data->auxLabels.push_back("S2_PF");  
   this->data->auxLabels.push_back("S3_PF");  this->data->auxLabels.push_back("Tau_PF");
   // 29 - spatially calculated time derivatives for comparison purposes!
-  this->data->auxLabels.push_back("dtp");  this->data->auxLabels.push_back("dtrho");  
   this->data->auxLabels.push_back("dtv1");  this->data->auxLabels.push_back("dtv2");
   this->data->auxLabels.push_back("dtv3");
+  this->data->auxLabels.push_back("dtp");  this->data->auxLabels.push_back("dtrho");  
+
   // 34
 
 }
