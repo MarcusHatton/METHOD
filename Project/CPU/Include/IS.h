@@ -26,8 +26,9 @@ class IS : public Model
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n };
     enum Aux { A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
-               pi00, pi01, pi02, pi03, h, T, e, W,  dpdt, drhodt, dndt, dv1dt, 
-               dv2dt, dv3dt, dWdt, a1, a2, a3, vsqrd, rho_plus_p };
+               pi00, pi01, pi02, pi03, h, T, e, W,  dpdt, drhodt, dndt, dv1dt, dv2dt, dv3dt, dWdt,
+               a1, a2, a3, vsqrd, rho_plus_p, dtp, dtrho, dtv1, dtv2, dtv3 };
+               
 
 
     int smartGuesses;     //!< Number of smart guess required

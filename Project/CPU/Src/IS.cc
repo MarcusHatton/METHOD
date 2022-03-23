@@ -14,14 +14,14 @@ IS::IS() : Model()
 {
   this->Ncons = 5;
   this->Nprims = 6;
-  this->Naux = 34;
+  this->Naux = 39;
 }
 
 IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 6;
-  this->Naux = (this->data)->Naux = 34;
+  this->Naux = (this->data)->Naux = 39;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
@@ -38,6 +38,7 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
   this->data->consLabels.push_back("Tau");
+  // 5
 
   // 0
   this->data->primsLabels.push_back("v1");   this->data->primsLabels.push_back("v2");
@@ -45,6 +46,7 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   // 3
   this->data->primsLabels.push_back("p");   this->data->primsLabels.push_back("rho");
   this->data->primsLabels.push_back("n");
+  // 6
 
 
   // 0
@@ -72,8 +74,11 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
   this->data->auxLabels.push_back("rho_plus_p");
-  // 34
-
+  // 34 - spatially calculated time derivatives for comparison purposes!
+  this->data->auxLabels.push_back("dtv1");  this->data->auxLabels.push_back("dtv2");
+  this->data->auxLabels.push_back("dtv3");
+  this->data->auxLabels.push_back("dtp");  this->data->auxLabels.push_back("dtrho");
+  // 39
 }
 
 IS::~IS()
