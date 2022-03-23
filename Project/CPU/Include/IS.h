@@ -4,9 +4,9 @@
 #include "model.h"
 
 template<typename T>
-T pow(T x) { 
+T pow(T x, int N) { 
   double result { 1.0 };
-  for(int n(0); n < pow; n++) {
+  for(int n(0); n < N; n++) {
     result *= (x);
   }
   return result; 
