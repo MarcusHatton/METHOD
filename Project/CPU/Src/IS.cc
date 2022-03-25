@@ -886,6 +886,12 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
         // S1,2,3
         cons[ID(Cons::S1, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)] 
           + (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
+
+
+        if (i==401 && j==0 && k==0) {
+          std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << std::endl;
+        }
+
         cons[ID(Cons::S2, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)] 
           + (aux[ID(Aux::q2, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi02, i, j, k)];
         cons[ID(Cons::S3, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v3, i, j, k)] 
@@ -969,9 +975,9 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
           throw std::runtime_error("Flux direction is not 0, 1 or 2");
         }
 
-        if (i==401 && j==0 && k==0) {
-          std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << f[ID(1, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << std::endl;
-        }
+        // if (i==401 && j==0 && k==0) {
+        //   std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << f[ID(1, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << std::endl;
+        // }
 
         // (Tau+p)*v + ...
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
