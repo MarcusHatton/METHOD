@@ -176,8 +176,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   */
   
   // Chain rule on W to get dWdt
-  double dWdt_rf = pow(args->W_rf,3)*args->v1_rf*x[0] + pow(args->W_rf,3)*args->v2_rf*x[1]
-                + pow(args->W_rf,3)*args->v3_rf*x[2]; 
+  double dWdt_rf = pow(args->W_rf,3)*(args->v1_rf*x[0] + args->v2_rf*x[1] + args->v3_rf*x[2]); 
   double Theta_rf = dWdt_rf + args->dxux_rf + args->dyuy_rf + args->dzuz_rf;
   double dndt_rf = -( args->v1_rf*args->dndx_rf + args->v2_rf*args->dndy_rf + args->v3_rf*args->dndz_rf 
                    + args->n_rf*Theta_rf/args->W_rf );
@@ -215,7 +214,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   
   double pi00_rf = pi11_rf + pi22_rf + pi33_rf;
   double qv_rf = q1_rf*args->v1_rf + q2_rf*args->v2_rf + q3_rf*args->v3_rf;
-  double pi01_rf = pi11_rf*args->v1_rf + pi12_rf*args->v2_rf + pi13_rf*args->v3_rf; // dbl check sign on orthogonality relation
+  double pi01_rf = pi11_rf*args->v1_rf + pi12_rf*args->v2_rf + pi13_rf*args->v3_rf;
   double pi02_rf = pi12_rf*args->v1_rf + pi22_rf*args->v2_rf + pi23_rf*args->v3_rf;
   double pi03_rf = pi13_rf*args->v1_rf + pi23_rf*args->v2_rf + pi33_rf*args->v3_rf;
 
@@ -556,13 +555,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           prims[ID(Prims::v3, i, j, k)]*dzux );
           
           // + beta_epsilon*( dxrho 
-          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( prims[ID(Prims::drhodt, i, j, k)]
           // + prims[ID(Prims::v1, i, j, k)]*dxrho 
           // + prims[ID(Prims::v2, i, j, k)]*dyrho
           // + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
           
           // + beta_n*( (aux[ID(Aux::n, i+1, j, k)] - aux[ID(Aux::n, i-1, j, k)])/(2*d->dx) 
-          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*( aux[ID(Aux::dndt, i, j, k)]
           // + prims[ID(Prims::v1, i, j, k)]*dxn 
           // + prims[ID(Prims::v2, i, j, k)]*dyn
           // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
@@ -575,13 +574,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           prims[ID(Prims::v3, i, j, k)]*dzuy );
           
           // + beta_epsilon*( dyrho 
-          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( prims[ID(Prims::drhodt, i, j, k)]
           // + prims[ID(Prims::v1, i, j, k)]*dxrho 
           // + prims[ID(Prims::v2, i, j, k)]*dyrho
           // + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
           
           // + beta_n*( dyn
-          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*( aux[ID(Aux::dndt, i, j, k)]
           // + prims[ID(Prims::v1, i, j, k)]*dxn 
           // + prims[ID(Prims::v2, i, j, k)]*dyn
           // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
@@ -594,13 +593,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           prims[ID(Prims::v3, i, j, k)]*dzuz );
           
           // + beta_epsilon*( dzrho 
-          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( -prims[ID(Prims::drhodt, i, j, k)]
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( prims[ID(Prims::drhodt, i, j, k)]
           // + prims[ID(Prims::v1, i, j, k)]*dxrho 
           // + prims[ID(Prims::v2, i, j, k)]*dyrho
           // + prims[ID(Prims::v3, i, j, k)]*dzrho ) ) 
           
           // + beta_n*( dzn 
-          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( -aux[ID(Aux::dndt, i, j, k)]
+          // + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*( aux[ID(Aux::dndt, i, j, k)]
           // + prims[ID(Prims::v1, i, j, k)]*dxn 
           // + prims[ID(Prims::v2, i, j, k)]*dyn
           // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
@@ -969,6 +968,9 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         } else {
           throw std::runtime_error("Flux direction is not 0, 1 or 2");
         }
+
+        if (i==401 && j==0 && k==0)
+          std::cout << f[ID(1, i, j, k)] << std::endl;
 
         // (Tau+p)*v + ...
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
