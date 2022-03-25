@@ -199,12 +199,12 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                   args->v1_rf*args->dxuz_rf + args->v2_rf*args->dyuz_rf + args->v3_rf*args->dzuz_rf );
   
   // These expressions still need improvement!
-  double pi11_rf = -2*args->eta_rf*( 2*args->dxux_rf - (2/3)*(1 + (args->W_rf*args->v1_rf)*(args->W_rf*args->v1_rf))*Theta_rf );
-  double pi12_rf = -2*args->eta_rf*( args->dxuy_rf + args->dyux_rf - (2/3)*(args->W_rf*args->v1_rf)*(args->W_rf*args->v2_rf)*Theta_rf );
-  double pi13_rf = -2*args->eta_rf*( args->dxuz_rf + args->dzux_rf - (2/3)*(args->W_rf*args->v1_rf)*(args->W_rf*args->v3_rf)*Theta_rf );
-  double pi22_rf = -2*args->eta_rf*( 2*args->dyuy_rf - (2/3)*(1 + (args->W_rf*args->v2_rf)*(args->W_rf*args->v2_rf))*Theta_rf );
-  double pi23_rf = -2*args->eta_rf*( args->dyuz_rf + args->dzuy_rf - (2/3)*(args->W_rf*args->v2_rf)*(args->W_rf*args->v3_rf)*Theta_rf );
-  double pi33_rf = -2*args->eta_rf*( 2*args->dzuz_rf - (2/3)*(1 + (args->W_rf*args->v3_rf)*(args->W_rf*args->v3_rf))*Theta_rf );
+  double pi11_rf = -args->eta_rf*( 2*args->dxux_rf - (2/3)*(1 + (args->W_rf*args->v1_rf)*(args->W_rf*args->v1_rf))*Theta_rf );
+  double pi12_rf = -args->eta_rf*( args->dxuy_rf + args->dyux_rf - (2/3)*(args->W_rf*args->v1_rf)*(args->W_rf*args->v2_rf)*Theta_rf );
+  double pi13_rf = -args->eta_rf*( args->dxuz_rf + args->dzux_rf - (2/3)*(args->W_rf*args->v1_rf)*(args->W_rf*args->v3_rf)*Theta_rf );
+  double pi22_rf = -args->eta_rf*( 2*args->dyuy_rf - (2/3)*(1 + (args->W_rf*args->v2_rf)*(args->W_rf*args->v2_rf))*Theta_rf );
+  double pi23_rf = -args->eta_rf*( args->dyuz_rf + args->dzuy_rf - (2/3)*(args->W_rf*args->v2_rf)*(args->W_rf*args->v3_rf)*Theta_rf );
+  double pi33_rf = -args->eta_rf*( 2*args->dzuz_rf - (2/3)*(1 + (args->W_rf*args->v3_rf)*(args->W_rf*args->v3_rf))*Theta_rf );
 
   // Values should be sensible    
   if (args->p_rf < 0 || args->rho_rf < 0 || args->W_rf < 1 || args->n_rf < 0 || abs(args->v1_rf) >= 1 || abs(args->v2_rf) >= 1 || abs(args->v3_rf) >= 1 ) {
@@ -606,25 +606,25 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           // + prims[ID(Prims::v3, i, j, k)]*dzn ) ) ;
 
         // These expressions need expanding and improving from HP!
-        aux[ID(Aux::pi11, i, j, k)] = -2*eta*( 2*dxux
+        aux[ID(Aux::pi11, i, j, k)] = -eta*( 2*dxux
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
 
-        aux[ID(Aux::pi12, i, j, k)] = -2*eta*( dxuy
+        aux[ID(Aux::pi12, i, j, k)] = -eta*( dxuy
           + dyux
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
 
-        aux[ID(Aux::pi13, i, j, k)] = -2*eta*( dxuz
+        aux[ID(Aux::pi13, i, j, k)] = -eta*( dxuz
           + dzux
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
 
-        aux[ID(Aux::pi22, i, j, k)] = -2*eta*( 2*dyuy
+        aux[ID(Aux::pi22, i, j, k)] = -eta*( 2*dyuy
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
 
-        aux[ID(Aux::pi23, i, j, k)] = -2*eta*( dyuz
+        aux[ID(Aux::pi23, i, j, k)] = -eta*( dyuz
           + dzuy
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
 
-        aux[ID(Aux::pi33, i, j, k)] = -2*eta*( dzuz
+        aux[ID(Aux::pi33, i, j, k)] = -eta*( dzuz
           - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
 
         // Again, repeating this here once the correct values for v1,v2,v3 have been set...
@@ -633,13 +633,13 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::pi00, i, j, k)] = aux[ID(Aux::pi11, i, j, k)] + aux[ID(Aux::pi22, i, j, k)] + aux[ID(Aux::pi33, i, j, k)];
         aux[ID(Aux::pi01, i, j, k)] = aux[ID(Aux::pi11, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
                                   + aux[ID(Aux::pi12, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + aux[ID(Aux::pi13, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
+                                  + aux[ID(Aux::pi13, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; 
         aux[ID(Aux::pi02, i, j, k)] = aux[ID(Aux::pi12, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
                                   + aux[ID(Aux::pi22, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
+                                  + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; 
         aux[ID(Aux::pi03, i, j, k)] = aux[ID(Aux::pi13, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
                                   + aux[ID(Aux::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
-                                  + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; // dbl check sign on orthogonality relation
+                                  + aux[ID(Aux::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)]; 
 
         aux[ID(Aux::S1_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v1, i, j, k)];  
         aux[ID(Aux::S2_PF, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)];  
