@@ -970,9 +970,9 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
         }
 
         if (i==401 && j==0 && k==0) {
-          std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << f[ID(1, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] std::endl;
+          std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << f[ID(1, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << std::endl;
         }
-        
+
         // (Tau+p)*v + ...
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)] 
           + (aux[ID(Aux::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
