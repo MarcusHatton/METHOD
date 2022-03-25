@@ -425,6 +425,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           tau_epsilon = (3.0/4.0)*d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1);
+          beta_n = -tau_q*(d->gamma - 1) - kappa*pow(aux[ID(Aux::T, i, j, k)],4)*(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) / pow(prims[ID(Prims::p, i, j, k)],3);
 
           // Initial guesses - could replace these with spatial-calc'd
           sol[0] = prims[ID(Prims::dv1dt, i, j, k)];
@@ -465,6 +466,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           args.tau_q_rf = tau_q;
           args.eta_rf = eta;
           args.zeta_rf = zeta;
+          args.beta_n_rf = beta_n;
+          args.beta_epsilon_rf = beta_epsilon;
 
           args.gamma = d->gamma;
   
@@ -546,8 +549,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
         aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
 
-        beta_n = -tau_q*(d->gamma - 1) - kappa*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]*aux[ID(Aux::T, i, j, k)]
-          *(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) / (prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]);
+        // beta_n = -tau_q*(d->gamma - 1) - kappa*pow(aux[ID(Aux::T, i, j, k)],4)*(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) / pow(prims[ID(Prims::p, i, j, k)],3);
 
         aux[ID(Aux::q1, i, j, k)] = -tau_q * (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * 
           aux[ID(Aux::W, i, j, k)]*( (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::dv1dt, i, j, k)] + aux[ID(Aux::dWdt, i, j, k)]*prims[ID(Prims::v1, i, j, k)]) + // chain rule

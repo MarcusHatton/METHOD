@@ -205,6 +205,8 @@ class IS : public Model
       tau_q_rf,
       eta_rf,
       zeta_rf,
+      beta_n_rf,
+      beta_epsilon_rf,
       gamma;
       int i;
     } Args;
