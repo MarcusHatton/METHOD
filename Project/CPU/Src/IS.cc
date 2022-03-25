@@ -129,7 +129,7 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
-        for(int ncon(0); ncon < 4; ncon++) {
+        for(int ncon(0); ncon < 5; ncon++) {
           source[ID(ncon, i, j, k)] = 0;
         }
         for(int ncon(0); ncon < 5; ncon++) {
@@ -533,8 +533,8 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
         aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + dxux + dyuy + dzuz;
 
-        aux[ID(Aux::dndt, i, j, k)] = prims[ID(Prims::v1, i, j, k)]*dxn + prims[ID(Prims::v2, i, j, k)]*dyn
-          + prims[ID(Prims::v3, i, j, k)]*dzn + aux[ID(Aux::n, i, j, k)]*aux[ID(Aux::Theta, i, j, k)]/aux[ID(Aux::W, i, j, k)];
+        aux[ID(Aux::dndt, i, j, k)] = - ( prims[ID(Prims::v1, i, j, k)]*dxn + prims[ID(Prims::v2, i, j, k)]*dyn
+          + prims[ID(Prims::v3, i, j, k)]*dzn + aux[ID(Aux::n, i, j, k)]*aux[ID(Aux::Theta, i, j, k)]/aux[ID(Aux::W, i, j, k)] );
       
         prims[ID(Prims::drhodt, i, j, k)] = aux[ID(Aux::dndt, i, j, k)] + prims[ID(Prims::dpdt, i, j, k)]/(d->gamma-1);
 
