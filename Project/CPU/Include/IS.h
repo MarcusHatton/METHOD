@@ -179,6 +179,7 @@ class IS : public Model
       W_rf,
       p_rf,
       rho_rf,
+      D_rf,
       S1_NI_rf,
       S2_NI_rf,
       S3_NI_rf,

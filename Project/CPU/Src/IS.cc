@@ -182,7 +182,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
                    + args->n_rf*Theta_rf/args->W_rf );
   double drhodt_rf = dndt_rf + x[3]/(args->gamma-1);
 
-  double E_rf = args->Tau_NI_rf + args->n_rf*args->W_rf; // Replacement for D
+  double E_rf = args->Tau_NI_rf + args->D_rf; // args->n_rf*args->W_rf; // Replacement for D
   double A_rf = -args->tau_epsilon_rf * ( args->W_rf*(drhodt_rf + 
                 args->v1_rf*args->dxrho_rf + args->v2_rf*args->dyrho_rf + args->v3_rf*args->dzrho_rf ) +
                 (args->p_rf + args->rho_rf)*Theta_rf  );
@@ -439,6 +439,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           args.W_rf = aux[ID(Aux::W, i, j, k)];
           args.p_rf = prims[ID(Prims::p, i, j, k)];
           args.rho_rf = prims[ID(Prims::rho, i, j, k)];
+          args.D_rf = cons[ID(Cons::D, i, j, k)];
           args.S1_NI_rf = cons[ID(Cons::S1, i, j, k)]  - (args.rho_rf + args.p_rf)*args.W_rf*args.W_rf*args.v1_rf;
           args.S2_NI_rf = cons[ID(Cons::S2, i, j, k)]  - (args.rho_rf + args.p_rf)*args.W_rf*args.W_rf*args.v2_rf;
           args.S3_NI_rf = cons[ID(Cons::S3, i, j, k)]  - (args.rho_rf + args.p_rf)*args.W_rf*args.W_rf*args.v3_rf;
@@ -888,9 +889,9 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           + (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
 
 
-        if (i==401 && j==0 && k==0) {
-          std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << std::endl;
-        }
+        // if (i==401 && j==0 && k==0) {
+        //   std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << std::endl;
+        // }
 
         cons[ID(Cons::S2, i, j, k)] = (prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::Pi, i, j, k)] + aux[ID(Aux::A, i, j, k)]) * aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::v2, i, j, k)] 
           + (aux[ID(Aux::q2, i, j, k)] + aux[ID(Aux::qv, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) * aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi02, i, j, k)];
