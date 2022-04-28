@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(400);
-  int ny(400);
+  int nx(800);
+  int ny(800);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(10);
+  int nreports(30);
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
 
