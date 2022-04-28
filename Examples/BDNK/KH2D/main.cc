@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(200);
-  int ny(200);
+  int nx(800);
+  int ny(800);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(10);
+  int nreports(30);
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
 
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  double eta_0 = 1.0e-15;
-  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  5.0e-2, eta_0, (25/4)*eta_0} };
+  double eta_0 = 5.0e-4;
+  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-15, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
