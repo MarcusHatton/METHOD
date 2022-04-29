@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  double eta_0 = 5.0e-4;
+  double eta_0 = 2.0e-4;
   const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-15, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
