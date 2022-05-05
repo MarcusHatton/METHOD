@@ -16,8 +16,8 @@
 
 Hybrid::Hybrid() : Model()
 {
-  this->Ncons = 14;
-  this->Nprims = 11;
+  this->Ncons = 15;
+  this->Nprims = 16;
   this->Naux = 17;
 }
 
@@ -158,38 +158,38 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
   return data->sigmaFunc(cons, prims, aux) < sigmaCrossOver;
 }
 
-void Hybrid::setIdealCPAs(double * rcons, double * rprims, double * raux)
+void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
 {
   // Set the ideal cons prims and aux from the dissipative versions (single cell)
-  sicons[0] = rcons[0]; sicons[1] = rcons[1]; sicons[2] = rcons[2]; sicons[3] = rcons[3];
-  sicons[4] = rcons[4]; sicons[5] = rcons[5]; sicons[6] = rcons[6]; sicons[7] = rcons[7];
-  sicons[8] = rcons[12];
+  sicons[0] = dcons[0]; sicons[1] = dcons[1]; sicons[2] = dcons[2]; sicons[3] = dcons[3];
+  sicons[4] = dcons[4];
 
-  siprims[0] = rprims[0]; siprims[1] = rprims[1]; siprims[2] = rprims[2]; siprims[3] = rprims[3];
-  siprims[4] = rprims[4]; siprims[5] = rprims[5]; siprims[6] = rprims[6]; siprims[7] = rprims[7];
+  siprims[0] = dprims[0]; siprims[1] = dprims[1]; siprims[2] = dprims[2]; 
+  siprims[3] = dprims[3]; siprims[4] = dprims[4]; siprims[5] = dprims[5]; 
 
-  siaux[0] = raux[0]; siaux[1] = raux[1]; siaux[2] = raux[2]; siaux[3] = raux[3];
+  // Need to be more careful here
+  siaux[0] = daux[0]; siaux[1] = daux[1]; siaux[2] = daux[2]; siaux[3] = daux[3];
 
-  double b0(raux[1]*(rprims[5]*rprims[1] + rprims[6]*rprims[2] + rprims[7]*rprims[3]));
-  double bx(rprims[5] / raux[1] + b0*rprims[1]);
-  double by(rprims[6] / raux[1] + b0*rprims[2]);
-  double bz(rprims[7] / raux[1] + b0*rprims[3]);
-  double bsq((rprims[5]*rprims[5] + rprims[6]*rprims[6] + rprims[7]*rprims[7] + b0*b0)/(raux[1]*raux[1]));
-  double BS(raux[1]*(rprims[5]*rcons[1] + rprims[6]*rcons[2] + rprims[7]*rcons[3]));
-  double Ssq(rcons[1]*rcons[1] + rcons[2]*rcons[2] + rcons[3]*rcons[3]);
+  double b0(daux[1]*(dprims[5]*dprims[1] + dprims[6]*dprims[2] + dprims[7]*dprims[3]));
+  double bx(dprims[5] / daux[1] + b0*dprims[1]);
+  double by(dprims[6] / daux[1] + b0*dprims[2]);
+  double bz(dprims[7] / daux[1] + b0*dprims[3]);
+  double bsq((dprims[5]*dprims[5] + dprims[6]*dprims[6] + dprims[7]*dprims[7] + b0*b0)/(daux[1]*daux[1]));
+  double BS(daux[1]*(dprims[5]*dcons[1] + dprims[6]*dcons[2] + dprims[7]*dcons[3]));
+  double Ssq(dcons[1]*dcons[1] + dcons[2]*dcons[2] + dcons[3]*dcons[3]);
 
   siaux[4]  = b0;
   siaux[5]  = bx;
   siaux[6]  = by;
   siaux[7]  = bz;
   siaux[8]  = bsq;
-  siaux[9]  = raux[9];
+  siaux[9]  = daux[9];
   siaux[10] = BS;
-  siaux[11] = raux[7];
+  siaux[11] = daux[7];
   siaux[12] =  Ssq;
 }
 
-void Hybrid::setIdealCPAsAll(double * rcons, double * rprims, double * raux)
+void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
 {
   // Syntax
   Data * d(this->data);
@@ -198,31 +198,31 @@ void Hybrid::setIdealCPAsAll(double * rcons, double * rprims, double * raux)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
-        icons[ID(0, i, j, k)] = rcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = rcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = rcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = rcons[ID(3, i, j, k)];
-        icons[ID(4, i, j, k)] = rcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = rcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = rcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = rcons[ID(7, i, j, k)];
-        icons[ID(8, i, j, k)] = rcons[ID(12, i, j, k)];
+        icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
+        icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
+        icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];
 
-        iprims[ID(0, i, j, k)] = rprims[ID(0, i, j, k)]; iprims[ID(1, i, j, k)] = rprims[ID(1, i, j, k)]; iprims[ID(2, i, j, k)] = rprims[ID(2, i, j, k)]; iprims[ID(3, i, j, k)] = rprims[ID(3, i, j, k)];
-        iprims[ID(4, i, j, k)] = rprims[ID(4, i, j, k)]; iprims[ID(5, i, j, k)] = rprims[ID(5, i, j, k)]; iprims[ID(6, i, j, k)] = rprims[ID(6, i, j, k)]; iprims[ID(7, i, j, k)] = rprims[ID(7, i, j, k)];
+        iprims[ID(0, i, j, k)] = dprims[ID(0, i, j, k)]; iprims[ID(1, i, j, k)] = dprims[ID(1, i, j, k)]; iprims[ID(2, i, j, k)] = dprims[ID(2, i, j, k)]; iprims[ID(3, i, j, k)] = dprims[ID(3, i, j, k)];
+        iprims[ID(4, i, j, k)] = dprims[ID(4, i, j, k)]; iprims[ID(5, i, j, k)] = dprims[ID(5, i, j, k)]; iprims[ID(6, i, j, k)] = dprims[ID(6, i, j, k)]; iprims[ID(7, i, j, k)] = dprims[ID(7, i, j, k)];
 
-        iaux[ID(0, i, j, k)] = raux[ID(0, i, j, k)]; iaux[ID(1, i, j, k)] = raux[ID(1, i, j, k)]; iaux[ID(2, i, j, k)] = raux[ID(2, i, j, k)]; iaux[ID(3, i, j, k)] = raux[ID(3, i, j, k)];
+        iaux[ID(0, i, j, k)] = daux[ID(0, i, j, k)]; iaux[ID(1, i, j, k)] = daux[ID(1, i, j, k)]; iaux[ID(2, i, j, k)] = daux[ID(2, i, j, k)]; iaux[ID(3, i, j, k)] = daux[ID(3, i, j, k)];
 
-        double b0(raux[ID(1, i, j, k)]*(rprims[ID(5, i, j, k)]*rprims[ID(1, i, j, k)] + rprims[ID(6, i, j, k)]*rprims[ID(2, i, j, k)] + rprims[ID(7, i, j, k)]*rprims[ID(3, i, j, k)]));
-        double bx(rprims[ID(5, i, j, k)] / raux[ID(1, i, j, k)] + b0*rprims[ID(1, i, j, k)]);
-        double by(rprims[ID(6, i, j, k)] / raux[ID(1, i, j, k)] + b0*rprims[ID(2, i, j, k)]);
-        double bz(rprims[ID(7, i, j, k)] / raux[ID(1, i, j, k)] + b0*rprims[ID(3, i, j, k)]);
-        double bsq((rprims[ID(5, i, j, k)]*rprims[ID(5, i, j, k)] + rprims[ID(6, i, j, k)]*rprims[ID(6, i, j, k)] + rprims[ID(7, i, j, k)]*rprims[ID(7, i, j, k)] + b0*b0)/(raux[ID(1, i, j, k)]*raux[ID(1, i, j, k)]));
-        double BS(raux[ID(1, i, j, k)]*(rprims[ID(5, i, j, k)]*rcons[ID(1, i, j, k)] + rprims[ID(6, i, j, k)]*rcons[ID(2, i, j, k)] + rprims[ID(7, i, j, k)]*rcons[ID(3, i, j, k)]));
-        double Ssq(rcons[ID(1, i, j, k)]*rcons[ID(1, i, j, k)] + rcons[ID(2, i, j, k)]*rcons[ID(2, i, j, k)] + rcons[ID(3, i, j, k)]*rcons[ID(3, i, j, k)]);
+        double b0(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dprims[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(3, i, j, k)]));
+        double bx(dprims[ID(5, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(1, i, j, k)]);
+        double by(dprims[ID(6, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(2, i, j, k)]);
+        double bz(dprims[ID(7, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(3, i, j, k)]);
+        double bsq((dprims[ID(5, i, j, k)]*dprims[ID(5, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(6, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(7, i, j, k)] + b0*b0)/(daux[ID(1, i, j, k)]*daux[ID(1, i, j, k)]));
+        double BS(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dcons[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dcons[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dcons[ID(3, i, j, k)]));
+        double Ssq(dcons[ID(1, i, j, k)]*dcons[ID(1, i, j, k)] + dcons[ID(2, i, j, k)]*dcons[ID(2, i, j, k)] + dcons[ID(3, i, j, k)]*dcons[ID(3, i, j, k)]);
 
         iaux[ID(4, i, j, k)]  = b0;
         iaux[ID(5, i, j, k)]  = bx;
         iaux[ID(6, i, j, k)]  = by;
         iaux[ID(7, i, j, k)]  = bz;
         iaux[ID(8, i, j, k)]  = bsq;
-        iaux[ID(9, i, j, k)]  = raux[ID(9, i, j, k)];
+        iaux[ID(9, i, j, k)]  = daux[ID(9, i, j, k)];
         iaux[ID(10, i, j, k)] = BS;
-        iaux[ID(11, i, j, k)] = raux[ID(7, i, j, k)];
+        iaux[ID(11, i, j, k)] = daux[ID(7, i, j, k)];
         iaux[ID(12, i, j, k)] =  Ssq;
       }
     }
