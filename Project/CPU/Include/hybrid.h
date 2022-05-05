@@ -4,16 +4,16 @@
 #include "model.h"
 #include "srrmhd.h"
 #include "IS.h"
-#include "srmhd.h"
+#include "ISCE.h"
 #include "DEIFY.h"
 #include "flux.h"
 
 //! <b> Hybrid model </b>
 /*!
   @par
-    This hybrid model combines the ideal and resistive models, dynamically
-    swutching between the two dependant upon the local (and nearest neighbours'
-    if using REGIME) conductivity. This model is SRRMHD in disguise, that is,
+    This hybrid model combines the ideal and dissipative models, dynamically
+    switching between the two dependant upon the local (and nearest neighbours'
+    if using DEIFY) conductivity. This model is SRRMHD in disguise, that is,
     for any cons, prims, aux arguments, these refer to the resistive versions.
     Ideal vectors are prefixed with `i'.
   @par
@@ -44,22 +44,18 @@ class Hybrid : public Model
     *icons, *iprims, *iaux,                     // Ideal cons, prims and aux. Size is \f$N_{var}*N_x*N_y*N_z\f$.
     *sicons, *siprims, *siaux,                  // Ideal cons, prims and aux. Size is \f$N_{var}\f$.
     *iflux, *rflux,                             // Flux vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
-    *isource, *rsource, *regimeSource,          // Source vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
+    *isource, *rsource, *deifySource,          // Source vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
     sigmaCrossOver,                             // Centre conductivity of penalty function
     sigmaSpan;                                  // Span of conductivity of penalty function
 
-    bool useREGIME;                             // Should we use REGIME? (Default to true)
+    bool useDEIFY;                             // Should we use REGIME? (Default to true)
 
+    IS * dissipativeModel;                    // Pointer to SRRMHD model
 
+    ISCE * idealModel;                         // Pointer to SRMHD model
 
-    SRRMHD * resistiveModel;                    // Pointer to SRRMHD model
-
-    SRMHD * idealModel;                         // Pointer to SRMHD model
-
-    REGIME * subgridModel = NULL;               // Pointer to REGIME model
+    DEIFY * subgridModel = NULL;               // Pointer to REGIME model
     
-    IS * ISModel;
-
     int *mask;                                  // Flag: can we set REGIME source?
 
     Hybrid();                                   //!< Default constructor
@@ -89,7 +85,7 @@ class Hybrid : public Model
 
         @param[in] fluxMethod pointer to simulations FluxMethod
     */
-    void setupREGIME(FluxMethod * fluxMethod);
+    void setupDEIFY(FluxMethod * fluxMethod);
 
   private:
     //! Penalty function: ideal contribution
@@ -133,7 +129,7 @@ class Hybrid : public Model
         @param[in] aux pointer to auxiliary vector. Size is \f$N_{aux}*N_x*N_y*N_z\f$.
         @return use bool do we use the resistive C2P?
     */
-    bool useResistive(double * cons, double * prims, double * aux);
+    bool useDissipative(double * cons, double * prims, double * aux);
 
     //! Set ideal cons, prims and aux vectors for a single cell
     /*!

@@ -14,7 +14,6 @@
 // Macro for getting array index
 #define ID(variable, idx, jdx, kdx) ((variable)*(d->Nx)*(d->Ny)*(d->Nz) + (idx)*(d->Ny)*(d->Nz) + (jdx)*(d->Nz) + (kdx))
 
-
 Hybrid::Hybrid() : Model()
 {
   this->Ncons = 14;
@@ -22,18 +21,17 @@ Hybrid::Hybrid() : Model()
   this->Naux = 17;
 }
 
-
-Hybrid::Hybrid(Data * data, double sigmaCrossOver, double sigmaSpan, bool useREGIME) : Model(data), sigmaCrossOver(sigmaCrossOver), sigmaSpan(sigmaSpan), useREGIME(useREGIME)
+Hybrid::Hybrid(Data * data, double sigmaCrossOver, double sigmaSpan, bool useDEIFY) : Model(data), sigmaCrossOver(sigmaCrossOver), sigmaSpan(sigmaSpan), useDEIFY(useDEIFY)
 {
-  // The hybrid model is basically a resistive model in disguise, i.e. its cons
+  // The hybrid model is basically a dissipative model in disguise, i.e. its cons
   // prims and aux are the same as SRRMHD. This model contains pointers to both
   // SRMHD and SRRMHD models, and REGIME if requested.
 
-  resistiveModel = new SRRMHD(data);
-  idealModel = new SRMHD(data);
+  dissipativeModel = new IS(data);
+  idealModel = new ISCE(data);
 
-  this->Ncons = (this->data)->Ncons = 14;
-  this->Nprims = (this->data)->Nprims = 11;
+  this->Ncons = (this->data)->Ncons = 15;
+  this->Nprims = (this->data)->Nprims = 16;
   this->Naux = (this->data)->Naux = 17;
 
   // Allocate ideal arrays
@@ -44,46 +42,70 @@ Hybrid::Hybrid(Data * data, double sigmaCrossOver, double sigmaSpan, bool useREG
   siprims  = new double[idealModel->Nprims];
   siaux    = new double[idealModel->Naux];
   iflux    = new double[data->Nx*data->Ny*data->Nz*idealModel->Ncons];
-  rflux    = new double[data->Nx*data->Ny*data->Nz*resistiveModel->Ncons];
+  dflux    = new double[data->Nx*data->Ny*data->Nz*dissipativeModel->Ncons];
   isource  = new double[idealModel->Ncons];
-  rsource  = new double[resistiveModel->Ncons];
+  dsource  = new double[dissipativeModel->Ncons];
 
+  // 0
+  this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
+  this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
+  this->data->consLabels.push_back("Tau");  this->data->consLabels.push_back("Y1");
+  this->data->consLabels.push_back("Y2");  this->data->consLabels.push_back("Y3");
+  this->data->consLabels.push_back("U");  this->data->consLabels.push_back("Z11");
+  this->data->consLabels.push_back("Z12");  this->data->consLabels.push_back("Z13");
+  this->data->consLabels.push_back("Z22");  this->data->consLabels.push_back("Z23");
+  this->data->consLabels.push_back("Z33");
+  // 15
 
-  this->data->consLabels.push_back("D");   this->data->consLabels.push_back("Sx");
-  this->data->consLabels.push_back("Sy");  this->data->consLabels.push_back("Sx");
-  this->data->consLabels.push_back("tau"); this->data->consLabels.push_back("Bx");
-  this->data->consLabels.push_back("By");  this->data->consLabels.push_back("Bz");
-  this->data->consLabels.push_back("Ex");  this->data->consLabels.push_back("Ey");
-  this->data->consLabels.push_back("Ez");  this->data->consLabels.push_back("psi");
-  this->data->consLabels.push_back("phi"); this->data->consLabels.push_back("qch");
+  // 0
+  this->data->primsLabels.push_back("v1");   this->data->primsLabels.push_back("v2");
+  this->data->primsLabels.push_back("v3");
+  // 3
+  this->data->primsLabels.push_back("p");   this->data->primsLabels.push_back("rho");
+  this->data->primsLabels.push_back("n");   
+  // 6
+  this->data->primsLabels.push_back("q1");  this->data->primsLabels.push_back("q2");
+  this->data->primsLabels.push_back("q3");
+  // 9
+  this->data->primsLabels.push_back("Pi");  
+  // 10
+  this->data->primsLabels.push_back("pi11");   this->data->primsLabels.push_back("pi12");
+  this->data->primsLabels.push_back("pi13");  this->data->primsLabels.push_back("pi22");
+  this->data->primsLabels.push_back("pi23");  this->data->primsLabels.push_back("pi33");
 
-  this->data->primsLabels.push_back("rho"); this->data->primsLabels.push_back("vx");
-  this->data->primsLabels.push_back("vy");  this->data->primsLabels.push_back("vz");
-  this->data->primsLabels.push_back("p");   this->data->primsLabels.push_back("Bx");
-  this->data->primsLabels.push_back("By");  this->data->primsLabels.push_back("Bz");
-  this->data->primsLabels.push_back("Ex");  this->data->primsLabels.push_back("Ey");
-  this->data->primsLabels.push_back("Ez");
-
-  this->data->auxLabels.push_back("h");       this->data->auxLabels.push_back("W");
-  this->data->auxLabels.push_back("e");       this->data->auxLabels.push_back("c");
-  this->data->auxLabels.push_back("Jx");      this->data->auxLabels.push_back("Jy");
-  this->data->auxLabels.push_back("Jz");      this->data->auxLabels.push_back("Bsq");
-  this->data->auxLabels.push_back("Esq");     this->data->auxLabels.push_back("vsq");
-  this->data->auxLabels.push_back("rhohWsq"); this->data->auxLabels.push_back("vE");
-  this->data->auxLabels.push_back("Sbarx");   this->data->auxLabels.push_back("Sbary");
-  this->data->auxLabels.push_back("Sbarz");   this->data->auxLabels.push_back("Sbarsq");
-  this->data->auxLabels.push_back("tauBar");
+  // 0
+  this->data->auxLabels.push_back("h");     this->data->auxLabels.push_back("T");
+  this->data->auxLabels.push_back("e");     this->data->auxLabels.push_back("W");
+  // 4
+  this->data->auxLabels.push_back("q0");    this->data->auxLabels.push_back("qv");
+  this->data->auxLabels.push_back("pi00");  this->data->auxLabels.push_back("pi01");
+  this->data->auxLabels.push_back("pi02");  this->data->auxLabels.push_back("pi03");
+  // 10
+  this->data->auxLabels.push_back("q1NS");  this->data->auxLabels.push_back("q2NS");
+  this->data->auxLabels.push_back("q3NS");
+  // 13
+  this->data->auxLabels.push_back("PiNS");    
+  // 14
+  this->data->auxLabels.push_back("pi11NS"); this->data->auxLabels.push_back("pi12NS");
+  this->data->auxLabels.push_back("pi13NS"); this->data->auxLabels.push_back("pi22NS");
+  this->data->auxLabels.push_back("pi23NS"); this->data->auxLabels.push_back("pi33NS");
+  // 20
+  this->data->auxLabels.push_back("Theta");  this->data->auxLabels.push_back("dv1dt");
+  this->data->auxLabels.push_back("dv2dt");  this->data->auxLabels.push_back("dv3dt");
+  this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
+  this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
+  this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
 
 }
 
 Hybrid::~Hybrid()
 {
-  delete resistiveModel;
+  delete dissipativeModel;
   delete idealModel;
-  if (useREGIME)
+  if (useDEIFY)
   {
     delete subgridModel;
-    delete[] regimeSource;
+    delete[] deifySource;
     delete[] mask;
   }
   delete[] icons;
@@ -93,21 +115,21 @@ Hybrid::~Hybrid()
   delete[] siprims;
   delete[] siaux;
   delete[] iflux;
-  delete[] rflux;
+  delete[] dflux;
   delete[] isource;
-  delete[] rsource;
+  delete[] dsource;
 }
 
-void Hybrid::setupREGIME(FluxMethod * fluxMethod)
+void Hybrid::setupDEIFY(FluxMethod * fluxMethod)
 {
   // Syntax
   Data * d(this->data);
 
   // Store pointer REGIME and allocate work arrays
-  if (useREGIME)
+  if (useDEIFY)
   {
-    subgridModel = new REGIME(d, fluxMethod);
-    regimeSource = new double[d->Nx*d->Ny*d->Nz*idealModel->Ncons];
+    subgridModel = new DEIFY(d, fluxMethod);
+    deifySource = new double[d->Nx*d->Ny*d->Nz*idealModel->Ncons];
     mask         = new int[d->Nx*d->Ny*d->Nz];
   }
 }
@@ -130,7 +152,7 @@ double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i,
          1;
 }
 
-bool Hybrid::useResistive(double * cons, double * prims, double * aux)
+bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
   // Should we use the Resistive C2P?
   return data->sigmaFunc(cons, prims, aux) < sigmaCrossOver;
@@ -138,7 +160,7 @@ bool Hybrid::useResistive(double * cons, double * prims, double * aux)
 
 void Hybrid::setIdealCPAs(double * rcons, double * rprims, double * raux)
 {
-  // Set the ideal cons prims and aux from the resistive versions (single cell)
+  // Set the ideal cons prims and aux from the dissipative versions (single cell)
   sicons[0] = rcons[0]; sicons[1] = rcons[1]; sicons[2] = rcons[2]; sicons[3] = rcons[3];
   sicons[4] = rcons[4]; sicons[5] = rcons[5]; sicons[6] = rcons[6]; sicons[7] = rcons[7];
   sicons[8] = rcons[12];
@@ -172,7 +194,7 @@ void Hybrid::setIdealCPAsAll(double * rcons, double * rprims, double * raux)
   // Syntax
   Data * d(this->data);
 
-  // Set the ideal cons prims and aux from the resistive versions (all cells)
+  // Set the ideal cons prims and aux from the dissipative versions (all cells)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
@@ -215,18 +237,18 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
   // Set ideal cons prims and aux
   setIdealCPAsAll(cons, prims, aux);
 
-  // Calculate the ideal and resistive flux vectors
+  // Calculate the ideal and dissipative flux vectors
   idealModel->fluxVector(icons, iprims, iaux, iflux, dir);
-  resistiveModel->fluxVector(cons, prims, aux, rflux, dir);
+  dissipativeModel->fluxVector(cons, prims, aux, dflux, dir);
 
-  // Add resistive contribution to hybrid->f
-  for (int var(0); var < resistiveModel->Ncons; var++) {
+  // Add dissipative contribution to hybrid->f
+  for (int var(0); var < dissipativeModel->Ncons; var++) {
     for (int i(0); i < d->Nx; i++) {
       for (int j(0); j < d->Ny; j++) {
         for (int k(0); k < d->Nz; k++) {
 
           double iW = idealWeightID(cons, prims, aux, i, j, k);
-          f[ID(var, i, j, k)] = (1-iW)*rflux[ID(var, i, j, k)];
+          f[ID(var, i, j, k)] = (1-iW)*dflux[ID(var, i, j, k)];
 
         }
       }
@@ -264,17 +286,17 @@ void Hybrid::sourceTermSingleCell(double *cons, double *prims, double *aux, doub
   // Set ideal cons prims and aux
   setIdealCPAs(cons, prims, aux);
 
-  // Calculate the ideal and resistive source vectors
-  resistiveModel->sourceTermSingleCell(cons, prims, aux, rsource, i, j, k);
+  // Calculate the ideal and dissipative source vectors
+  dissipativeModel->sourceTermSingleCell(cons, prims, aux, dsource, i, j, k);
   idealModel->sourceTermSingleCell(sicons, siprims, siaux, isource, i, j, k);
 
   // Add ideal contribution
   for (int var(0); var < 8; var++) {
-    source[var] = iW*isource[var] + (1-iW)*rsource[var];
+    source[var] = iW*isource[var] + (1-iW)*dsource[var];
   }
-  // Add resistive contribution
-  for (int var(8); var < resistiveModel->Ncons; var++)
-    source[var] = (1-iW)*rsource[var];
+  // Add dissipative contribution
+  for (int var(8); var < dissipativeModel->Ncons; var++)
+    source[var] = (1-iW)*dsource[var];
 }
 
 void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source)
@@ -319,7 +341,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
   }
 
   // Now add REGIME source
-  if (useREGIME)
+  if (useDEIFY)
   {
     // Calculate the ideal cons prims and aux vectors
     setIdealCPAsAll(cons, prims, aux);
@@ -327,7 +349,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
     // Set the REGIME mask
     setMasks(cons, prims, aux);
     // Calculate the REGIEME source
-    subgridModel->sourceExtension(icons, iprims, iaux, regimeSource);
+    subgridModel->sourceExtension(icons, iprims, iaux, deifySource);
 
     // Add REGIME contribution
     for (int var(0); var < idealModel->Ncons; var++) {
@@ -336,7 +358,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
           for (int k(0); k < d->Nz; k++) {
             double iW = idealWeightID(icons, iprims, iaux, i, j, k);
 
-            source[ID(var, i, j, k)] += regimeSource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
+            source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
 
           }
         }
@@ -353,10 +375,10 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
 
 void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
-  if (useResistive(cons, prims, aux))
+  if (useDissipative(cons, prims, aux))
   {
     // Resistive cons2prims
-    resistiveModel->getPrimitiveVarsSingleCell(cons, prims, aux, i, j, k);
+    dissipativeModel->getPrimitiveVarsSingleCell(cons, prims, aux, i, j, k);
   }
   else
   {
@@ -364,7 +386,7 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     setIdealCPAs(cons, prims, aux);
     idealModel->getPrimitiveVarsSingleCell(sicons, siprims, siaux, i, j, k);
 
-    // And convert from ideal to resistive prims and aux
+    // And convert from ideal to dissipative prims and aux
     prims[0] = siprims[0]; prims[1] = siprims[1]; prims[2] = siprims[2];
     prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
     prims[6] = siprims[6]; prims[7] = siprims[7];
@@ -419,10 +441,10 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
 
         // Copy cell's prim and aux back to data class
         // Store this cell's cons data
-        for (int var(0); var < resistiveModel->Nprims; var++) {
+        for (int var(0); var < dissipativeModel->Nprims; var++) {
           prims[ID(var, i, j, k)] = singlePrims[var];
         }
-        for (int var(0); var < resistiveModel->Naux; var++) {
+        for (int var(0); var < dissipativeModel->Naux; var++) {
           aux[ID(var, i, j, k)] = singleAux[var];
         }
       }
@@ -442,8 +464,8 @@ void Hybrid::primsToAll(double *cons, double *prims, double *aux)
 
   setIdealCPAsAll(cons, prims, aux);
 
-  // Calculate ideal and resistive variables
-  resistiveModel->primsToAll(cons, prims, aux);
+  // Calculate ideal and dissipative variables
+  dissipativeModel->primsToAll(cons, prims, aux);
   idealModel->primsToAll(icons, iprims, iaux);
 
   // Compute the hybrid variables using the penalty function
@@ -451,17 +473,17 @@ void Hybrid::primsToAll(double *cons, double *prims, double *aux)
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
         double iW = idealWeightID(cons, prims, aux, i, j, k);
-        for (int var(0); var < resistiveModel->Ncons; var++) {
+        for (int var(0); var < dissipativeModel->Ncons; var++) {
           cons[ID(var, i, j, k)] *= (1-iW);
           if (var < idealModel->Ncons)
             cons[ID(var, i, j, k)] += iW*icons[ID(var, i, j, k)];
         }
-        for (int var(0); var < resistiveModel->Nprims; var++) {
+        for (int var(0); var < dissipativeModel->Nprims; var++) {
           prims[ID(var, i, j, k)] *= (1-iW);
           if (var < idealModel->Nprims)
             prims[ID(var, i, j, k)] += iW*iprims[ID(var, i, j, k)];
         }
-        for (int var(0); var < resistiveModel->Naux; var++) {
+        for (int var(0); var < dissipativeModel->Naux; var++) {
           aux[ID(var, i, j, k)] *= (1-iW);
           if (var < idealModel->Naux)
             aux[ID(var, i, j, k)] += iW*iaux[ID(var, i, j, k)];
@@ -543,7 +565,7 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
             for (int m(-3); m < 3; m++) {
               for (int n(-3); n < 3; n++) {
                 if (d->sigmaFunc(icons, iprims, iaux, i+l, j+m, k+n) < sigmaCrossOver-sigmaSpan)
-                  // If this neighbour is too resistive then we cannot calculate REGIME for the original cell
+                  // If this neighbour is too dissipative then we cannot calculate REGIME for the original cell
                   termsPossible = false;
               }
             }
