@@ -5,7 +5,7 @@
 #include "srrmhd.h"
 #include "IS.h"
 #include "srmhd.h"
-#include "REGIME.h"
+#include "DEIFY.h"
 #include "flux.h"
 
 //! <b> Hybrid model </b>
