@@ -148,3 +148,18 @@ double Data::sigmaFunc(double * cons, double * prims, double * aux, int i, int j
   }
 }
 
+double Data::tauFunc(double * cons, double * prims, double * aux, int i, int j, int k)
+{
+  if (!functionalTau)
+  {
+    return tau;
+  }
+  else
+  {
+    if (i < 0 || j < 0 || k < 0)
+      return tau * ( pow(aux[0], gam) );
+    else
+      return tau * pow(aux[IDn(0, i, j, k)], gam);
+  }
+}
+

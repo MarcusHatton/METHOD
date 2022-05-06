@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
   int frameSkip(40);
   bool output(false);
   int safety(-1);
+
   double tauCrossOver(150);
   double tauSpan(50);
   bool useDEIFY(true);
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Data data(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime, &env,
-  //           cfl, Ng, gamma, sigma, cp, mu1, mu2, frameSkip);
+  //           cfl, Ng, xi, tau, cp, frameSkip);
 
   // Choose particulars of simulation
   Hybrid model(&data, tauCrossOver, tauSpan, useDEIFY);

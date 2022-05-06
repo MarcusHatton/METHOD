@@ -84,7 +84,7 @@ Hybrid::Hybrid(Data * data, double sigmaCrossOver, double sigmaSpan, bool useDEI
   this->data->auxLabels.push_back("q1NS");  this->data->auxLabels.push_back("q2NS");
   this->data->auxLabels.push_back("q3NS");
   // 13
-  this->data->auxLabels.push_back("PiNS");    
+  this->data->auxLabels.push_back("PiNS");
   // 14
   this->data->auxLabels.push_back("pi11NS"); this->data->auxLabels.push_back("pi12NS");
   this->data->auxLabels.push_back("pi13NS"); this->data->auxLabels.push_back("pi22NS");
