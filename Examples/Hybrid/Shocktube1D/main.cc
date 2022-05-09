@@ -50,13 +50,19 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int safety(-1);
 
-  double tauCrossOver(150);
-  double tauSpan(50);
+  double tauCrossOver(1.0e-2);
+  double tauSpan(5.0e-3);
   bool useDEIFY(true);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
+  data_args.gamma = 5.0/3.0;
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
+  const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
+  const int n_toy_params(6);
+  data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
+  data_args.tau = 1.0e-2;
   Data data(data_args, &env);
 
   // Data data(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime, &env,

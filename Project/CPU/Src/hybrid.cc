@@ -21,7 +21,7 @@ Hybrid::Hybrid() : Model()
   this->Naux = 17;
 }
 
-Hybrid::Hybrid(Data * data, double sigmaCrossOver, double sigmaSpan, bool useDEIFY) : Model(data), sigmaCrossOver(sigmaCrossOver), sigmaSpan(sigmaSpan), useDEIFY(useDEIFY)
+Hybrid::Hybrid(Data * data, double tauCrossOver, double tauSpan, bool useDEIFY) : Model(data), tauCrossOver(tauCrossOver), tauSpan(tauSpan), useDEIFY(useDEIFY)
 {
   // The hybrid model is basically a dissipative model in disguise, i.e. its cons
   // prims and aux are the same as SRRMHD. This model contains pointers to both
@@ -137,56 +137,68 @@ void Hybrid::setupDEIFY(FluxMethod * fluxMethod)
 double Hybrid::idealWeight(double * cons, double * prims, double * aux)
 {
   // Penalty function for a given cell
-  return data->sigmaFunc(cons, prims, aux) < sigmaCrossOver-sigmaSpan ? 0 :
-         data->sigmaFunc(cons, prims, aux) < sigmaCrossOver+sigmaSpan?
-        (tanh((data->sigmaFunc(cons, prims, aux) - sigmaCrossOver) / (sigmaSpan/3))+1)/2 :
+  return data->tauFunc(cons, prims, aux) < tauCrossOver-tauSpan ? 0 :
+         data->tauFunc(cons, prims, aux) < tauCrossOver+tauSpan?
+        (tanh((data->tauFunc(cons, prims, aux) - tauCrossOver) / (tauSpan/3))+1)/2 :
         1;
 }
 
 double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i, int j, int k)
 {
   // Penalty function for a given cell, given global cons prims and aux
-  return data->sigmaFunc(cons, prims, aux, i, j, k) < sigmaCrossOver-sigmaSpan ? 0 :
-         data->sigmaFunc(cons, prims, aux, i, j, k) < sigmaCrossOver+sigmaSpan?
-         (tanh((data->sigmaFunc(cons, prims, aux, i, j, k) - sigmaCrossOver) / (sigmaSpan/3))+1)/2 :
+  return data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver-tauSpan ? 0 :
+         data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver+tauSpan?
+         (tanh((data->tauFunc(cons, prims, aux, i, j, k) - tauCrossOver) / (tauSpan/3))+1)/2 :
          1;
 }
 
 bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
   // Should we use the Resistive C2P?
-  return data->sigmaFunc(cons, prims, aux) < sigmaCrossOver;
+  return data->tauFunc(cons, prims, aux) < tauCrossOver;
 }
 
 void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
 {
   // Set the ideal cons prims and aux from the dissipative versions (single cell)
-  sicons[0] = dcons[0]; sicons[1] = dcons[1]; sicons[2] = dcons[2]; sicons[3] = dcons[3];
-  sicons[4] = dcons[4];
+  for(int ncon(0); ncon < 5; ncon++) {
+    sicons[ncon] = dcons[ncon];
+  }
+  // sicons[0] = dcons[0]; sicons[1] = dcons[1]; sicons[2] = dcons[2]; sicons[3] = dcons[3];
+  // sicons[4] = dcons[4];
 
-  siprims[0] = dprims[0]; siprims[1] = dprims[1]; siprims[2] = dprims[2]; 
-  siprims[3] = dprims[3]; siprims[4] = dprims[4]; siprims[5] = dprims[5]; 
+  for(int nprim(0); nprim < 6; nprim++) {
+    siprims[nprim] = dprims[nprim];
+  }
+  // siprims[0] = dprims[0]; siprims[1] = dprims[1]; siprims[2] = dprims[2]; 
+  // siprims[3] = dprims[3]; siprims[4] = dprims[4]; siprims[5] = dprims[5]; 
 
+  for(int naux(0); naux < 4; naux++) {
+    siaux[naux] = daux[naux];
+  }
+  for(int naux(12); naux < 22; naux++) {
+    siaux[naux] = daux[naux-2];
+  }
   // Need to be more careful here
-  siaux[0] = daux[0]; siaux[1] = daux[1]; siaux[2] = daux[2]; siaux[3] = daux[3];
+  // siaux[0] = daux[0]; siaux[1] = daux[1]; siaux[2] = daux[2]; siaux[3] = daux[3];
 
-  double b0(daux[1]*(dprims[5]*dprims[1] + dprims[6]*dprims[2] + dprims[7]*dprims[3]));
-  double bx(dprims[5] / daux[1] + b0*dprims[1]);
-  double by(dprims[6] / daux[1] + b0*dprims[2]);
-  double bz(dprims[7] / daux[1] + b0*dprims[3]);
-  double bsq((dprims[5]*dprims[5] + dprims[6]*dprims[6] + dprims[7]*dprims[7] + b0*b0)/(daux[1]*daux[1]));
-  double BS(daux[1]*(dprims[5]*dcons[1] + dprims[6]*dcons[2] + dprims[7]*dcons[3]));
-  double Ssq(dcons[1]*dcons[1] + dcons[2]*dcons[2] + dcons[3]*dcons[3]);
+  // double b0(daux[1]*(dprims[5]*dprims[1] + dprims[6]*dprims[2] + dprims[7]*dprims[3]));
+  // double bx(dprims[5] / daux[1] + b0*dprims[1]);
+  // double by(dprims[6] / daux[1] + b0*dprims[2]);
+  // double bz(dprims[7] / daux[1] + b0*dprims[3]);
+  // double bsq((dprims[5]*dprims[5] + dprims[6]*dprims[6] + dprims[7]*dprims[7] + b0*b0)/(daux[1]*daux[1]));
+  // double BS(daux[1]*(dprims[5]*dcons[1] + dprims[6]*dcons[2] + dprims[7]*dcons[3]));
+  // double Ssq(dcons[1]*dcons[1] + dcons[2]*dcons[2] + dcons[3]*dcons[3]);
 
-  siaux[4]  = b0;
-  siaux[5]  = bx;
-  siaux[6]  = by;
-  siaux[7]  = bz;
-  siaux[8]  = bsq;
-  siaux[9]  = daux[9];
-  siaux[10] = BS;
-  siaux[11] = daux[7];
-  siaux[12] =  Ssq;
+  // siaux[4]  = b0;
+  // siaux[5]  = bx;
+  // siaux[6]  = by;
+  // siaux[7]  = bz;
+  // siaux[8]  = bsq;
+  // siaux[9]  = daux[9];
+  // siaux[10] = BS;
+  // siaux[11] = daux[7];
+  // siaux[12] =  Ssq;
 }
 
 void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
@@ -198,32 +210,42 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
-        icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
-        icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
-        icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];
+          for(int ncon(0); ncon < 5; ncon++) {
+            icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)];
+          } 
+        // icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
+        // icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
+        // icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];
+        for(int nprim(0); nprim < 6; nprim++) {
+          iprims[ID(nprim, i, j, k)] = dprims[ID(nprim, i, j, k)];
+        } 
+        // iprims[ID(0, i, j, k)] = dprims[ID(0, i, j, k)]; iprims[ID(1, i, j, k)] = dprims[ID(1, i, j, k)]; iprims[ID(2, i, j, k)] = dprims[ID(2, i, j, k)]; iprims[ID(3, i, j, k)] = dprims[ID(3, i, j, k)];
+        // iprims[ID(4, i, j, k)] = dprims[ID(4, i, j, k)]; iprims[ID(5, i, j, k)] = dprims[ID(5, i, j, k)]; iprims[ID(6, i, j, k)] = dprims[ID(6, i, j, k)]; iprims[ID(7, i, j, k)] = dprims[ID(7, i, j, k)];
+        for(int naux(0); naux < 4; naux++) {
+          iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
+        }
+        for(int naux(12); naux < 22; naux++) {
+          iaux[ID(naux, i, j, k)] = daux[ID(naux-2, i, j, k)];
+        }
+        // iaux[ID(0, i, j, k)] = daux[ID(0, i, j, k)]; iaux[ID(1, i, j, k)] = daux[ID(1, i, j, k)]; iaux[ID(2, i, j, k)] = daux[ID(2, i, j, k)]; iaux[ID(3, i, j, k)] = daux[ID(3, i, j, k)];
 
-        iprims[ID(0, i, j, k)] = dprims[ID(0, i, j, k)]; iprims[ID(1, i, j, k)] = dprims[ID(1, i, j, k)]; iprims[ID(2, i, j, k)] = dprims[ID(2, i, j, k)]; iprims[ID(3, i, j, k)] = dprims[ID(3, i, j, k)];
-        iprims[ID(4, i, j, k)] = dprims[ID(4, i, j, k)]; iprims[ID(5, i, j, k)] = dprims[ID(5, i, j, k)]; iprims[ID(6, i, j, k)] = dprims[ID(6, i, j, k)]; iprims[ID(7, i, j, k)] = dprims[ID(7, i, j, k)];
+        // double b0(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dprims[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(3, i, j, k)]));
+        // double bx(dprims[ID(5, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(1, i, j, k)]);
+        // double by(dprims[ID(6, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(2, i, j, k)]);
+        // double bz(dprims[ID(7, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(3, i, j, k)]);
+        // double bsq((dprims[ID(5, i, j, k)]*dprims[ID(5, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(6, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(7, i, j, k)] + b0*b0)/(daux[ID(1, i, j, k)]*daux[ID(1, i, j, k)]));
+        // double BS(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dcons[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dcons[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dcons[ID(3, i, j, k)]));
+        // double Ssq(dcons[ID(1, i, j, k)]*dcons[ID(1, i, j, k)] + dcons[ID(2, i, j, k)]*dcons[ID(2, i, j, k)] + dcons[ID(3, i, j, k)]*dcons[ID(3, i, j, k)]);
 
-        iaux[ID(0, i, j, k)] = daux[ID(0, i, j, k)]; iaux[ID(1, i, j, k)] = daux[ID(1, i, j, k)]; iaux[ID(2, i, j, k)] = daux[ID(2, i, j, k)]; iaux[ID(3, i, j, k)] = daux[ID(3, i, j, k)];
-
-        double b0(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dprims[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(3, i, j, k)]));
-        double bx(dprims[ID(5, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(1, i, j, k)]);
-        double by(dprims[ID(6, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(2, i, j, k)]);
-        double bz(dprims[ID(7, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(3, i, j, k)]);
-        double bsq((dprims[ID(5, i, j, k)]*dprims[ID(5, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(6, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(7, i, j, k)] + b0*b0)/(daux[ID(1, i, j, k)]*daux[ID(1, i, j, k)]));
-        double BS(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dcons[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dcons[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dcons[ID(3, i, j, k)]));
-        double Ssq(dcons[ID(1, i, j, k)]*dcons[ID(1, i, j, k)] + dcons[ID(2, i, j, k)]*dcons[ID(2, i, j, k)] + dcons[ID(3, i, j, k)]*dcons[ID(3, i, j, k)]);
-
-        iaux[ID(4, i, j, k)]  = b0;
-        iaux[ID(5, i, j, k)]  = bx;
-        iaux[ID(6, i, j, k)]  = by;
-        iaux[ID(7, i, j, k)]  = bz;
-        iaux[ID(8, i, j, k)]  = bsq;
-        iaux[ID(9, i, j, k)]  = daux[ID(9, i, j, k)];
-        iaux[ID(10, i, j, k)] = BS;
-        iaux[ID(11, i, j, k)] = daux[ID(7, i, j, k)];
-        iaux[ID(12, i, j, k)] =  Ssq;
+        // iaux[ID(4, i, j, k)]  = b0;
+        // iaux[ID(5, i, j, k)]  = bx;
+        // iaux[ID(6, i, j, k)]  = by;
+        // iaux[ID(7, i, j, k)]  = bz;
+        // iaux[ID(8, i, j, k)]  = bsq;
+        // iaux[ID(9, i, j, k)]  = daux[ID(9, i, j, k)];
+        // iaux[ID(10, i, j, k)] = BS;
+        // iaux[ID(11, i, j, k)] = daux[ID(7, i, j, k)];
+        // iaux[ID(12, i, j, k)] =  Ssq;
       }
     }
   }
@@ -529,7 +551,7 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
   // Syntax
   Data * d(this->data);
 
-  // Assume REGIME is not valid...
+  // Assume DEIFY is not valid...
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
@@ -538,10 +560,11 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
     }
   }
 
+  // Why were these hard-coded to 3 instead of d->Ng
   // Only loop over interior points
-  int is(3); int ie(d->Nx-3);
-  int js(3); int je(d->Ny-3);
-  int ks(3); int ke(d->Nz-3);
+  int is(d->Ng); int ie(d->Nx-d->Ng);
+  int js(d->Ng); int je(d->Ny-d->Ng);
+  int ks(d->Ng); int ke(d->Nz-d->Ng);
   if (d->dims<3) {
     ks = 0; ke = 1;
   }
@@ -554,17 +577,18 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
     for (int j(js); j < je; j++) {
       for (int k(ks); k < ke; k++) {
 
-        // Assume this cell's REGIME source is valid
+        // Assume this cell's DEIFY source is valid
         bool termsPossible(true);
 
-        // If this cell needs the REGIME source....
-        if (d->sigmaFunc(icons, iprims, iaux, i, j, k) > sigmaCrossOver-sigmaSpan)
+        // If this cell needs the DEIFY source....
+        if (d->tauFunc(icons, iprims, iaux, i, j, k) > tauCrossOver-tauSpan)
         {
           // Can we compute all of the terms too? I.e. and neighbours' terms be calculated
-          for (int l(-3); l < 3; l++) {
-            for (int m(-3); m < 3; m++) {
-              for (int n(-3); n < 3; n++) {
-                if (d->sigmaFunc(icons, iprims, iaux, i+l, j+m, k+n) < sigmaCrossOver-sigmaSpan)
+          int nn_req {2}; // MOVE THIS SOMEWHERE BETTER - also, value?
+          for (int l(-nn_req); l < nn_req; l++) {
+            for (int m(-nn_req); m < nn_req; m++) {
+              for (int n(-nn_req); n < nn_req; n++) {
+                if (d->tauFunc(icons, iprims, iaux, i+l, j+m, k+n) < tauCrossOver-tauSpan)
                   // If this neighbour is too dissipative then we cannot calculate REGIME for the original cell
                   termsPossible = false;
               }

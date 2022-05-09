@@ -14,7 +14,7 @@ Data::Data(int nx, int ny, int nz,
            double zmin, double zmax,
            double endTime, PlatformEnv *env,
 	         double cfl, int Ng,
-           double gamma, double sigma,
+           double gamma, double sigma, 
            double cp,
            double mu1, double mu2, int frameSkip,
            int reportItersPeriod,
@@ -157,9 +157,9 @@ double Data::tauFunc(double * cons, double * prims, double * aux, int i, int j, 
   else
   {
     if (i < 0 || j < 0 || k < 0)
-      return tau * ( pow(aux[0], gam) );
+      return tau * aux[PiNS];
     else
-      return tau * pow(aux[IDn(0, i, j, k)], gam);
+      return tau * aux[IDn(PiNS, i, j, k)];
   }
 }
 
