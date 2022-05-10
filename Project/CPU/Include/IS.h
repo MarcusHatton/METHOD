@@ -45,7 +45,7 @@ class IS : public Model
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    IS(Data * data, bool alternative_C2P=false);
+    IS(Data * data);
 
     virtual ~IS();     //!< Destructor
 

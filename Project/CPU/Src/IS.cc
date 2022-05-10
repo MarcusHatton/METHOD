@@ -17,7 +17,7 @@ IS::IS() : Model()
   this->Naux = 30;
 }
 
-IS::IS(Data * data, bool alt_C2P=false) : Model(data)
+IS::IS(Data * data) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 15;
   this->Nprims = (this->data)->Nprims = 16;
@@ -32,7 +32,7 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
 
   smartGuesses = 0;
   
-  alternative_C2P = alt_C2P;
+  alternative_C2P = false;
   
   // 0
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
