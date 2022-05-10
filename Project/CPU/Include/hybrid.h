@@ -50,8 +50,8 @@ class Hybrid : public Model
     double
     *icons, *iprims, *iaux,                     // Ideal cons, prims and aux. Size is \f$N_{var}*N_x*N_y*N_z\f$.
     *sicons, *siprims, *siaux,                  // Ideal cons, prims and aux. Size is \f$N_{var}\f$.
-    *iflux, *rflux,                             // Flux vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
-    *isource, *rsource, *deifySource,          // Source vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
+    *iflux, *dflux,                             // Flux vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
+    *isource, *dsource, *deifySource,          // Source vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
     sigmaCrossOver,                             // Centre conductivity of penalty function
     sigmaSpan,                                  // Span of conductivity of penalty function
     tauCrossOver,                             // Centre conductivity of penalty function
