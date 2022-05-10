@@ -210,9 +210,9 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
-          for(int ncon(0); ncon < 5; ncon++) {
-            icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)];
-          } 
+        for(int ncon(0); ncon < 5; ncon++) {
+          icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)];
+        } 
         // icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
         // icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
         // icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];
@@ -277,7 +277,7 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
     }
   }
   // Add ideal contribution to hybrid->f
-  for (int var(0); var < 8; var++) {
+  for (int var(0); var < idealModel->Ncons; var++) {
     for (int i(0); i < d->Nx; i++) {
       for (int j(0); j < d->Ny; j++) {
         for (int k(0); k < d->Nz; k++) {
@@ -289,17 +289,17 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
       }
     }
   }
-  // And the divergence cleaning part separately
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
+  // // And the divergence cleaning part separately
+  // for (int i(0); i < d->Nx; i++) {
+  //   for (int j(0); j < d->Ny; j++) {
+  //     for (int k(0); k < d->Nz; k++) {
 
-        double iW = idealWeightID(cons, prims, aux, i, j, k);
-        f[ID(12, i, j, k)] += iW*iflux[ID(8, i, j, k)];
+  //       double iW = idealWeightID(cons, prims, aux, i, j, k);
+  //       f[ID(12, i, j, k)] += iW*iflux[ID(8, i, j, k)];
 
-      }
-    }
-  }
+  //     }
+  //   }
+  // }
 }
 
 void Hybrid::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
@@ -408,21 +408,30 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     setIdealCPAs(cons, prims, aux);
     idealModel->getPrimitiveVarsSingleCell(sicons, siprims, siaux, i, j, k);
 
+    for(int nprim(0); nprim < 6; nprim++) {
+      prims[nprim] = siprims[nprim];
+    } 
     // And convert from ideal to dissipative prims and aux
-    prims[0] = siprims[0]; prims[1] = siprims[1]; prims[2] = siprims[2];
-    prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
-    prims[6] = siprims[6]; prims[7] = siprims[7];
+    // prims[0] = siprims[0]; prims[1] = siprims[1]; prims[2] = siprims[2];
+    // prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
+    // prims[6] = siprims[6]; prims[7] = siprims[7];
 
-    aux[0] = siaux[0]; aux[1] = siaux[1]; aux[2] = siaux[2]; aux[3] = siaux[3];
-    aux[4] = 0; aux[5] = 0; aux[6] = 0; aux[7] = siaux[11];
-    aux[8] = cons[8]*cons[8] + cons[9]*cons[9] + cons[10]*cons[10];
-    aux[9] = siaux[9]; aux[10] = prims[0]*aux[0]*aux[1]*aux[1];
-    aux[11] = prims[1]*cons[8] + prims[2]*cons[9] + prims[3]*cons[10];
-    aux[12] = aux[10] * prims[1];
-    aux[13] = aux[10] * prims[2];
-    aux[14] = aux[10] * prims[3];
-    aux[15] = aux[12] * aux[12] + aux[13] * aux[13] + aux[14] * aux[14];
-    aux[16] = aux[10] - prims[4] - cons[0];
+    for(int naux(0); naux < 4; naux++) {
+      aux[naux] = siaux[naux];
+    } 
+    for(int naux(12); naux < 22; naux++) {
+      aux[naux] = siaux[naux-2];
+    }
+    // aux[0] = siaux[0]; aux[1] = siaux[1]; aux[2] = siaux[2]; aux[3] = siaux[3];
+    // aux[4] = 0; aux[5] = 0; aux[6] = 0; aux[7] = siaux[11];
+    // aux[8] = cons[8]*cons[8] + cons[9]*cons[9] + cons[10]*cons[10];
+    // aux[9] = siaux[9]; aux[10] = prims[0]*aux[0]*aux[1]*aux[1];
+    // aux[11] = prims[1]*cons[8] + prims[2]*cons[9] + prims[3]*cons[10];
+    // aux[12] = aux[10] * prims[1];
+    // aux[13] = aux[10] * prims[2];
+    // aux[14] = aux[10] * prims[3];
+    // aux[15] = aux[12] * aux[12] + aux[13] * aux[13] + aux[14] * aux[14];
+    // aux[16] = aux[10] - prims[4] - cons[0];
 
   }
 }
