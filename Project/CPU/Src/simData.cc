@@ -18,7 +18,8 @@ Data::Data(int nx, int ny, int nz,
            double cp,
            double mu1, double mu2, int frameSkip,
            int reportItersPeriod,
-           bool functionalSigma, double gam)
+           bool functionalSigma, double gam,
+           bool functionalTau, double tau)
            :
            nx(nx), ny(ny), nz(nz),
            xmin(xmin), xmax(xmax),
@@ -32,7 +33,8 @@ Data::Data(int nx, int ny, int nz,
            mu1(mu1), mu2(mu2),
            frameSkip(frameSkip),
            reportItersPeriod(reportItersPeriod),
-           functionalSigma(functionalSigma), gam(gam), 
+           functionalSigma(functionalSigma), gam(gam),
+           functionalTau(functionalTau), tau(tau),
 	   t(0)
 {
 	initData(env);
@@ -53,6 +55,7 @@ Data::Data(DataArgsBase args, PlatformEnv *env)
            frameSkip(args.frameSkip),
            reportItersPeriod(args.reportItersPeriod),
            functionalSigma(args.functionalSigma), gam(args.gam),
+           functionalTau(args.functionalTau), tau(args.tau),
            t(args.t) 
 {
 	initData(env, args.nOptionalSimArgs, args.optionalSimArgs, args.optionalSimArgNames);

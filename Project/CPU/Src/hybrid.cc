@@ -176,8 +176,8 @@ void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
   for(int naux(0); naux < 4; naux++) {
     siaux[naux] = daux[naux];
   }
-  for(int naux(12); naux < 22; naux++) {
-    siaux[naux] = daux[naux-2];
+  for(int naux(10); naux < 20; naux++) {
+    siaux[naux] = daux[naux];
   }
   // Need to be more careful here
   // siaux[0] = daux[0]; siaux[1] = daux[1]; siaux[2] = daux[2]; siaux[3] = daux[3];
@@ -224,8 +224,8 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
         for(int naux(0); naux < 4; naux++) {
           iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
         }
-        for(int naux(12); naux < 22; naux++) {
-          iaux[ID(naux, i, j, k)] = daux[ID(naux-2, i, j, k)];
+        for(int naux(10); naux < 20; naux++) {
+          iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
         }
         // iaux[ID(0, i, j, k)] = daux[ID(0, i, j, k)]; iaux[ID(1, i, j, k)] = daux[ID(1, i, j, k)]; iaux[ID(2, i, j, k)] = daux[ID(2, i, j, k)]; iaux[ID(3, i, j, k)] = daux[ID(3, i, j, k)];
 
@@ -419,8 +419,8 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     for(int naux(0); naux < 4; naux++) {
       aux[naux] = siaux[naux];
     } 
-    for(int naux(12); naux < 22; naux++) {
-      aux[naux] = siaux[naux-2];
+    for(int naux(10); naux < 20; naux++) {
+      aux[naux] = siaux[naux];
     }
     // aux[0] = siaux[0]; aux[1] = siaux[1]; aux[2] = siaux[2]; aux[3] = siaux[3];
     // aux[4] = 0; aux[5] = 0; aux[6] = 0; aux[7] = siaux[11];

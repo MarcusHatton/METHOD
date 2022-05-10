@@ -43,28 +43,30 @@ int main(int argc, char *argv[]) {
   double zmax(1.0);
   double endTime(5.0);
   double cfl(0.1);
-
   // double cp(1.0);
-
   // int frameSkip(40);
   bool output(false);
   int safety(-1);
 
+  double tau(1.0e-2);
   double tauCrossOver(1.0e-2);
   double tauSpan(5.0e-3);
+  bool functionalTau(true);
   bool useDEIFY(true);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
+
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.gamma = 5.0/3.0;
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
+  data_args.sfunctionalTau(functionalTau);
+  data_args.stau(tau);
   const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
-  data_args.tau = 1.0e-2;
   Data data(data_args, &env);
 
   // Data data(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime, &env,

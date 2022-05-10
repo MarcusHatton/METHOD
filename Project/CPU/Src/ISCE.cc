@@ -52,26 +52,26 @@ ISCE::ISCE(Data * data) : Model(data)
   this->data->auxLabels.push_back("q0");    this->data->auxLabels.push_back("qv");
   this->data->auxLabels.push_back("pi00");  this->data->auxLabels.push_back("pi01");
   this->data->auxLabels.push_back("pi02");  this->data->auxLabels.push_back("pi03");
-  this->data->auxLabels.push_back("Theta"); this->data->auxLabels.push_back("vsqrd");
-  // 12
+  // 10
   this->data->auxLabels.push_back("q1NS");  this->data->auxLabels.push_back("q2NS");
   this->data->auxLabels.push_back("q3NS");
-  // 15
+  // 13
   this->data->auxLabels.push_back("PiNS");    
-  // 16
+  // 14
   this->data->auxLabels.push_back("pi11NS"); this->data->auxLabels.push_back("pi12NS");
   this->data->auxLabels.push_back("pi13NS"); this->data->auxLabels.push_back("pi22NS");
   this->data->auxLabels.push_back("pi23NS"); this->data->auxLabels.push_back("pi33NS");
-  // 22
+  // 20
   this->data->auxLabels.push_back("q1LO");  this->data->auxLabels.push_back("q2LO");
   this->data->auxLabels.push_back("qLO");
-  // 25
+  // 23
   this->data->auxLabels.push_back("PiLO");    
-  // 26
+  // 24
   this->data->auxLabels.push_back("pi11LO"); this->data->auxLabels.push_back("pi12LO");
   this->data->auxLabels.push_back("pi13LO"); this->data->auxLabels.push_back("pi22LO");
   this->data->auxLabels.push_back("pi23LO"); this->data->auxLabels.push_back("pi33LO");
-  // 32
+  // 30
+  this->data->auxLabels.push_back("Theta"); this->data->auxLabels.push_back("vsqrd");
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");
 
