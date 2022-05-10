@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.gamma = 5.0/3.0;
-  data_args.Cfl(cfl);
-  data_args.Ng(Ng);
+  data_args.sCfl(cfl);
+  data_args.sNg(Ng);
   data_args.functionalTau(functionalTau);
   data_args.tau(tau);
   const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
