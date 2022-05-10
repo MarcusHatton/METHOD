@@ -81,7 +81,8 @@ class Data
     int
     reportItersPeriod;     //!< Period with which time step data is reported to screen during program execution
     bool
-    functionalSigma;       //!< Are we using a functional (vs homogeneous) conductivity?
+    functionalSigma,     //!< Are we using a functional (vs homogeneous) conductivity?
+    functionalTau;       //!< Are we using a functional (vs homogeneous) dissipative timescale?   
     double
     gam,                   //!< Exponent in the functional conductivity
     tau;                   //!< Universal scaling for hybrid timescale calc.
@@ -221,7 +222,8 @@ class Data
          double mu1=-1.0e4, double mu2=1.0e4,
          int frameskip=10,
          int reportItersPeriod=1,
-         bool funtionalSigma=false, double gam=12);
+         bool funtionalSigma=false, bool functionalTau=false, 
+         double gam=12, double tau=1.0e-2);
 
     //! Constructor
     /*!
