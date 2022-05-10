@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
   data_args.gamma = 5.0/3.0;
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
-  data_args.functionalTau(functionalTau);
-  data_args.tau(tau);
+  data_args.functionalTau = functionalTau;
+  data_args.tau = tau;
   const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);

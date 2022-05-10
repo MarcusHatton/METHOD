@@ -63,8 +63,8 @@ class DataArgsBase
     int
     reportItersPeriod=1;     //!< Period with which time step data is reported to screen during program execution
     bool
-    functionalSigma=false,
-    functionalTau=false;       //!< Are we using a functional (vs homogeneous) conductivity?
+    functionalSigma=false,  //!< Are we using a functional (vs homogeneous) conductivity?
+    functionalTau=false;    //!< Are we using a functional (vs homogeneous) dissipative timescales?   
     double
     gam=12,                   //!< Exponent in the functional conductivity
     tau = 1.0e-2;           //!< Universal scaling for hybrid timescale calc.
