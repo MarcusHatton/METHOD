@@ -232,7 +232,7 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
     throw std::runtime_error("C2P could not converge.\n");
   }
   aux[Aux::vsqrd] = (cons[Cons::S1]*cons[Cons::S1] + cons[Cons::S2]*cons[Cons::S2] 
-                      + cons[Cons::S3]*cons[Cons::S3] - sol[3])
+                      + cons[Cons::S3]*cons[Cons::S3])
                       /((cons[Cons::Tau] + cons[Cons::D] + sol[0])*(cons[Cons::Tau]  + cons[Cons::D] + sol[0]));
   aux[Aux::W] = 1 / sqrt((1-aux[Aux::vsqrd]));
   prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
@@ -246,7 +246,7 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
   aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
   aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
   aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
-   
+
 }
 
 void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)

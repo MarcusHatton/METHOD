@@ -145,8 +145,16 @@ class DataArgs : public DataArgsBase
       this->functionalSigma = functionalSigma; return *this; 
     }
 
+    DataArgs& sfunctionalTau(bool functionalTau) {
+      this->functionalTau = functionalTau; return *this; 
+    }
+
     DataArgs& sGam(double gam) {
       this->gam = gam; return *this; 
+    }
+
+    DataArgs& sTau(double tau) {
+      this->tau = tau; return *this; 
     }
 
     DataArgs& sFrameSkip(double frameSkip) {
