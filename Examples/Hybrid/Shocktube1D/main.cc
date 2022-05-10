@@ -83,8 +83,8 @@ int main(int argc, char *argv[]) {
 
   IS_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
 
-  // RKSplit2 timeInt(&data, &model, &bcs, &fluxMethod, NULL);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
+  RKSplit2 timeInt(&data, &model, &bcs, &fluxMethod, NULL);
+  // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
   SerialSaveData save(&data, &env, 1);
 
