@@ -83,7 +83,7 @@ class Data
     bool
     functionalSigma;       //!< Are we using a functional (vs homogeneous) conductivity?
     double
-    gam;                   //!< Exponent in the functional conductivity
+    gam,                   //!< Exponent in the functional conductivity
     tau;                   //!< Universal scaling for hybrid timescale calc.
     double
     //@{
