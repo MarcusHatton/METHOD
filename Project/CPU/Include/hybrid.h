@@ -54,6 +54,8 @@ class Hybrid : public Model
     *isource, *rsource, *deifySource,          // Source vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
     sigmaCrossOver,                             // Centre conductivity of penalty function
     sigmaSpan;                                  // Span of conductivity of penalty function
+    tauCrossOver,                             // Centre conductivity of penalty function
+    tauSpan;                                  // Span of conductivity of penalty function
 
     bool useDEIFY;                             // Should we use REGIME? (Default to true)
 

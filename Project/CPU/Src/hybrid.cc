@@ -32,7 +32,7 @@ Hybrid::Hybrid(Data * data, double tauCrossOver, double tauSpan, bool useDEIFY) 
 
   this->Ncons = (this->data)->Ncons = 15;
   this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 17;
+  this->Naux = (this->data)->Naux = 30;
 
   // Allocate ideal arrays
   icons    = new double[data->Nx*data->Ny*data->Nz*idealModel->Ncons];
@@ -72,6 +72,7 @@ Hybrid::Hybrid(Data * data, double tauCrossOver, double tauSpan, bool useDEIFY) 
   this->data->primsLabels.push_back("pi11");   this->data->primsLabels.push_back("pi12");
   this->data->primsLabels.push_back("pi13");  this->data->primsLabels.push_back("pi22");
   this->data->primsLabels.push_back("pi23");  this->data->primsLabels.push_back("pi33");
+  // 16
 
   // 0
   this->data->auxLabels.push_back("h");     this->data->auxLabels.push_back("T");
@@ -95,6 +96,7 @@ Hybrid::Hybrid(Data * data, double tauCrossOver, double tauSpan, bool useDEIFY) 
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
   this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
+  // 30
 
 }
 
