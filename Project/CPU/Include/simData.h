@@ -222,8 +222,8 @@ class Data
          double mu1=-1.0e4, double mu2=1.0e4,
          int frameskip=10,
          int reportItersPeriod=1,
-         bool funtionalSigma=false, bool functionalTau=false, 
-         double gam=12, double tau=1.0e-2);
+         bool funtionalSigma=false, double gam=12,
+         bool functionalTau=false, double tau=1.0e-2);
 
     //! Constructor
     /*!
