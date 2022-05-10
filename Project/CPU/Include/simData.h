@@ -166,6 +166,7 @@ class Data
     @return sig the value of the conductivity
     */
     double sigmaFunc(double * cons, double * prims, double * aux, int i=-1, int j=-1, int k=-1);
+    double tauFunc(double * cons, double * prims, double * aux, int i=-1, int j=-1, int k=-1);
 
     //! Initialiser
     /*!  
