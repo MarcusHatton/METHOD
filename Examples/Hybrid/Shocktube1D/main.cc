@@ -15,7 +15,7 @@
 #include "rkSplit2ndOrder.h"
 #include "fluxVectorSplitting.h"
 #include "hybrid.h"
-#include "serialSaveData.h"
+#include "serialSaveDataHDF5.h"
 #include "serialEnv.h"
 #include "weno.h"
 
@@ -103,8 +103,17 @@ int main(int argc, char *argv[]) {
 
   double timeTaken(double(clock() - startTime)/(double)CLOCKS_PER_SEC);
 
+  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/data_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
+
   save.saveAll();
   printf("\nRuntime: %.5fs\nCompleted %d iterations.\n", timeTaken, data.iters);
+
+  for (int n(0); n<nreports; n++) {
+    data.endTime = (n+1)*endTime/(nreports);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/bulk/data_serial_TIx_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    sim.evolve(output);
+    save_in_loop.saveAll();
+  }
 
   return 0;
 
