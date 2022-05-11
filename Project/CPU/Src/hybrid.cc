@@ -600,7 +600,7 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
             for (int m(-nn_req); m < nn_req; m++) {
               for (int n(-nn_req); n < nn_req; n++) {
                 if (d->tauFunc(icons, iprims, iaux, i+l, j+m, k+n) < tauCrossOver-tauSpan)
-                  // If this neighbour is too dissipative then we cannot calculate REGIME for the original cell
+                  // If this neighbour is too dissipative then we cannot calculate DEIFY for the original cell
                   termsPossible = false;
               }
             }
