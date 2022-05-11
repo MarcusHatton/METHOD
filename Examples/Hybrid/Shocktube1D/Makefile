@@ -6,6 +6,7 @@
 CC = g++
 
 USE_MPI=0
+USE_HDF = 1
 
 PROJECT_TYPE = CPU
 
@@ -49,6 +50,14 @@ SERIAL_SRCS = serialSaveData.cc \
 PARALLEL_SRCS = parallelSaveData.cc \
 			 parallelBoundaryConds.cc \
 			 parallelEnv.cc
+
+ifeq ($(USE_HDF), 1)
+    SERIAL_SRCS += serialSaveDataHDF5.cc
+endif
+
+ifeq ($(USE_HDF), 1)
+    PARALLEL_SRCS += parallelSaveDataHDF5.cc
+endif
 
 ifeq ($(USE_MPI), 1)
    SRCS += ${PARALLEL_SRCS}
