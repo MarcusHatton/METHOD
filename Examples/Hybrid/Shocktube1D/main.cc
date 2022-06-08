@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   double tauSpan(5.0e-3);
   bool functionalTau(true);
   bool useDEIFY(true);
+  int nreports(10);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -90,7 +91,8 @@ int main(int argc, char *argv[]) {
   RKSplit2 timeInt(&data, &model, &bcs, &fluxMethod, NULL);
   // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveData save(&data, &env, 1);
+  // SerialSaveData save(&data, &env, 1);
+  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/data_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -103,7 +105,6 @@ int main(int argc, char *argv[]) {
 
   double timeTaken(double(clock() - startTime)/(double)CLOCKS_PER_SEC);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/data_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   save.saveAll();
   printf("\nRuntime: %.5fs\nCompleted %d iterations.\n", timeTaken, data.iters);
