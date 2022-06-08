@@ -131,7 +131,7 @@ void Hybrid::setupDEIFY(FluxMethod * fluxMethod)
   if (useDEIFY)
   {
     subgridModel = new DEIFY(d, fluxMethod);
-    deifySource = new double[d->Nx*d->Ny*d->Nz*idealModel->Ncons];
+    deifySource = new double[d->Nx*d->Ny*d->Nz*idealModel->Ncons]; // 5
     mask         = new int[d->Nx*d->Ny*d->Nz];
   }
 }
@@ -291,17 +291,7 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
       }
     }
   }
-  // // And the divergence cleaning part separately
-  // for (int i(0); i < d->Nx; i++) {
-  //   for (int j(0); j < d->Ny; j++) {
-  //     for (int k(0); k < d->Nz; k++) {
 
-  //       double iW = idealWeightID(cons, prims, aux, i, j, k);
-  //       f[ID(12, i, j, k)] += iW*iflux[ID(8, i, j, k)];
-
-  //     }
-  //   }
-  // }
 }
 
 void Hybrid::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
@@ -314,13 +304,23 @@ void Hybrid::sourceTermSingleCell(double *cons, double *prims, double *aux, doub
   dissipativeModel->sourceTermSingleCell(cons, prims, aux, dsource, i, j, k);
   idealModel->sourceTermSingleCell(sicons, siprims, siaux, isource, i, j, k);
 
-  // Add ideal contribution
-  for (int var(0); var < 8; var++) {
-    source[var] = iW*isource[var] + (1-iW)*dsource[var];
-  }
-  // Add dissipative contribution
-  for (int var(8); var < dissipativeModel->Ncons; var++)
+  // Do IS dissipative variables' source
+  for (int var(5); var < 15; var++) {
     source[var] = (1-iW)*dsource[var];
+  }
+
+  // Do ISCE source for fluid part
+  for (int var(0); var < 5; var++) {
+    source[var] = iW*isource[var];
+  }
+
+  // // Add ideal contribution
+  // for (int var(0); var < 8; var++) {
+  //   source[var] = iW*isource[var] + (1-iW)*dsource[var];
+  // }
+  // // Add dissipative contribution
+  // for (int var(8); var < dissipativeModel->Ncons; var++)
+  //   source[var] = (1-iW)*dsource[var];
 }
 
 void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source)
@@ -364,26 +364,24 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
     }
   }
 
-  // Now add REGIME source
+  // Now add DEIFY source
   if (useDEIFY)
   {
     // Calculate the ideal cons prims and aux vectors
     setIdealCPAsAll(cons, prims, aux);
 
-    // Set the REGIME mask
+    // Set the DEIFY mask
     setMasks(cons, prims, aux);
     // Calculate the REGIEME source
     subgridModel->sourceExtension(icons, iprims, iaux, deifySource);
 
-    // Add REGIME contribution
+    // Add DEIFY contribution
     for (int var(0); var < idealModel->Ncons; var++) {
       for (int i(0); i < d->Nx; i++) {
         for (int j(0); j < d->Ny; j++) {
           for (int k(0); k < d->Nz; k++) {
             double iW = idealWeightID(icons, iprims, iaux, i, j, k);
-
             source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
-
           }
         }
       }
@@ -528,33 +526,33 @@ void Hybrid::primsToAll(double *cons, double *prims, double *aux)
 
 void Hybrid::finalise(double *cons, double *prims, double *aux)
 {
-  // Syntax
-  // Data * d(this->data);
 
-  // Set ideal electric fields
-  // for (int i(0); i < d->Nx; i++) {
-  //   for (int j(0); j < d->Ny; j++) {
-  //     for (int k(0); k < d->Nz; k++) {
-  //       double iW = idealWeightID(cons, prims, aux, i, j, k);
-  //       double iEx = -(prims[ID(2, i, j, k)]*prims[ID(7, i, j, k)] - prims[ID(3, i, j, k)]*prims[ID(6, i, j, k)]);
-  //       double iEy = -(prims[ID(3, i, j, k)]*prims[ID(5, i, j, k)] - prims[ID(1, i, j, k)]*prims[ID(7, i, j, k)]);
-  //       double iEz = -(prims[ID(1, i, j, k)]*prims[ID(6, i, j, k)] - prims[ID(2, i, j, k)]*prims[ID(5, i, j, k)]);
+  // Time derivs?
 
-  //       cons[ID(8, i, j, k)]  *= (1-iW);
-  //       cons[ID(9, i, j, k)]  *= (1-iW);
-  //       cons[ID(10, i, j, k)] *= (1-iW);
+  //printf("final_step: %d", final_step);
+  if (!final_step) return;
 
-  //       cons[ID(8, i, j, k)]  += iW*iEx;
-  //       cons[ID(9, i, j, k)]  += iW*iEy;
-  //       cons[ID(10, i, j, k)] += iW*iEz;
+  Data * d(this->data);
 
-  //       prims[ID(8, i, j, k)]  = cons[ID(8, i, j, k)];
-  //       prims[ID(9, i, j, k)]  = cons[ID(9, i, j, k)];
-  //       prims[ID(10, i, j, k)] = cons[ID(10, i, j, k)];
-
-  //     }
-  //   }
-  // }
+  // Get timestep
+  double dt=d->dt;
+  //printf("dt: %.17g", dt);
+  for (int i(d->is); i < d->ie; i++) {
+    for (int j(d->js); j < d->je; j++) {
+      for (int k(d->ks); k < d->ke; k++) {
+        // dW/dt \equiv du0/dt
+        aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
+        aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
+        aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
+        aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
+        // Update previous values
+        prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
+        prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
+        prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
+        prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
+      } // End k-loop
+    } // End j-loop
+  } // End i-loop
 
 }
 

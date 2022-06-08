@@ -48,9 +48,10 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int safety(-1);
 
+  // HYBRID PARAMETERS
   double tau(1.0e-2);
-  double tauCrossOver(1.0e-2);
-  double tauSpan(5.0e-3);
+  double tauCrossOver(1.0e-3);
+  double tauSpan(5.0e-4);
   bool functionalTau(true);
   bool useDEIFY(true);
   int nreports(10);
