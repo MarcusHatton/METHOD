@@ -101,10 +101,9 @@ int main(int argc, char *argv[]) {
   clock_t startTime(clock());
 
   // Run until end time and save results
-  sim.evolve(output, safety);
+  // sim.evolve(output, safety);
 
   double timeTaken(double(clock() - startTime)/(double)CLOCKS_PER_SEC);
-
 
   save.saveAll();
   printf("\nRuntime: %.5fs\nCompleted %d iterations.\n", timeTaken, data.iters);
