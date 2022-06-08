@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   clock_t startTime(clock());
 
   // Run until end time and save results
-  sim.evolve(output, safety);
+  // sim.evolve(output, safety);
 
   double timeTaken(double(clock() - startTime)/(double)CLOCKS_PER_SEC);
 
