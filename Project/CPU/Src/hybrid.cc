@@ -524,37 +524,8 @@ void Hybrid::primsToAll(double *cons, double *prims, double *aux)
   }
 }
 
-void Hybrid::finalise(double *cons, double *prims, double *aux)
-{
-
-  // Time derivs?
-
-  //printf("final_step: %d", final_step);
-  if (!final_step) return;
-
-  Data * d(this->data);
-
-  // Get timestep
-  double dt=d->dt;
-  //printf("dt: %.17g", dt);
-  for (int i(d->is); i < d->ie; i++) {
-    for (int j(d->js); j < d->je; j++) {
-      for (int k(d->ks); k < d->ke; k++) {
-        // dW/dt \equiv du0/dt
-        aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
-        aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
-        aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
-        aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
-        // Update previous values
-        prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
-        prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
-        prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
-        prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
-      } // End k-loop
-    } // End j-loop
-  } // End i-loop
-
-}
+// void Hybrid::finalise(double *cons, double *prims, double *aux)
+// { }
 
 void Hybrid::setMasks(double * cons, double * prims, double * aux)
 {

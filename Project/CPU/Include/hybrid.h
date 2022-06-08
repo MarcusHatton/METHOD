@@ -298,7 +298,14 @@ class Hybrid : public Model
         @param[in] prims pointer to primitive vector. Size is \f$N_{prims}*N_x*N_y*N_z\f$
         @param[in] aux pointer to auxiliary vector. Size is \f$N_{aux}*N_x*N_y*N_z\f$
     */
-    void finalise(double *cons, double *prims, double *aux);
+   
+    // void finalise(double *cons, double *prims, double *aux);
+    void finalise(double *cons, double *prims, double *aux, bool final_step=false) { 
+     
+        IS->finalise(double *cons, double *prims, double *aux, bool final_step=false);
+
+    };      
+
 };
 
 #endif
