@@ -36,12 +36,12 @@ int main(int argc, char *argv[]) {
   int ny(0);
   int nz(0);
   double xmin(0.0);
-  double xmax(5.0);
+  double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(5.0);
+  double endTime(0.4);
   double cfl(0.1);
   // double cp(1.0);
   // int frameSkip(40);
@@ -104,7 +104,6 @@ int main(int argc, char *argv[]) {
   sim.evolve(output, safety);
 
   double timeTaken(double(clock() - startTime)/(double)CLOCKS_PER_SEC);
-
 
   save.saveAll();
   printf("\nRuntime: %.5fs\nCompleted %d iterations.\n", timeTaken, data.iters);
