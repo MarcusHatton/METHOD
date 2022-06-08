@@ -190,7 +190,6 @@ class IS : public Model
         } // End j-loop
       } // End i-loop
 
-//      -calc derivatives
       };
 
     //! <b> Additional arguments for the IS residual function </b>

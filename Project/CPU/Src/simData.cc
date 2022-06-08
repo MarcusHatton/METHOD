@@ -159,7 +159,7 @@ double Data::tauFunc(double * cons, double * prims, double * aux, int i, int j, 
   }
   else
   {
-    if (i < 0 || j < 0 || k < 0)
+    if (i < 0 || j < 0 || k < 0) // less than zero!?
       // return tau * aux[PiNS];
       return aux[13];
 
