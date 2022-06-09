@@ -531,8 +531,10 @@ void Hybrid::primsToAll(double *cons, double *prims, double *aux)
   }
 }
 
-// void Hybrid::finalise(double *cons, double *prims, double *aux)
-// { }
+void Hybrid::finalise(double *cons, double *prims, double *aux)
+{        
+   dissipativeModel->finalise(cons, prims, aux, final_step);
+} 
 
 void Hybrid::setMasks(double * cons, double * prims, double * aux)
 {

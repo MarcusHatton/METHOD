@@ -300,11 +300,7 @@ class Hybrid : public Model
     */
    
     // void finalise(double *cons, double *prims, double *aux);
-    void finalise(double *cons, double *prims, double *aux, bool final_step=false) { 
-     
-        dissipativeModel->finalise(cons, prims, aux, final_step);
-
-    };      
+    void finalise(double *cons, double *prims, double *aux, bool final_step=false);
 
 };
 
