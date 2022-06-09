@@ -2,7 +2,6 @@
 #define HYBRID_H
 
 #include "model.h"
-#include "srrmhd.h"
 #include "IS.h"
 #include "ISCE.h"
 #include "DEIFY.h"
@@ -21,7 +20,7 @@
     crossover conductivity, \f$\sigma_{crossover}\f$, and with in the span of
     \f$\pm\sigma_{span}\f$. For conductivities less than \f$\sigma_c-\sigma_s\f$
     the resistive model is used, and for \f$\simga_c+\sigma_s\f$ ideal is used.
-    If REGIME is used, it is calculated across the entire domain and added to
+    If DEIFY is used, it is calculated across the entire domain and added to
     the ideal MHD contribution.
   @par
     The source and flux vectors of the hybrid model are a combination of the
@@ -31,7 +30,7 @@
     The C2P of this model utilises the resistive C2P for \f$\sigma<\sigma_c\f$
     and the ideal C2P otherwise.
   @par
-    If specified in the constructor, he REGIME source is calculated for the
+    If specified in the constructor, he DEIFY source is calculated for the
     whole domain, but only added to the source vector if the cell, and its
     nearest 3 neighbours have conductivites \f$\sigma\ge\sigma_c-\sigma_s\f$.
 */
@@ -50,22 +49,22 @@ class Hybrid : public Model
     double
     *icons, *iprims, *iaux,                     // Ideal cons, prims and aux. Size is \f$N_{var}*N_x*N_y*N_z\f$.
     *sicons, *siprims, *siaux,                  // Ideal cons, prims and aux. Size is \f$N_{var}\f$.
-    *iflux, *dflux,                             // Flux vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
-    *isource, *dsource, *deifySource,          // Source vectors for ideal, resistive and REGIME. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
-    sigmaCrossOver,                             // Centre conductivity of penalty function
-    sigmaSpan,                                  // Span of conductivity of penalty function
+    *iflux, *dflux,                             // Flux vectors for ideal, resistive and DEIFY. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
+    *isource, *dsource, *deifySource,          // Source vectors for ideal, resistive and DEIFY. Size is \f$N_{cons}*N_x*N_y*N_z\f$.
+    tauCrossOver,                             // Centre conductivity of penalty function
+    tauSpan,                                  // Span of conductivity of penalty function
     tauCrossOver,                             // Centre conductivity of penalty function
     tauSpan;                                  // Span of conductivity of penalty function
 
-    bool useDEIFY;                             // Should we use REGIME? (Default to true)
+    bool useDEIFY;                             // Should we use DEIFY? (Default to true)
 
     IS * dissipativeModel;                    // Pointer to SRRMHD model
 
     ISCE * idealModel;                         // Pointer to SRMHD model
 
-    DEIFY * subgridModel = NULL;               // Pointer to REGIME model
+    DEIFY * subgridModel = NULL;               // Pointer to DEIFY model
     
-    int *mask;                                  // Flag: can we set REGIME source?
+    int *mask;                                  // Flag: can we set DEIFY source?
 
     Hybrid();                                   //!< Default constructor
 
@@ -77,20 +76,20 @@ class Hybrid : public Model
         up the parameters for the hybrid model.
 
         @param[in *data Pointer to Data class containing global simulation data
-        @param[in] sigmaCrossOver double centre conductivity of penalty function (defaults to 150)
-        @param[in] sigmaSpan double conductivity span of penalty function (defaults to 50)
-        @param[in] useREGIME bool should we use REGIME? (defaults to true)
+        @param[in] tauCrossOver double centre conductivity of penalty function (defaults to 150)
+        @param[in] tauSpan double conductivity span of penalty function (defaults to 50)
+        @param[in] useDEIFY bool should we use DEIFY? (defaults to true)
     */
-    Hybrid(Data * data, double sigmaCrossOver=150, double sigmaSpan=50, bool useREGIME=true);
+    Hybrid(Data * data, double tauCrossOver=150, double tauSpan=50, bool useDEIFY=true);
 
 
     virtual ~Hybrid();  //!< Destructor
 
-    //! Setup the REGIME model
+    //! Setup the DEIFY model
     /*!
       @par
-        Initialise the REGIME model and store a pointer it. Also allocate memory
-        for the REGIME source vector and the mask.
+        Initialise the DEIFY model and store a pointer it. Also allocate memory
+        for the DEIFY source vector and the mask.
 
         @param[in] fluxMethod pointer to simulations FluxMethod
     */
@@ -172,10 +171,10 @@ class Hybrid : public Model
     */
     void setIdealCPAsAll(double *cons, double * prims, double * aux);
 
-    //! Set the REGIME source mask
+    //! Set the DEIFY source mask
     /*!
       @par
-        Set the REGIME mask to indicate whether the REGIME source should be
+        Set the DEIFY mask to indicate whether the DEIFY source should be
         added to the hybrid->source vector.
 
         @param[in] cons pointer to conserved vector. Size is \f$N_{cons}*N_x*N_y*N_z\f$.

@@ -49,15 +49,14 @@ int main(int argc, char *argv[]) {
   int safety(-1);
 
   // HYBRID PARAMETERS
-  double tau(1.0e-2);
+  double tau(1.0e-2); // Unused currently
   double tauCrossOver(1.0e-3);
-  double tauSpan(5.0e-4);
-  bool functionalTau(true);
-  bool useDEIFY(true);
+  double tauSpan(5.0e-4); 
+  bool functionalTau(true); // hard-coded or calc'd on-the-fly?
+  bool useDEIFY(true); // add source-extension when near-ideal limit?
   int nreports(10);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
-
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.gamma = 5.0/3.0;

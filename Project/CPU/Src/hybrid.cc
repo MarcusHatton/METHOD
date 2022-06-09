@@ -1,4 +1,4 @@
-//! Hybrid SRRMHD/SRMHD model
+//! Hybrid IS/ISCE model
 /*!
     This script contains the function definitions for the hybrid model.
     For detailed documentation about the methods contained herein, see hybrid.h
@@ -182,14 +182,10 @@ void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
   // siprims[0] = dprims[0]; siprims[1] = dprims[1]; siprims[2] = dprims[2]; 
   // siprims[3] = dprims[3]; siprims[4] = dprims[4]; siprims[5] = dprims[5]; 
 
-  for(int naux(0); naux < 4; naux++) {
+  for(int naux(0); naux < 20; naux++) {
     siaux[naux] = daux[naux];
   }
-  for(int naux(10); naux < 20; naux++) {
-    siaux[naux] = daux[naux];
-  }
-
-  dissipativeModel->calcNSvars(cons, prims, aux);
+  siaux[30] = daux[20]; siaux[31] = daux[27]; // Copy theta and vsqrd... more needed!?
 
 }
 
@@ -198,7 +194,7 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
   // Syntax
   Data * d(this->data);
 
-  // Set the ideal cons prims and aux from the dissipative versions (all cells)
+  // Set the ideal (ISCE) cons prims and aux from the dissipative versions (all cells)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
@@ -208,22 +204,18 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
         // icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
         // icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
         // icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];
-        for(int nprim(0); nprim < 6; nprim++) {
+        for(int nprim(0); nprim < 16; nprim++) {
           iprims[ID(nprim, i, j, k)] = dprims[ID(nprim, i, j, k)];
         } 
         // iprims[ID(0, i, j, k)] = dprims[ID(0, i, j, k)]; iprims[ID(1, i, j, k)] = dprims[ID(1, i, j, k)]; iprims[ID(2, i, j, k)] = dprims[ID(2, i, j, k)]; iprims[ID(3, i, j, k)] = dprims[ID(3, i, j, k)];
         // iprims[ID(4, i, j, k)] = dprims[ID(4, i, j, k)]; iprims[ID(5, i, j, k)] = dprims[ID(5, i, j, k)]; iprims[ID(6, i, j, k)] = dprims[ID(6, i, j, k)]; iprims[ID(7, i, j, k)] = dprims[ID(7, i, j, k)];
-        for(int naux(0); naux < 4; naux++) {
+        for(int naux(0); naux < 20; naux++) {
           iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
         }
-        for(int naux(10); naux < 20; naux++) {
-          iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
-        }
+        iaux[ID(30, i, j, k)] = daux[ID(20, i, j, k)]; iaux[ID(31, i, j, k)] = daux[ID(27, i, j, k)];
       }
     }
   }
-
-  dissipativeModel->calcNSvars(cons, prims, aux);
 
 }
 
@@ -266,14 +258,13 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
   }
 
 
-  // Add ideal (ISCE) contribution to hybrid->f (next 10, dissipation fluxes)
-  for (int var(5); var < dissipativeModel->Ncons; var++) {
+  // Add dissipative (IS) contribution to hybrid->f (next 10, dissipation fluxes)
+  for (int var(idealModel->Ncons); var < dissipativeModel->Ncons; var++) {
     for (int i(0); i < d->Nx; i++) {
       for (int j(0); j < d->Ny; j++) {
         for (int k(0); k < d->Nz; k++) {
 
-          double iW = idealWeightID(cons, prims, aux, i, j, k);
-          f[ID(var, i, j, k)] += (1-iW)*dflux[ID(var, i, j, k)];
+          f[ID(var, i, j, k)] += dflux[ID(var, i, j, k)]; // removed weighting here... (?)
 
         }
       }
@@ -295,13 +286,13 @@ void Hybrid::sourceTermSingleCell(double *cons, double *prims, double *aux, doub
 
   // Do IS dissipative variables' source
   for (int var(5); var < 15; var++) {
-    source[var] = (1-iW)*dsource[var];
+    source[var] = dsource[var];
   }
 
-  // Do ISCE source for fluid part
-  for (int var(0); var < 5; var++) {
-    source[var] = iW*isource[var];
-  }
+  // Do ISCE source for fluid part - doesn't have one ...
+  // for (int var(0); var < 5; var++) {
+  //   source[var] = iW*isource[var];
+  // }
 
   // // Add ideal contribution
   // for (int var(0); var < 8; var++) {
@@ -370,7 +361,8 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
         for (int j(0); j < d->Ny; j++) {
           for (int k(0); k < d->Nz; k++) {
             double iW = idealWeightID(icons, iprims, iaux, i, j, k);
-            source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
+            // source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
+            source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * mask[ID(0, i, j, k)]; // remove weight (?) (and mask?)
           }
         }
       }
@@ -406,17 +398,13 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     // prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
     // prims[6] = siprims[6]; prims[7] = siprims[7];
 
-    for(int naux(0); naux < 4; naux++) {
+    for(int naux(0); naux < 20; naux++) {
       aux[naux] = siaux[naux];
     } 
-    for(int naux(10); naux < 20; naux++) {
-      aux[naux] = siaux[naux];
-    }
+    aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
 
   }
  
-  dissipativeModel->calcNSvars(cons, prims, aux);
-
 }
 
 void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
@@ -448,8 +436,8 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
           singleAux[var] = aux[ID(var, i, j, k)];
         }
 
-        singlePrims[5] = singleCons[5]; singlePrims[6] = singleCons[6]; singlePrims[7] = singleCons[7];
-        singlePrims[8] = singleCons[8]; singlePrims[9] = singleCons[9]; singlePrims[10] = singleCons[10];
+        // singlePrims[5] = singleCons[5]; singlePrims[6] = singleCons[6]; singlePrims[7] = singleCons[7];
+        // singlePrims[8] = singleCons[8]; singlePrims[9] = singleCons[9]; singlePrims[10] = singleCons[10];
 
         this->getPrimitiveVarsSingleCell(singleCons, singlePrims, singleAux, i, j, k);
 
@@ -484,40 +472,44 @@ void Hybrid::primsToAll(double *cons, double *prims, double *aux)
   dissipativeModel->primsToAll(cons, prims, aux);
   idealModel->primsToAll(icons, iprims, iaux);
 
-  // Compute the hybrid variables using the penalty function
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
-        double iW = idealWeightID(cons, prims, aux, i, j, k);
-        for (int var(0); var < dissipativeModel->Ncons; var++) {
-          cons[ID(var, i, j, k)] *= (1-iW);
-          if (var < idealModel->Ncons)
-            cons[ID(var, i, j, k)] += iW*icons[ID(var, i, j, k)];
-        }
-        for (int var(0); var < dissipativeModel->Nprims; var++) {
-          prims[ID(var, i, j, k)] *= (1-iW);
-          if (var < idealModel->Nprims)
-            prims[ID(var, i, j, k)] += iW*iprims[ID(var, i, j, k)];
-        }
-        for (int var(0); var < dissipativeModel->Naux; var++) {
-          aux[ID(var, i, j, k)] *= (1-iW);
-          if (var < idealModel->Naux)
-            aux[ID(var, i, j, k)] += iW*iaux[ID(var, i, j, k)];
-        }
-      }
-    }
-  }
+  // Compute the hybrid variables using the penalty function - shouldn't be needed as we want hybrid variables to just be IS ones to start...
+  // for (int i(0); i < d->Nx; i++) {
+  //   for (int j(0); j < d->Ny; j++) {
+  //     for (int k(0); k < d->Nz; k++) {
+  //       double iW = idealWeightID(cons, prims, aux, i, j, k);
+  //       for (int var(0); var < dissipativeModel->Ncons; var++) {
+  //         cons[ID(var, i, j, k)] *= (1-iW);
+  //         if (var < idealModel->Ncons)
+  //           cons[ID(var, i, j, k)] += iW*icons[ID(var, i, j, k)];
+  //       }
+  //       for (int var(0); var < dissipativeModel->Nprims; var++) {
+  //         prims[ID(var, i, j, k)] *= (1-iW);
+  //         if (var < idealModel->Nprims)
+  //           prims[ID(var, i, j, k)] += iW*iprims[ID(var, i, j, k)];
+  //       }
+  //       for (int var(0); var < dissipativeModel->Naux; var++) {
+  //         aux[ID(var, i, j, k)] *= (1-iW);
+  //         if (var < idealModel->Naux)
+  //           aux[ID(var, i, j, k)] += iW*iaux[ID(var, i, j, k)];
+  //       }
+  //     }
+  //   }
+  // }
+
+  setIdealCPAsAll(cons, prims, aux); // should now copy everything setup in P2All of IS
 }
 
 void Hybrid::finalise(double *cons, double *prims, double *aux, bool final_step)
 {        
-   dissipativeModel->finalise(cons, prims, aux, final_step);
+   dissipativeModel->finalise(cons, prims, aux, final_step); // Calcs time derivs
 } 
 
 void Hybrid::setMasks(double * cons, double * prims, double * aux)
 {
   // Syntax
   Data * d(this->data);
+
+  setIdealCPAsAll(cons, prims, aux); // should now copy everything setup in P2All of IS
 
   // Assume DEIFY is not valid...
   for (int i(0); i < d->Nx; i++) {
@@ -549,14 +541,15 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
         bool termsPossible(true);
 
         // If this cell needs the DEIFY source....
-        if (d->tauFunc(icons, iprims, iaux, i, j, k) > tauCrossOver-tauSpan)
+        if (d->tauFunc(icons, iprims, iaux, i, j, k) > tauCrossOver-tauSpan
+            && d->tauFunc(icons, iprims, iaux, i, j, k) < tauCrossOver+tauSpan)
         {
           // Can we compute all of the terms too? I.e. and neighbours' terms be calculated
-          int nn_req {2}; // MOVE THIS SOMEWHERE BETTER - also, value?
+          int nn_req {2}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
           for (int l(-nn_req); l < nn_req; l++) {
             for (int m(-nn_req); m < nn_req; m++) {
               for (int n(-nn_req); n < nn_req; n++) {
-                if (d->tauFunc(icons, iprims, iaux, i+l, j+m, k+n) < tauCrossOver-tauSpan)
+                if (d->tauFunc(icons, iprims, iaux, i+l, j+m, k+n) > tauCrossOver+tauSpan)
                   // If this neighbour is too dissipative then we cannot calculate DEIFY for the original cell
                   termsPossible = false;
               }
