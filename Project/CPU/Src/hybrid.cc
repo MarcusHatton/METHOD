@@ -157,7 +157,7 @@ double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i,
 bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
   // Should we use the Resistive C2P?
-  if data->tauFunc(cons, prims, aux) < tauCrossOver {
+  if (data->tauFunc(cons, prims, aux) < tauCrossOver) {
       printf("Yes");
     // std::cout << "Yes";
   } else { 
