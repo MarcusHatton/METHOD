@@ -156,15 +156,15 @@ double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i,
 
 bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
-  // Should we use the Resistive C2P?
-  if (data->tauFunc(cons, prims, aux) < tauCrossOver) {
-      printf("Yes");
+  // Should we use the Dissipative (IS) C2P?
+  if (data->tauFunc(cons, prims, aux) > tauCrossOver) {
+      printf("IS");
     // std::cout << "Yes";
   } else { 
-      printf("No");
+      printf("ISCE");
   }
 
-  return data->tauFunc(cons, prims, aux) < tauCrossOver;
+  return data->tauFunc(cons, prims, aux) > tauCrossOver;
 }
 
 void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
