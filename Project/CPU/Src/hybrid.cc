@@ -139,19 +139,19 @@ void Hybrid::setupDEIFY(FluxMethod * fluxMethod)
 double Hybrid::idealWeight(double * cons, double * prims, double * aux)
 {
   // Penalty function for a given cell
-  return data->tauFunc(cons, prims, aux) < tauCrossOver-tauSpan ? 0 :
+  return data->tauFunc(cons, prims, aux) < tauCrossOver-tauSpan ? 1 :
          data->tauFunc(cons, prims, aux) < tauCrossOver+tauSpan?
-        (tanh((data->tauFunc(cons, prims, aux) - tauCrossOver) / (tauSpan/3))+1)/2 :
-        1;
+        (tauCrossOver - tanh((data->tauFunc(cons, prims, aux)) / (tauSpan/3))+1)/2 :
+        0;
 }
 
 double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i, int j, int k)
 {
   // Penalty function for a given cell, given global cons prims and aux
-  return data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver-tauSpan ? 0 :
+  return data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver-tauSpan ? 1 :
          data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver+tauSpan?
-         (tanh((data->tauFunc(cons, prims, aux, i, j, k) - tauCrossOver) / (tauSpan/3))+1)/2 :
-         1;
+         (tanh((tauCrossOver - data->tauFunc(cons, prims, aux, i, j, k)) / (tauSpan/3))+1)/2 :
+         0;
 }
 
 bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
@@ -188,26 +188,9 @@ void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
   for(int naux(10); naux < 20; naux++) {
     siaux[naux] = daux[naux];
   }
-  // Need to be more careful here
-  // siaux[0] = daux[0]; siaux[1] = daux[1]; siaux[2] = daux[2]; siaux[3] = daux[3];
 
-  // double b0(daux[1]*(dprims[5]*dprims[1] + dprims[6]*dprims[2] + dprims[7]*dprims[3]));
-  // double bx(dprims[5] / daux[1] + b0*dprims[1]);
-  // double by(dprims[6] / daux[1] + b0*dprims[2]);
-  // double bz(dprims[7] / daux[1] + b0*dprims[3]);
-  // double bsq((dprims[5]*dprims[5] + dprims[6]*dprims[6] + dprims[7]*dprims[7] + b0*b0)/(daux[1]*daux[1]));
-  // double BS(daux[1]*(dprims[5]*dcons[1] + dprims[6]*dcons[2] + dprims[7]*dcons[3]));
-  // double Ssq(dcons[1]*dcons[1] + dcons[2]*dcons[2] + dcons[3]*dcons[3]);
+  dissipativeModel->calcNSvars(cons, prims, aux);
 
-  // siaux[4]  = b0;
-  // siaux[5]  = bx;
-  // siaux[6]  = by;
-  // siaux[7]  = bz;
-  // siaux[8]  = bsq;
-  // siaux[9]  = daux[9];
-  // siaux[10] = BS;
-  // siaux[11] = daux[7];
-  // siaux[12] =  Ssq;
 }
 
 void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
@@ -236,28 +219,12 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
         for(int naux(10); naux < 20; naux++) {
           iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
         }
-        // iaux[ID(0, i, j, k)] = daux[ID(0, i, j, k)]; iaux[ID(1, i, j, k)] = daux[ID(1, i, j, k)]; iaux[ID(2, i, j, k)] = daux[ID(2, i, j, k)]; iaux[ID(3, i, j, k)] = daux[ID(3, i, j, k)];
-
-        // double b0(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dprims[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(3, i, j, k)]));
-        // double bx(dprims[ID(5, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(1, i, j, k)]);
-        // double by(dprims[ID(6, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(2, i, j, k)]);
-        // double bz(dprims[ID(7, i, j, k)] / daux[ID(1, i, j, k)] + b0*dprims[ID(3, i, j, k)]);
-        // double bsq((dprims[ID(5, i, j, k)]*dprims[ID(5, i, j, k)] + dprims[ID(6, i, j, k)]*dprims[ID(6, i, j, k)] + dprims[ID(7, i, j, k)]*dprims[ID(7, i, j, k)] + b0*b0)/(daux[ID(1, i, j, k)]*daux[ID(1, i, j, k)]));
-        // double BS(daux[ID(1, i, j, k)]*(dprims[ID(5, i, j, k)]*dcons[ID(1, i, j, k)] + dprims[ID(6, i, j, k)]*dcons[ID(2, i, j, k)] + dprims[ID(7, i, j, k)]*dcons[ID(3, i, j, k)]));
-        // double Ssq(dcons[ID(1, i, j, k)]*dcons[ID(1, i, j, k)] + dcons[ID(2, i, j, k)]*dcons[ID(2, i, j, k)] + dcons[ID(3, i, j, k)]*dcons[ID(3, i, j, k)]);
-
-        // iaux[ID(4, i, j, k)]  = b0;
-        // iaux[ID(5, i, j, k)]  = bx;
-        // iaux[ID(6, i, j, k)]  = by;
-        // iaux[ID(7, i, j, k)]  = bz;
-        // iaux[ID(8, i, j, k)]  = bsq;
-        // iaux[ID(9, i, j, k)]  = daux[ID(9, i, j, k)];
-        // iaux[ID(10, i, j, k)] = BS;
-        // iaux[ID(11, i, j, k)] = daux[ID(7, i, j, k)];
-        // iaux[ID(12, i, j, k)] =  Ssq;
       }
     }
   }
+
+  dissipativeModel->calcNSvars(cons, prims, aux);
+
 }
 
 void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, const int dir)
@@ -272,20 +239,19 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
   idealModel->fluxVector(icons, iprims, iaux, iflux, dir);
   dissipativeModel->fluxVector(cons, prims, aux, dflux, dir);
 
-  // Add dissipative contribution to hybrid->f
-  for (int var(0); var < dissipativeModel->Ncons; var++) {
+  // Add dissipative (IS) contribution to hybrid->f (first 5)
+  for (int var(0); var < idealModel->Ncons; var++) {
     for (int i(0); i < d->Nx; i++) {
       for (int j(0); j < d->Ny; j++) {
         for (int k(0); k < d->Nz; k++) {
 
           double iW = idealWeightID(cons, prims, aux, i, j, k);
           f[ID(var, i, j, k)] = (1-iW)*dflux[ID(var, i, j, k)];
-
         }
       }
     }
   }
-  // Add ideal contribution to hybrid->f
+  // Add ideal (ISCE) contribution to hybrid->f (first 5)
   for (int var(0); var < idealModel->Ncons; var++) {
     for (int i(0); i < d->Nx; i++) {
       for (int j(0); j < d->Ny; j++) {
@@ -298,6 +264,22 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
       }
     }
   }
+
+
+  // Add ideal (ISCE) contribution to hybrid->f (next 10, dissipation fluxes)
+  for (int var(5); var < dissipativeModel->Ncons; var++) {
+    for (int i(0); i < d->Nx; i++) {
+      for (int j(0); j < d->Ny; j++) {
+        for (int k(0); k < d->Nz; k++) {
+
+          double iW = idealWeightID(cons, prims, aux, i, j, k);
+          f[ID(var, i, j, k)] += (1-iW)*dflux[ID(var, i, j, k)];
+
+        }
+      }
+    }
+  }
+
 
 }
 
@@ -404,6 +386,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
 
 void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
+
   if (useDissipative(cons, prims, aux))
   {
     // Resistive cons2prims
@@ -429,18 +412,11 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     for(int naux(10); naux < 20; naux++) {
       aux[naux] = siaux[naux];
     }
-    // aux[0] = siaux[0]; aux[1] = siaux[1]; aux[2] = siaux[2]; aux[3] = siaux[3];
-    // aux[4] = 0; aux[5] = 0; aux[6] = 0; aux[7] = siaux[11];
-    // aux[8] = cons[8]*cons[8] + cons[9]*cons[9] + cons[10]*cons[10];
-    // aux[9] = siaux[9]; aux[10] = prims[0]*aux[0]*aux[1]*aux[1];
-    // aux[11] = prims[1]*cons[8] + prims[2]*cons[9] + prims[3]*cons[10];
-    // aux[12] = aux[10] * prims[1];
-    // aux[13] = aux[10] * prims[2];
-    // aux[14] = aux[10] * prims[3];
-    // aux[15] = aux[12] * aux[12] + aux[13] * aux[13] + aux[14] * aux[14];
-    // aux[16] = aux[10] - prims[4] - cons[0];
 
   }
+ 
+  dissipativeModel->calcNSvars(cons, prims, aux);
+
 }
 
 void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
@@ -488,6 +464,8 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
       }
     }
   }
+
+  dissipativeModel->calcNSvars(cons, prims, aux);
 
   // Free up
   free(singleCons);
