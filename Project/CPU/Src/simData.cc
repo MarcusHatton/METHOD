@@ -159,13 +159,15 @@ double Data::tauFunc(double * cons, double * prims, double * aux, int i, int j, 
   }
   else
   {
-    if (i < 0 || j < 0 || k < 0) // less than zero!?
+    if (i < 0 || j < 0 || k < 0) { // less than zero!?
       // return tau * aux[PiNS];
       return aux[13];
-
-    else
+    }
+    else {
       // return tau * aux[IDn(PiNS, i, j, k)];
+      std::cout << aux[IDn(13, i, j, k)] << std::endl;
       return aux[IDn(13, i, j, k)]; // PiNS
+    }
   }
 }
 
