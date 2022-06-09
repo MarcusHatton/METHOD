@@ -193,7 +193,7 @@ class IS : public Model
       };
 
     //! Calculate the NS variables' values (requires derivs, also done in full source)
-    void IS::calcNSvars(double *cons, double *prims, double *aux);
+    void calcNSvars(double *cons, double *prims, double *aux);
 
     //! <b> Additional arguments for the IS residual function </b>
     /*!
