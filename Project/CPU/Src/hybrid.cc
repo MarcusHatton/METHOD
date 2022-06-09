@@ -18,7 +18,7 @@ Hybrid::Hybrid() : Model()
 {
   this->Ncons = 15;
   this->Nprims = 16;
-  this->Naux = 17;
+  this->Naux = 30;
 }
 
 Hybrid::Hybrid(Data * data, double tauCrossOver, double tauSpan, bool useDEIFY) : Model(data), tauCrossOver(tauCrossOver), tauSpan(tauSpan), useDEIFY(useDEIFY)
