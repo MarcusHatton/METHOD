@@ -1193,6 +1193,9 @@ void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const i
 
 void IS::calcNSvars(double *cons, double *prims, double *aux) 
 {
+
+  Data * d(this->data);
+
   double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
