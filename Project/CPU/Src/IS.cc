@@ -1197,11 +1197,11 @@ void IS::calcNSvars(double *cons, double *prims, double *aux)
   Data * d(this->data);
 
   double kappa = this->data->optionalSimArgs[0];
-  double tau_q = this->data->optionalSimArgs[1];
+  // double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
-  double tau_Pi = this->data->optionalSimArgs[3];
+  // double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
-  double tau_pi = this->data->optionalSimArgs[5];
+  // double tau_pi = this->data->optionalSimArgs[5];
 
   double dxT;
   double dyT;
