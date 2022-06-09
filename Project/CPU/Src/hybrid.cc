@@ -158,9 +158,10 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
   // Should we use the Resistive C2P?
   if data->tauFunc(cons, prims, aux) < tauCrossOver {
-    std::cout << "Yes";
+      printf("Yes");
+    // std::cout << "Yes";
   } else { 
-    std::cout << "No";
+      printf("No");
   }
 
   return data->tauFunc(cons, prims, aux) < tauCrossOver;
