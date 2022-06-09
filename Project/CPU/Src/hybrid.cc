@@ -161,7 +161,7 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
       printf("IS");
     // std::cout << "Yes";
   } else { 
-      printf("ISCE");
+      // printf("ISCE");
   }
 
   return data->tauFunc(cons, prims, aux) > tauCrossOver;
