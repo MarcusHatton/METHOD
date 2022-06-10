@@ -170,8 +170,6 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
 {
 
-  dissipativeModel->calcNSvars(cons, prims, aux);
-
   // Set the ideal cons prims and aux from the dissipative versions (single cell)
   for(int ncon(0); ncon < 5; ncon++) {
     sicons[ncon] = dcons[ncon];
@@ -196,8 +194,6 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
 {
   // Syntax
   Data * d(this->data);
-
-  dissipativeModel->calcNSvars(cons, prims, aux);
 
   // Set the ideal (ISCE) cons prims and aux from the dissipative versions (all cells)
   for (int i(0); i < data->Nx; i++) {
