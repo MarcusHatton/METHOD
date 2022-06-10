@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.sfunctionalTau(functionalTau);
   data_args.sTau(tau);
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-3, 1.0e-1,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -74,7 +74,8 @@ int main(int argc, char *argv[]) {
   //           cfl, Ng, xi, tau, cp, frameSkip);
 
   // Choose particulars of simulation
-  Hybrid model(&data, tauCrossOver, tauSpan, useDEIFY);
+  Hybrid model(&data, tauCrossOver, eta0CrossOver, useDEIFY);
+  // Hybrid model(&data, tauCrossOver, tauSpan, useDEIFY);
 
   Weno3 weno(&data);
 
