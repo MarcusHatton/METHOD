@@ -32,7 +32,7 @@ IS::IS(Data * data) : Model(data)
 
   smartGuesses = 0;
   
-  alternative_C2P = true;
+  alternative_C2P = false;
   
   // 0
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
