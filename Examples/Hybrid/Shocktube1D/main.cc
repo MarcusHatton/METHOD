@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
   //           cfl, Ng, xi, tau, cp, frameSkip);
 
   // Choose particulars of simulation
-  Hybrid model(&data, tauCrossOver, eta0CrossOver, useDEIFY);
-  // Hybrid model(&data, tauCrossOver, tauSpan, useDEIFY);
+  // Hybrid model(&data, tauCrossOver, eta0CrossOver, useDEIFY);
+  Hybrid model(&data, tauCrossOver, tauSpan, useDEIFY);
 
   Weno3 weno(&data);
 
