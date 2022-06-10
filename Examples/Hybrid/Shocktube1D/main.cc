@@ -50,8 +50,8 @@ int main(int argc, char *argv[]) {
 
   // HYBRID PARAMETERS
   double tau(1.0e-2); // Unused currently
-  double tauCrossOver(1.0e-3);
-  double tauSpan(5.0e-4); 
+  double tauCrossOver(1.0e-2);
+  double tauSpan(5.0e-3); 
   bool functionalTau(true); // hard-coded or calc'd on-the-fly?
   bool useDEIFY(true); // add source-extension when near-ideal limit?
   int nreports(10);
