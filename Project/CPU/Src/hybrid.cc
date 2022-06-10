@@ -401,10 +401,10 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     // prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
     // prims[6] = siprims[6]; prims[7] = siprims[7];
 
-    for(int naux(0); naux < 4; naux++) {
+    for(int naux(0); naux < 20; naux++) {
       aux[naux] = siaux[naux];
     } 
-    // aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
+    aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
 
   }
  
@@ -549,7 +549,7 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
             && d->tauFunc(icons, iprims, iaux, i, j, k) < tauCrossOver+tauSpan)
         {
           // Can we compute all of the terms too? I.e. and neighbours' terms be calculated
-          int nn_req {1}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
+          int nn_req {2}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
           for (int l(-nn_req); l < nn_req; l++) {
             for (int m(-nn_req); m < nn_req; m++) {
               for (int n(-nn_req); n < nn_req; n++) {
