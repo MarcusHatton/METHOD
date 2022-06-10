@@ -550,7 +550,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
                                       tol, wa, lwa);
     // If root find fails, add failed cell to the list
     if (info!=1) {
-      //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
+      // printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
       throw std::runtime_error("C2P could not converge.\n");
     }
     aux[Aux::vsqrd] = sol[0]*sol[0]*((cons[Cons::S1] - sol[1])*(cons[Cons::S1] - sol[1]) + (cons[Cons::S2] - sol[2])*(cons[Cons::S2] - sol[2]) 
@@ -586,7 +586,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
                                       tol, wa, lwa);
     // If root find fails, add failed cell to the list
     if (info!=1) {
-      //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
+      printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
       throw std::runtime_error("C2P could not converge.\n");
     }
     aux[Aux::vsqrd] = ((cons[Cons::S1] - sol[1])*(cons[Cons::S1] - sol[1]) + (cons[Cons::S2] - sol[2])*(cons[Cons::S2] - sol[2]) 
