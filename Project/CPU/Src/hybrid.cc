@@ -401,10 +401,10 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     // prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
     // prims[6] = siprims[6]; prims[7] = siprims[7];
 
-    for(int naux(0); naux < 20; naux++) {
+    for(int naux(0); naux < 4; naux++) {
       aux[naux] = siaux[naux];
     } 
-    aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
+    // aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
 
   }
  
