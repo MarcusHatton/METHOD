@@ -136,23 +136,23 @@ void Hybrid::setupDEIFY(FluxMethod * fluxMethod)
   }
 }
 
-// double Hybrid::idealWeight(double * cons, double * prims, double * aux)
-// {
-//   // Penalty function for a given cell
-//   return data->tauFunc(cons, prims, aux) < tauCrossOver-tauSpan ? 1 :
-//          data->tauFunc(cons, prims, aux) < tauCrossOver+tauSpan?
-//         (tauCrossOver - tanh((data->tauFunc(cons, prims, aux)) / (tauSpan/3))+1)/2 :
-//         0;
-// }
+double Hybrid::idealWeight(double * cons, double * prims, double * aux)
+{
+  // Penalty function for a given cell
+  return data->tauFunc(cons, prims, aux) < tauCrossOver-tauSpan ? 1 :
+         data->tauFunc(cons, prims, aux) < tauCrossOver+tauSpan?
+        (tauCrossOver - tanh((data->tauFunc(cons, prims, aux)) / (tauSpan/3))+1)/2 :
+        0;
+}
 
-// double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i, int j, int k)
-// {
-//   // Penalty function for a given cell, given global cons prims and aux
-//   return data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver-tauSpan ? 1 :
-//          data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver+tauSpan?
-//          (tanh((tauCrossOver - data->tauFunc(cons, prims, aux, i, j, k)) / (tauSpan/3))+1)/2 :
-//          0;
-// }
+double Hybrid::idealWeightID(double * cons, double * prims, double * aux, int i, int j, int k)
+{
+  // Penalty function for a given cell, given global cons prims and aux
+  return data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver-tauSpan ? 1 :
+         data->tauFunc(cons, prims, aux, i, j, k) < tauCrossOver+tauSpan?
+         (tanh((tauCrossOver - data->tauFunc(cons, prims, aux, i, j, k)) / (tauSpan/3))+1)/2 :
+         0;
+}
 
 bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
