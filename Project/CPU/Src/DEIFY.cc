@@ -43,7 +43,7 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
   // Syntax
   Data * d(this->data);
 
-  printf("DEIFY Called");
+  // printf("DEIFY Called");
 
   // Set vars - dissipative NS forms
   this->set_vars(cons, prims, aux);

@@ -364,6 +364,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
           for (int k(0); k < d->Nz; k++) {
             double iW = idealWeightID(icons, iprims, iaux, i, j, k);
             source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
+            printf("DEIFY size %g",source[ID(var, i, j, k)]);
             // source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * mask[ID(0, i, j, k)]; // remove weight (?) (and mask?)
           }
         }
