@@ -420,6 +420,7 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
   singlePrims = (double *) malloc(sizeof(double) * d->Nprims);
   singleAux = (double *) malloc(sizeof(double) * d->Naux);
 
+  dissipativeModel->calcNSvars(cons, prims, aux);
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
