@@ -158,9 +158,9 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 {
   // Should we use the Dissipative (IS) C2P?
   if (data->tauFunc(cons, prims, aux) > tauCrossOver - tauSpan) {
-      printf("IS");
+      printf("IS  ");
   } else { 
-      printf("ISCE");
+      printf("ISCE  ");
   }
 
   return data->tauFunc(cons, prims, aux) > tauCrossOver;
