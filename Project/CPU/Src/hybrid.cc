@@ -160,7 +160,7 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
   if (data->tauFunc(cons, prims, aux) > tauCrossOver - tauSpan) {
       printf("IS  ");
   } else { 
-      printf("ISCE  ");
+      // printf("ISCE  ");
   }
 
   return data->tauFunc(cons, prims, aux) > tauCrossOver;
@@ -363,8 +363,8 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
         for (int j(0); j < d->Ny; j++) {
           for (int k(0); k < d->Nz; k++) {
             double iW = idealWeightID(icons, iprims, iaux, i, j, k);
-            // source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
-            source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * mask[ID(0, i, j, k)]; // remove weight (?) (and mask?)
+            source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * iW * mask[ID(0, i, j, k)];
+            // source[ID(var, i, j, k)] += deifySource[ID(var, i, j, k)] * mask[ID(0, i, j, k)]; // remove weight (?) (and mask?)
           }
         }
       }
@@ -548,7 +548,7 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
             && d->tauFunc(icons, iprims, iaux, i, j, k) < tauCrossOver+tauSpan)
         {
           // Can we compute all of the terms too? I.e. and neighbours' terms be calculated
-          int nn_req {2}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
+          int nn_req {1}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
           for (int l(-nn_req); l < nn_req; l++) {
             for (int m(-nn_req); m < nn_req; m++) {
               for (int n(-nn_req); n < nn_req; n++) {
