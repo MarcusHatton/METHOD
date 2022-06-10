@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(0.4);
+  double endTime(2.0);
   double cfl(0.1);
   // double cp(1.0);
   // int frameSkip(40);
