@@ -168,7 +168,6 @@ bool Hybrid::useDissipative(double * cons, double * prims, double * aux)
 
 void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
 {
-
   // Set the ideal cons prims and aux from the dissipative versions (single cell)
   for(int ncon(0); ncon < 5; ncon++) {
     sicons[ncon] = dcons[ncon];
@@ -198,9 +197,21 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
-        for(int ncon(0); ncon < 5; ncon++) {
-          icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)];
-        } 
+        // for(int ncon(0); ncon < 5; ncon++) {
+        //   icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)]; 
+        // } 
+        // No...
+
+        icons[ID(Cons::D, i, j, k)] = dcons[ID(Cons::D, i, j, k)];
+        icons[ID(Cons::S1, i, j, k)] = dcons[ID(Cons::S1, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v1, i, j, k)]*daux[ID(Aux::W, i, j, k)]**2 
+                              - (dprims[ID(Prims::q1, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v1, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi01, i, j, k)];
+        icons[ID(Cons::S2, i, j, k)] = dcons[ID(Cons::S2, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v2, i, j, k)]*daux[ID(W, i, j, k)]**2 
+                              - (dprims[ID(Prims::q2, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v2, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi02, i, j, k)];
+        icons[ID(Cons::S3, i, j, k)] = dcons[ID(Cons::S3, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v3, i, j, k)]*daux[ID(W, i, j, k)]**2 
+                              - (dprims[ID(Prims::q3, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v3, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi03, i, j, k)];                                                            
+        icons[ID(Cons::Tau, i, j, k)] = dcons[ID(Cons::Tau, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*(daux[ID(Aux::W, i, j, k)]**2 - 1) 
+                              - 2*daux[ID(Aux::qv, i, j, k)]*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi00, i, j, k)]
+
         // icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
         // icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
         // icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];

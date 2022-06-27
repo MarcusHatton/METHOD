@@ -165,9 +165,6 @@ double Data::tauFunc(double * cons, double * prims, double * aux, int i, int j, 
     }
     else {
       // return tau * aux[IDn(PiNS, i, j, k)];
-      // if (aux[IDn(13, i, j, k)] != 0.0)
-      //   printf("PiNS: %g \t", aux[IDn(13, i, j, k)]);
-      // std::cout << aux[IDn(13, i, j, k)] << std::endl;
       return aux[IDn(13, i, j, k)]; // PiNS
     }
   }
