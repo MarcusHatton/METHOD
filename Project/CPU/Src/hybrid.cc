@@ -201,7 +201,7 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
         //   icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)]; 
         // } 
         // No...
-
+        // Do it like this or directly from the prims?
         icons[ID(Cons::D, i, j, k)] = dcons[ID(Cons::D, i, j, k)];
         icons[ID(Cons::S1, i, j, k)] = dcons[ID(Cons::S1, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v1, i, j, k)]*daux[ID(Aux::W, i, j, k)]**2 
                               - (dprims[ID(Prims::q1, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v1, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi01, i, j, k)];
@@ -224,6 +224,7 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
           iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
         }
         iaux[ID(30, i, j, k)] = daux[ID(20, i, j, k)]; iaux[ID(31, i, j, k)] = daux[ID(27, i, j, k)];
+        iaux[ID(32, i, j, k)] = daux[ID(24, i, j, k)]; iaux[ID(33, i, j, k)] = daux[ID(25, i, j, k)]; iaux[ID(34, i, j, k)] = daux[ID(26, i, j, k)];
       }
     }
   }
@@ -267,7 +268,6 @@ void Hybrid::fluxVector(double *cons, double *prims, double *aux, double *f, con
       }
     }
   }
-
 
   // Add dissipative (IS) contribution to hybrid->f (next 10, dissipation fluxes)
   for (int var(idealModel->Ncons); var < dissipativeModel->Ncons; var++) {
@@ -365,7 +365,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
 
     // Set the DEIFY mask
     setMasks(cons, prims, aux);
-    // Calculate the REGIEME source
+    // Calculate the DEIFY source
     subgridModel->sourceExtension(icons, iprims, iaux, deifySource);
 
     // Add DEIFY contribution
@@ -407,6 +407,8 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     for(int nprim(0); nprim < 6; nprim++) {
       prims[nprim] = siprims[nprim];
     } 
+    // Do some funny copying of ISCE NS vars values' to IS? (e.g. PiNS(ISCE)->Pi(IS))
+
     // And convert from ideal to dissipative prims and aux
     // prims[0] = siprims[0]; prims[1] = siprims[1]; prims[2] = siprims[2];
     // prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
@@ -416,7 +418,7 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
       aux[naux] = siaux[naux];
     } 
     aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
-
+    aux[24] = siaux[32]; aux[25] = siaux[33]; aux[26] = siaux[34]; // a1,a2,a3
   }
  
 }
@@ -560,7 +562,7 @@ void Hybrid::setMasks(double * cons, double * prims, double * aux)
             && d->tauFunc(icons, iprims, iaux, i, j, k) < tauCrossOver+tauSpan)
         {
           // Can we compute all of the terms too? I.e. and neighbours' terms be calculated
-          int nn_req {2}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
+          int nn_req {1}; // MOVE THIS SOMEWHERE BETTER - also, value? = order of derivs used in DEIFY?
           for (int l(-nn_req); l < nn_req; l++) {
             for (int m(-nn_req); m < nn_req; m++) {
               for (int n(-nn_req); n < nn_req; n++) {
