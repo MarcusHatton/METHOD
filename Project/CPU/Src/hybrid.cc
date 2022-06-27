@@ -204,13 +204,13 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
         // Do it like this or directly from the prims?
         icons[ID(Cons::D, i, j, k)] = dcons[ID(Cons::D, i, j, k)];
         icons[ID(Cons::S1, i, j, k)] = dcons[ID(Cons::S1, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v1, i, j, k)]*daux[ID(Aux::W, i, j, k)]*daux[ID(Aux::W, i, j, k)] 
-                              - (dprims[ID(Prims::q1, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v1, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi01, i, j, k)];
+                              - (dprims[ID(Prims::q1, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v1, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi01, i, j, k)];
         icons[ID(Cons::S2, i, j, k)] = dcons[ID(Cons::S2, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v2, i, j, k)]*daux[ID(W, i, j, k)]*daux[ID(Aux::W, i, j, k)]
-                              - (dprims[ID(Prims::q2, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v2, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi02, i, j, k)];
+                              - (dprims[ID(Prims::q2, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v2, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi02, i, j, k)];
         icons[ID(Cons::S3, i, j, k)] = dcons[ID(Cons::S3, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v3, i, j, k)]*daux[ID(W, i, j, k)]*daux[ID(Aux::W, i, j, k)]
-                              - (dprims[ID(Prims::q3, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v3, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi03, i, j, k)];                                                            
+                              - (dprims[ID(Prims::q3, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v3, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi03, i, j, k)];                                                            
         icons[ID(Cons::Tau, i, j, k)] = dcons[ID(Cons::Tau, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*(daux[ID(Aux::W, i, j, k)]*daux[ID(Aux::W, i, j, k)] - 1) 
-                              - 2*daux[ID(Aux::qv, i, j, k)]*daux[ID(Aux::W, i, j, k)] - dprims[ID(Prims::pi00, i, j, k)]
+                              - 2*daux[ID(Aux::qv, i, j, k)]*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi00, i, j, k)];
 
         // icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
         // icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
