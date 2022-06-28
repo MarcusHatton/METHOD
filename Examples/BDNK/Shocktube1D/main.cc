@@ -2,7 +2,7 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "IS.h"
+#include "BDNK.h"
 #include "boundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
