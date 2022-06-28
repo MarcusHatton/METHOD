@@ -1,7 +1,7 @@
 #ifndef RKSPLIT2ndORDER_H
 #define RKSPLIT2ndORDER_H
 #include "RK2.h"
-#include "hybrid.h"
+// #include "hybrid.h"
 
 
 //! <b> Operator splitting RK2 integrator, second order accurate in time </b>
