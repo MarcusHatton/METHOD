@@ -54,7 +54,7 @@ class BDNK : public Model
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    BDNK(Data * data, bool alternative_C2P);
+    BDNK(Data * data, alt_C2P=false);
 
     virtual ~BDNK();     //!< Destructor
 

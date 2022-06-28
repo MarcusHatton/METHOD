@@ -17,7 +17,7 @@ BDNK::BDNK() : Model()
   this->Naux = 39;
 }
 
-BDNK::BDNK(Data * data, bool alt_C2P=false) : Model(data)
+BDNK::BDNK(Data * data, alt_C2Ps=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 6;
@@ -30,10 +30,10 @@ BDNK::BDNK(Data * data, bool alt_C2P=false) : Model(data)
   // the 7 here is for the 7 time-deriv variables currently needed... should be automated really not hard-set
   prev_vars = (double *) malloc(sizeof(double)*7*data->Nx*data->Ny*data->Nz); 
 
-  smartGuesses = 0;
-  
   alternative_C2P = alt_C2P;
   
+  smartGuesses = 0;
+    
   // 0  
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
@@ -479,19 +479,10 @@ void BDNK::getPrimitiveVars(double *cons, double *prims, double *aux)
   double wa4[n];                     // Work array
   */
 
-  // std::cout << d->is << "\t" << d->ie << "\t" << d->js << "\t" << d->je << std::endl;
-
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
-
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
       for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
 
-  // for (int i(d->is-1); i < d->ie+1; i++) {
-  //   for (int j(d->js-1); j < d->je+1; j++) {
-  //     for (int k(d->ks-1); k < d->ke+1; k++) {
 
         aux[ID(Aux::W, i, j, k)] = 1 / sqrt( 1 - (prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
           + prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
@@ -514,11 +505,6 @@ void BDNK::getPrimitiveVars(double *cons, double *prims, double *aux)
         sol[1] = (aux[ID(Aux::q1, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi01, i, j, k)];
         sol[2] = (aux[ID(Aux::q2, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi02, i, j, k)];
         sol[3] = (aux[ID(Aux::q3, i, j, k)] + aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)] + aux[ID(Aux::pi03, i, j, k)];
-
-        // if (i==3 && j ==0 && k==0)
-        //   std::cout << cons[ID(Cons::S1, i, j, k)] << "\t" << prims[ID(Prims::rho, i, j, k)] << "\t" << prims[ID(Prims::p, i, j, k)] << "\t" 
-        //   << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::q1, i, j, k)] << "\t" << aux[ID(Aux::qv, i, j, k)] << 
-        //  "\t" <<  prims[ID(Prims::v1, i, j, k)] << "\t" << aux[ID(Aux::pi01, i, j, k)] << "\t" << aux[ID(Aux::W, i, j, k)] << std::endl;
 
         // Set additional args for rootfind
         args.D_rf = cons[ID(Cons::D, i, j, k)];
@@ -585,17 +571,9 @@ void BDNK::getPrimitiveVars(double *cons, double *prims, double *aux)
     } // End j-loop
   } // End i-loop
   
-  // for (int i(d->is-1); i < d->ie+1; i++) {
-  //   for (int j(d->js-1); j < d->je+1; j++) {
-  //     for (int k(d->ks-1); k < d->ke+1; k++) {
-
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
       for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
-
-  // for (int i(d->is); i < d->ie; i++) {
-  //   for (int j(d->js); j < d->je; j++) {
-  //     for (int k(d->ks); k < d->ke; k++) {
 
         // C2P Scheme as outlined in HP/FYR
         aux[ID(Aux::vsqrd, i, j, k)] = ((cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)])*(cons[ID(Cons::S1, i, j, k)] - solution[ID(1, i, j, k)]) 
@@ -707,9 +685,6 @@ void BDNK::getPrimitiveVars(double *cons, double *prims, double *aux)
           (prims[ID(Prims::p, i, j, k)] + prims[ID(Prims::rho, i, j, k)])*aux[ID(Aux::Theta, i, j, k)]  );
 
           aux[ID(Aux::Pi, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)] + (tau_Pi/tau_epsilon)*aux[ID(Aux::A, i, j, k)];
-
-          // if (i==4 && j ==0 && k==0)
-          //   std::cout << zeta << "\t" << aux[ID(Aux::Pi, i, j, k)] << "\t" << aux[ID(Aux::A, i, j, k)] << "\t" << aux[ID(Aux::Theta, i, j, k)] << "\t" << std::endl;
 
           beta_n = -tau_q*(d->gamma - 1) - kappa*pow(aux[ID(Aux::T, i, j, k)],4)*(prims[ID(Prims::rho, i, j, k)] + prims[ID(Prims::p, i, j, k)]) 
             / (prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::p, i, j, k)]);
@@ -874,10 +849,6 @@ void BDNK::primsToAll(double *cons, double *prims, double *aux)
   double beta_n;  
 
   // Addition BDNK variables
-
-  // for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
-  //   for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
-  //     for (int k(d->ks_minus.at(0)); k < d->ke_plus.at(0); k++) {
 
   double dxrho;
   double dyrho;
