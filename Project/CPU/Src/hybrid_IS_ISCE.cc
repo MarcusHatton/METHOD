@@ -184,8 +184,8 @@ void Hybrid::setIdealCPAs(double * dcons, double * dprims, double * daux)
   for(int naux(0); naux < 20; naux++) {
     siaux[naux] = daux[naux];
   }
-  siaux[30] = daux[20]; siaux[31] = daux[27]; // Copy theta and vsqrd... more needed!?
-
+  siaux[30] = daux[20]; siaux[31] = daux[27];
+  siaux[32] = daux[24];  siaux[33] = daux[25];  siaux[34] = daux[26];
 }
 
 void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
@@ -197,29 +197,22 @@ void Hybrid::setIdealCPAsAll(double * dcons, double * dprims, double * daux)
   for (int i(0); i < data->Nx; i++) {
     for (int j(0); j < data->Ny; j++) {
       for (int k(0); k < data->Nz; k++) {
-        // for(int ncon(0); ncon < 5; ncon++) {
-        //   icons[ID(ncon, i, j, k)] = dcons[ID(ncon, i, j, k)]; 
-        // } 
-        // No...
+
         // Do it like this or directly from the prims?
         icons[ID(Cons::D, i, j, k)] = dcons[ID(Cons::D, i, j, k)];
         icons[ID(Cons::S1, i, j, k)] = dcons[ID(Cons::S1, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v1, i, j, k)]*daux[ID(Aux::W, i, j, k)]*daux[ID(Aux::W, i, j, k)] 
                               - (dprims[ID(Prims::q1, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v1, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi01, i, j, k)];
-        icons[ID(Cons::S2, i, j, k)] = dcons[ID(Cons::S2, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v2, i, j, k)]*daux[ID(W, i, j, k)]*daux[ID(Aux::W, i, j, k)]
+        icons[ID(Cons::S2, i, j, k)] = dcons[ID(Cons::S2, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v2, i, j, k)]*daux[ID(Aux::W, i, j, k)]*daux[ID(Aux::W, i, j, k)]
                               - (dprims[ID(Prims::q2, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v2, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi02, i, j, k)];
-        icons[ID(Cons::S3, i, j, k)] = dcons[ID(Cons::S3, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v3, i, j, k)]*daux[ID(W, i, j, k)]*daux[ID(Aux::W, i, j, k)]
+        icons[ID(Cons::S3, i, j, k)] = dcons[ID(Cons::S3, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*dprims[ID(Prims::v3, i, j, k)]*daux[ID(Aux::W, i, j, k)]*daux[ID(Aux::W, i, j, k)]
                               - (dprims[ID(Prims::q3, i, j, k)] + daux[ID(Aux::qv, i, j, k)]*dprims[ID(Prims::v3, i, j, k)])*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi03, i, j, k)];                                                            
         icons[ID(Cons::Tau, i, j, k)] = dcons[ID(Cons::Tau, i, j, k)] - dprims[ID(Prims::Pi, i, j, k)]*(daux[ID(Aux::W, i, j, k)]*daux[ID(Aux::W, i, j, k)] - 1) 
                               - 2*daux[ID(Aux::qv, i, j, k)]*daux[ID(Aux::W, i, j, k)] - dprims[ID(Aux::pi00, i, j, k)];
 
-        // icons[ID(0, i, j, k)] = dcons[ID(0, i, j, k)]; icons[ID(1, i, j, k)] = dcons[ID(1, i, j, k)]; icons[ID(2, i, j, k)] = dcons[ID(2, i, j, k)]; icons[ID(3, i, j, k)] = dcons[ID(3, i, j, k)];
-        // icons[ID(4, i, j, k)] = dcons[ID(4, i, j, k)]; icons[ID(5, i, j, k)] = dcons[ID(5, i, j, k)]; icons[ID(6, i, j, k)] = dcons[ID(6, i, j, k)]; icons[ID(7, i, j, k)] = dcons[ID(7, i, j, k)];
-        // icons[ID(8, i, j, k)] = dcons[ID(12, i, j, k)];
         for(int nprim(0); nprim < 16; nprim++) {
           iprims[ID(nprim, i, j, k)] = dprims[ID(nprim, i, j, k)];
         } 
-        // iprims[ID(0, i, j, k)] = dprims[ID(0, i, j, k)]; iprims[ID(1, i, j, k)] = dprims[ID(1, i, j, k)]; iprims[ID(2, i, j, k)] = dprims[ID(2, i, j, k)]; iprims[ID(3, i, j, k)] = dprims[ID(3, i, j, k)];
-        // iprims[ID(4, i, j, k)] = dprims[ID(4, i, j, k)]; iprims[ID(5, i, j, k)] = dprims[ID(5, i, j, k)]; iprims[ID(6, i, j, k)] = dprims[ID(6, i, j, k)]; iprims[ID(7, i, j, k)] = dprims[ID(7, i, j, k)];
+
         for(int naux(0); naux < 20; naux++) {
           iaux[ID(naux, i, j, k)] = daux[ID(naux, i, j, k)];
         }
@@ -300,18 +293,6 @@ void Hybrid::sourceTermSingleCell(double *cons, double *prims, double *aux, doub
     source[var] = dsource[var];
   }
 
-  // Do ISCE source for fluid part - doesn't have one ...
-  // for (int var(0); var < 5; var++) {
-  //   source[var] = iW*isource[var];
-  // }
-
-  // // Add ideal contribution
-  // for (int var(0); var < 8; var++) {
-  //   source[var] = iW*isource[var] + (1-iW)*dsource[var];
-  // }
-  // // Add dissipative contribution
-  // for (int var(8); var < dissipativeModel->Ncons; var++)
-  //   source[var] = (1-iW)*dsource[var];
 }
 
 void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source)
@@ -409,16 +390,11 @@ void Hybrid::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux
     } 
     // Do some funny copying of ISCE NS vars values' to IS? (e.g. PiNS(ISCE)->Pi(IS))
 
-    // And convert from ideal to dissipative prims and aux
-    // prims[0] = siprims[0]; prims[1] = siprims[1]; prims[2] = siprims[2];
-    // prims[3] = siprims[3]; prims[4] = siprims[4]; prims[5] = siprims[5];
-    // prims[6] = siprims[6]; prims[7] = siprims[7];
-
-    for(int naux(0); naux < 20; naux++) {
-      aux[naux] = siaux[naux];
-    } 
-    aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
-    aux[24] = siaux[32]; aux[25] = siaux[33]; aux[26] = siaux[34]; // a1,a2,a3
+    // for(int naux(0); naux < 20; naux++) {
+    //   aux[naux] = siaux[naux];
+    // } 
+    // aux[20] = siaux[30]; aux[27] = siaux[31]; // Copy theta and vsqrd... more needed!?
+    // aux[24] = siaux[32]; aux[25] = siaux[33]; aux[26] = siaux[34]; // a1,a2,a3
   }
  
 }
@@ -452,9 +428,6 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
         for (int var(0); var < d->Naux; var++) {
           singleAux[var] = aux[ID(var, i, j, k)];
         }
-
-        // singlePrims[5] = singleCons[5]; singlePrims[6] = singleCons[6]; singlePrims[7] = singleCons[7];
-        // singlePrims[8] = singleCons[8]; singlePrims[9] = singleCons[9]; singlePrims[10] = singleCons[10];
 
         this->getPrimitiveVarsSingleCell(singleCons, singlePrims, singleAux, i, j, k);
 
