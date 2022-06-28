@@ -404,7 +404,7 @@ void BDNK::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
   
   } else {
   
-    sol[0] = prims[Prims::p] + aux[Aux::Pi] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
+    sol[0] = prims[Prims::p] + aux[Aux::Pi] + aux[Aux::A] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
     sol[1] = (aux[Aux::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
     sol[2] = (aux[Aux::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
     sol[3] = (aux[Aux::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
