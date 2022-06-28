@@ -27,7 +27,7 @@ Hybrid::Hybrid(Data * data, double tauCrossOver, double tauSpan, bool useDEIFY) 
   // prims and aux are the same as SRRMHD. This model contains pointers to both
   // SRMHD and SRRMHD models, and REGIME if requested.
 
-  dissipativeModel = new BDNK(data);
+  dissipativeModel = new BDNK(data, false);
   idealModel = new ISCE(data);
 
   this->Ncons = (this->data)->Ncons = 5;
