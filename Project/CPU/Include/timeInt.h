@@ -6,7 +6,8 @@
 #include "boundaryConds.h"
 #include "flux.h"
 #include "modelExtension.h"
-#include "hybrid.h"
+#include "hybrid_IS_ISCE.h"
+#include "hybrid_BDNK_ISCE.h"
 
 //! <b> Abstract base class for time integrator </b>
 /*!
