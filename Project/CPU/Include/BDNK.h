@@ -15,7 +15,7 @@ T pow(T x, int N) {
 /*
 This is the human readable description of this models variables.
 
-  IS has 15 conserved variables:
+  BDNK has 15 conserved variables:
     D, Sx, Sy, Sz, tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33
   16 primitive variables:
     v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
@@ -25,7 +25,7 @@ This is the human readable description of this models variables.
     dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p 
 */
 
-class IS : public Model
+class BDNK : public Model
 {
 
   public:
@@ -47,16 +47,16 @@ class IS : public Model
     
     bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
 
-    IS();     //!< Default constructor
+    BDNK();     //!< Default constructor
 
     //! Parameterized constructor
     /*!
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    IS(Data * data, bool alternative_C2P);
+    BDNK(Data * data, bool alternative_C2P);
 
-    virtual ~IS();     //!< Destructor
+    virtual ~BDNK();     //!< Destructor
 
 
     //! Single cell source term contribution
@@ -229,10 +229,10 @@ class IS : public Model
 
     };
 
-    //! <b> Additional arguments for the IS residual function </b>
+    //! <b> Additional arguments for the BDNK residual function </b>
     /*!
       @par
-        The conservative to primitive transformation for the IS class requires an
+        The conservative to primitive transformation for the BDNK class requires an
       N=2 dimensional nonlinear rootfind and thus requires the multi-dimensional Newton-
       Secant solver of the Cminpack library, i.e. the function @e hybrd1. This function
       can take additional arguments in the form of a void pointer to some data object,
@@ -288,14 +288,14 @@ class IS : public Model
 //! <b> Residual function for spectral analysis </b>
 /*!
   @par
-    IS requires N=4 rootfind, therefore need to implement the hybrd cminpack
+    BDNK requires N=4 rootfind, therefore need to implement the hybrd cminpack
   multiD Newton solver. Things may get ugly.
   @par
     Cant do anything about the arguments of this function, cminpack demands you
   not enjoy anything it offers...
 
   @param *p void pointer to the additional arguments struct, Args
-  @param n size of system (n=2 for IS)
+  @param n size of system (n=2 for BDNK)
   @param *x pointer to array containing initial estimate of solution, will also hold solution
   @param *fvec pointer to array to hold residual values. These should be 0 +- tol
   @param iflag Cminpack error flag

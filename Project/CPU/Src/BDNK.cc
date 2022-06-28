@@ -10,14 +10,14 @@
 template<typename T>
 T sqr(T x) { return ((x) * (x)); }
 
-IS::IS() : Model()
+BDNK::BDNK() : Model()
 {
   this->Ncons = 5;
   this->Nprims = 6;
   this->Naux = 39;
 }
 
-IS::IS(Data * data, bool alt_C2P=false) : Model(data)
+BDNK::BDNK(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 6;
@@ -81,7 +81,7 @@ IS::IS(Data * data, bool alt_C2P=false) : Model(data)
   // 39
 }
 
-IS::~IS()
+BDNK::~BDNK()
 {
   free(solution);
 }
@@ -111,7 +111,7 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
 
 
 
-void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
+void BDNK::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
   // D
   source[0] = 0.0;
@@ -123,7 +123,7 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
   source[4] = 0.0;
 }
 
-void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
+void BDNK::sourceTerm(double *cons, double *prims, double *aux, double *source)
 {
   // Syntax
   Data * d(this->data);
@@ -223,13 +223,13 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
     iflag : int
       Error flag
 */
-int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
+int BDNKresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 {
 
 //  Data * d(this->data);
   
   // Retrieve additional arguments
-  IS::Args * args = (IS::Args*) ptr;
+  BDNK::Args * args = (BDNK::Args*) ptr;
 
   // Values must make sense
   // Think this should be taken out for now - need new sensible values
@@ -272,13 +272,13 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   return 0;
 }
 
-int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
+int BDNKAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int iflag)
 {
 
 //  Data * d(this->data);
   
   // Retrieve additional arguments
-  IS::Args * args = (IS::Args*) ptr;
+  BDNK::Args * args = (BDNK::Args*) ptr;
 
   // Values must make sense
   // Think this should be taken out for now - need new sensible values
@@ -323,7 +323,7 @@ int ISAlternativeResidual(void *ptr, int n, const double *x, double *fvec, int i
 
 
 
-void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
+void BDNK::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
 
   Data * d(this->data);
@@ -374,7 +374,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
     sol[3] = (aux[Aux::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
   
     // Solve residual = 0
-    info = __cminpack_func__(hybrd1) (&ISAlternativeResidual, &args, sys_size, sol, res,
+    info = __cminpack_func__(hybrd1) (&BDNKAlternativeResidual, &args, sys_size, sol, res,
                                       tol, wa, lwa);
     // If root find fails, add failed cell to the list
     if (info!=1) {
@@ -410,7 +410,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
     sol[3] = (aux[Aux::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
   
     // Solve residual = 0
-    info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
+    info = __cminpack_func__(hybrd1) (&BDNKresidual, &args, sys_size, sol, res,
                                       tol, wa, lwa);
     // If root find fails, add failed cell to the list
     if (info!=1) {
@@ -442,7 +442,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
    
 }
 
-void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
+void BDNK::getPrimitiveVars(double *cons, double *prims, double *aux)
 {
   // Syntax
   Data * d(this->data);
@@ -540,9 +540,9 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
         args.gamma = d->gamma;
  
         // Solve residual = 0
-        info = __cminpack_func__(hybrd1) (&ISresidual, &args, sys_size, sol, res,
+        info = __cminpack_func__(hybrd1) (&BDNKresidual, &args, sys_size, sol, res,
                                           tol, wa, lwa);
-//        info = __cminpack_func__(hybrd) (&ISresidual, &args, sys_size, sol, res,
+//        info = __cminpack_func__(hybrd) (&BDNKresidual, &args, sys_size, sol, res,
 //                                          tol, maxfev, ml, mu, epsfcn, &diag[0], mode, factor, nprint, &nfev, &fjac[0][0], ldfjac, &r[0], lr, &qtf[0], &wa1[0], &wa2[0], &wa3[0], &wa4[0]);        
 
                                                                    
@@ -826,7 +826,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
 
 }
 
-void IS::primsToAll(double *cons, double *prims, double *aux)
+void BDNK::primsToAll(double *cons, double *prims, double *aux)
 {
   // Syntax
   Data * d(this->data);
@@ -1095,7 +1095,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
 
 }
 
-void IS::fluxVector(double *cons, double *prims, double *aux, double *f, const int dir)
+void BDNK::fluxVector(double *cons, double *prims, double *aux, double *f, const int dir)
 {
   // Syntax
   Data * d(this->data);
