@@ -3,7 +3,7 @@
 
 #include "model.h"
 #include "srrmhd.h"
-#include "IS.h"
+#include "BDNK.h"
 #include "srmhd.h"
 #include "REGIME.h"
 #include "flux.h"
