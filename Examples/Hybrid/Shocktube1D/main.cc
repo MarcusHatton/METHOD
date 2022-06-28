@@ -32,16 +32,16 @@ int main(int argc, char *argv[]) {
 
   // Set up domain
   int Ng(4);
-  int nx(400);
+  int nx(3200);
   int ny(0);
   int nz(0);
   double xmin(0.0);
-  double xmax(5.0);
+  double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(2.0);
+  double endTime(0.4);
   double cfl(0.1);
   // double cp(1.0);
   // int frameSkip(40);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.sfunctionalTau(functionalTau);
   data_args.sTau(tau);
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-4, 1.0e-1,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-15, 1.0e-1,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
   // SerialSaveData save(&data, &env, 1);
-  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/data_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/ideal/data_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/bulk/data_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/ideal/data_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

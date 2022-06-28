@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(50);
+  int nreports(10);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, false);
+  IS model(&data);
 
   Weno3 weno(&data);
 
