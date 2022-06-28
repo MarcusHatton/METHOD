@@ -329,7 +329,7 @@ void Hybrid::sourceTerm(double *cons, double *prims, double *aux, double *source
   // Syntax
   Data * d(this->data);
 
-  dissipativeModel->calcNSvars(cons, prims, aux);
+  idealModel->calcNSvars(cons, prims, aux);
 
   // Work arrays
   double * singleCons;
@@ -446,7 +446,7 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
   singlePrims = (double *) malloc(sizeof(double) * d->Nprims);
   singleAux = (double *) malloc(sizeof(double) * d->Naux);
 
-  dissipativeModel->calcNSvars(cons, prims, aux);
+  idealModel->calcNSvars(cons, prims, aux);
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -480,7 +480,7 @@ void Hybrid::getPrimitiveVars(double *cons, double *prims, double *aux)
     }
   }
 
-  dissipativeModel->calcNSvars(cons, prims, aux);
+  idealModel->calcNSvars(cons, prims, aux);
 
   // Free up
   free(singleCons);

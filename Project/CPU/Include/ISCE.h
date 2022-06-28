@@ -189,6 +189,8 @@ class ISCE : public Model
     */
     void fluxVector(double *cons, double *prims, double *aux, double *f, const int dir);
 
+    void calcNSvars(double *cons, double *prims, double *aux);
+
     //! Finalise the simulation variables
     /*!
       @par
