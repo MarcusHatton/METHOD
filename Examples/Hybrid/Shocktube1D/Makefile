@@ -42,7 +42,7 @@ SRCS = simulation.cc 					\
 			 serialSaveData.cc 			\
 			 DEIFY.cc						 	\
 			 fluxVectorSplitting.cc \
-			 hybrid.cc
+			 hybrid_IS_ISCE.cc
 
 SERIAL_SRCS = serialSaveData.cc \
 			  serialEnv.cc
@@ -182,7 +182,7 @@ fluxVectorSplitting.o : $(MODULE_DIR)/fluxVectorSplitting.cc $(INC_DIR)/fluxVect
 DEIFY.o : $(MODULE_DIR)/DEIFY.cc $(INC_DIR)/DEIFY.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-hybrid.o : $(MODULE_DIR)/hybrid.cc $(INC_DIR)/hybrid.h $(INC_DIR)/srrmhd.h $(INC_DIR)/srmhd.h
+hybrid_IS_ISCE.o : $(MODULE_DIR)/hybrid_IS_ISCE.cc $(INC_DIR)/hybrid_IS_ISCE.h $(INC_DIR)/srrmhd.h $(INC_DIR)/srmhd.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
 serialEnv.o : $(MODULE_DIR)/serialEnv.cc $(INC_DIR)/serialEnv.h

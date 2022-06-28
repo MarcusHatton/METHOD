@@ -14,7 +14,7 @@
 #include "boundaryConds.h"
 #include "rkSplit2ndOrder.h"
 #include "fluxVectorSplitting.h"
-#include "hybrid.h"
+#include "hybrid_IS_ISCE.h"
 #include "serialSaveDataHDF5.h"
 #include "serialEnv.h"
 #include "weno.h"
