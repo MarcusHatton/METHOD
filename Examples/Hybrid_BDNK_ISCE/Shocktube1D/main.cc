@@ -64,9 +64,10 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.sfunctionalTau(functionalTau);
   data_args.sTau(tau);
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-15, 1.0e-1,  1.0e-15, 1.0e-1} };
-  const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
-  const int n_toy_params(6);
+  double eta_0 = 1.0e-15;
+  const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  5.0e-2, eta_0, (25/4)*eta_0} };
+  const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
+  const int n_toy_params(5);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
   Data data(data_args, &env);
 
