@@ -17,7 +17,7 @@ BDNK::BDNK() : Model()
   this->Naux = 39;
 }
 
-BDNK::BDNK(Data * data, bool alt_C2P=false) : Model(data)
+BDNK::BDNK(Data * data, bool alt_C2P) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 6;
