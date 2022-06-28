@@ -17,7 +17,7 @@ BDNK::BDNK() : Model()
   this->Naux = 39;
 }
 
-BDNK::BDNK(Data * data, alt_C2P=false) : Model(data)
+BDNK::BDNK(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 6;
@@ -30,7 +30,7 @@ BDNK::BDNK(Data * data, alt_C2P=false) : Model(data)
   // the 7 here is for the 7 time-deriv variables currently needed... should be automated really not hard-set
   prev_vars = (double *) malloc(sizeof(double)*7*data->Nx*data->Ny*data->Nz); 
 
-  alternative_C2P = alt_C2P;
+  bool alternative_C2P = alt_C2P;
   
   smartGuesses = 0;
     
