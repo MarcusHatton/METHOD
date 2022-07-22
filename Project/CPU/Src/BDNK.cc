@@ -264,7 +264,7 @@ int ISresidual(void *ptr, int n, const double *x, double *fvec, int iflag)
   double pi02_rf = args->pi12_rf*v1_rf + args->pi22_rf*v2_rf + args->pi23_rf*v3_rf;
   double pi03_rf = args->pi13_rf*v1_rf + args->pi23_rf*v2_rf + args->pi33_rf*v3_rf;
 
-  fvec[0] = p_rf + args->Pi_rf - 2*qv_rf*W_rf - pi00_rf - x[0];
+  fvec[0] = p_rf + args->Pi_rf + args->A_rf - 2*qv_rf*W_rf - pi00_rf - x[0];
   fvec[1] = (args->q1_rf + qv_rf*v1_rf)*W_rf + pi01_rf - x[1];
   fvec[2] = (args->q2_rf + qv_rf*v2_rf)*W_rf + pi02_rf - x[2];
   fvec[3] = (args->q3_rf + qv_rf*v3_rf)*W_rf + pi03_rf - x[3];
@@ -404,7 +404,7 @@ void IS::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, in
   
   } else {
   
-    sol[0] = prims[Prims::p] + aux[Aux::Pi] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
+    sol[0] = prims[Prims::p] + aux[Aux::Pi] + aux[Aux::A] - 2*aux[Aux::qv]*aux[Aux::W] - aux[Aux::pi00];
     sol[1] = (aux[Aux::q1] + aux[Aux::qv]*prims[Prims::v1])*aux[Aux::W] + aux[Aux::pi01];
     sol[2] = (aux[Aux::q2] + aux[Aux::qv]*prims[Prims::v2])*aux[Aux::W] + aux[Aux::pi02];
     sol[3] = (aux[Aux::q3] + aux[Aux::qv]*prims[Prims::v3])*aux[Aux::W] + aux[Aux::pi03];
