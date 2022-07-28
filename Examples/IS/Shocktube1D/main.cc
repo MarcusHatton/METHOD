@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
   // int nx(65536);
   // int nx(32768);
   int nx(100);
-  int ny(4);
-  int nz(4);
+  int ny(0);
+  int nz(0);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, true); // bool for alt_C2P
+  IS model(&data, false); // bool for alt_C2P
 
   Weno3 weno(&data);
 
