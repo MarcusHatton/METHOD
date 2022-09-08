@@ -26,12 +26,12 @@ int main(int argc, char *argv[]) {
   int nx(200);
   int ny(200);
   int nz(0);
-  double xmin(0.0);
-  double xmax(5.0);
-  double ymin(0.0);
-  double ymax(1.0);
+  double xmin(-3.0);
+  double xmax(3.0);
+  double ymin(-3.0);
+  double ymax(3.0);
   double zmin(0.0);
-  double zmax(1.0);
+  double zmax(0.0);
   double endTime(5.0);
   double cfl(0.4);
   // double gamma(0.001);
