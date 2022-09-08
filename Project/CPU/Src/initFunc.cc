@@ -1663,7 +1663,6 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
   
   double R = 0.5; // radius of circle
   double delta = 0.05;
-  double d;
   double theta; // angle from x-axis
   double D;
   double omega; // ang vel
@@ -1673,15 +1672,14 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
         r = sqrt(d->x[i]*d->x[i] + d->y[j]*d->y[j]);
-        d = R - r;
         theta = atan2(d->y[j],d->x[i]);
-        D = 0.5*(1+ tanh(d/delta));
-        if (r <= R && abs(d->y[j]) < 0.1) ) {
+        D = 0.5*(1+ tanh((R - r)/delta));
+        if (r <= R && abs(d->y[j]) < 0.1) {
           B = 0.1;
         } else {
           B = 0.0;
         }
-        
+
         d->prims[ID(0, i, j, k)] = -omega*r*sin(theta)*D; // v_x
         d->prims[ID(1, i, j, k)] = omega*r*cos(theta)*D; // v_y
         d->prims[ID(2, i, j, k)] = 0; // v_z
