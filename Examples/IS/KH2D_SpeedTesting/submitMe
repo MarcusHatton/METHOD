@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#SBATCH --ntasks-per-node=40
+#SBATCH --nodes=1
+#SBATCH --time=50:00:00          # walltime
+
+module purge
+module load hdf5/1.10.2/gcc/parallel
+
+mpirun -np 40 ./main
