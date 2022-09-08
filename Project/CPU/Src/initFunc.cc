@@ -1684,9 +1684,10 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
         d->prims[ID(0, i, j, k)] = -omega*r*sin(theta)*D; // v_x
         d->prims[ID(1, i, j, k)] = omega*r*cos(theta)*D; // v_y
         d->prims[ID(2, i, j, k)] = 0; // v_z
-        d->prims[ID(3, i, j, k)] = 0; // p = (gamma-1)(rho-n)
         d->prims[ID(4, i, j, k)] = 1; // rho
         d->prims[ID(5, i, j, k)] = 0.5*(1+D) + B; // n
+        d->prims[ID(3, i, j, k)] = (d->gamma - 1)*(d->prims[ID(4, i, j, k)] - d->prims[ID(5, i, j, k)]); // p = (gamma-1)(rho-n)
+
 
       }
     }
