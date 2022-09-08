@@ -1667,6 +1667,7 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
   double D;
   double omega; // ang vel
   double B;
+  double r;
 
   for (int i(0); i<d->Nx; i++) {
     for (int j(0); j<d->Ny; j++) {
@@ -1686,8 +1687,6 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
         d->prims[ID(3, i, j, k)] = 0; // p = (gamma-1)(rho-n)
         d->prims[ID(4, i, j, k)] = 1; // rho
         d->prims[ID(5, i, j, k)] = 0.5*(1+D) + B; // n
-
-        }
 
       }
     }
