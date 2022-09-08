@@ -559,4 +559,16 @@ class IS_BulkHeatTest : public InitialFunc
     virtual ~IS_BulkHeatTest() { }     //!< Destructor
 };
 
+class Rotor : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    Rotor(Data * data);
+
+    virtual ~Rotor() { }     //!< Destructor
+};
+
 #endif

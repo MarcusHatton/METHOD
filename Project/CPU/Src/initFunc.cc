@@ -1650,7 +1650,52 @@ IS_BulkHeatTest::IS_BulkHeatTest(Data * data) : InitialFunc(data)
 
 }
 
+Rotor::Rotor(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  if (d->xmin != -3.0 || d->xmax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  if (d->ymin != -3.0 || d->ymax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+  
+  double R = 0.5; // radius of circle
+  double delta = 0.05;
+  double d;
+  double theta; // angle from x-axis
+  double D;
+  double omega; // ang vel
+  double B;
 
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        r = sqrt(d->x[i]*d->x[i] + d->y[j]*d->y[j]);
+        d = R - r;
+        theta = atan2(d->y[j],d->x[i]);
+        D = 0.5*(1+ tanh(d/delta));
+        if (r <= R && abs(d->y[j]) < 0.1) ) {
+          B = 0.1;
+        } else {
+          B = 0.0;
+        }
+        
+        d->prims[ID(0, i, j, k)] = -omega*r*sin(theta)*D; // v_x
+        d->prims[ID(1, i, j, k)] = omega*r*cos(theta)*D; // v_y
+        d->prims[ID(2, i, j, k)] = 0; // v_z
+        d->prims[ID(3, i, j, k)] = 0; // p = (gamma-1)(rho-n)
+        d->prims[ID(4, i, j, k)] = 1; // rho
+        d->prims[ID(5, i, j, k)] = 0.5*(1+D) + B; // n
+
+        }
+
+      }
+    }
+  }
+
+}
 
 
 
