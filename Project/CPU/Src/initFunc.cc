@@ -1665,7 +1665,7 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
   double delta = 0.05;
   double theta; // angle from x-axis
   double D;
-  double omega; // ang vel
+  double omega = 1; // ang vel
   double B;
   double r;
 
