@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <cstdio>
 #include "ISCE.h"
-#include "cminpack.h"
+//#include "cminpack.h"
 #include "cudaErrorCheck.h"
 
 #define TOL 1.0e-12
@@ -25,13 +25,13 @@
 
 // C2P residual and rootfinder (Serial)
 static double residual(const double, const double, const double, const double, double);
-static int newton(double *Z, const double StildeSq, const double D, const double tauTilde, double gamma, int i, int j, int k);
+static int newton(double *Z, const double S_sqrd, const double D, const double Tau, double gamma, int i, int j, int k);
 
 // C2P residual and rootfinder (Parallel)
 __device__
-static double residualParallel(const double Z, const double StildeSq, const double D, const double tauTilde, double gamma);
+static double residualParallel(const double Z, const double StildeSq, const double D, const double Tau, double gamma);
 __device__
-static int newtonParallel(double *Z, const double StildeSq, const double D, const double tauTilde, double gamma);
+static int newtonParallel(double *Z, const double S_sqrd, const double D, const double Tau, double gamma);
 __global__
 static void getPrimitiveVarsParallel(double *cons, double *prims, double *aux, double *guess, int stream, double gamma, double sigma, int Ncons, int Nprims, int Naux, int origWidth, int streamWidth);
 
@@ -68,7 +68,7 @@ ISCE::ISCE(Data * data) : Model(data)
   modType_t = ModelType::ISCE;
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 59;
+  this->Naux = (this->data)->Naux = 61;
 
   // 0
   this->data->primsLabels.push_back("v1");   this->data->primsLabels.push_back("v2");
