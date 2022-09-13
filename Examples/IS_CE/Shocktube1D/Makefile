@@ -9,7 +9,7 @@ USE_MPI = 0
 USE_OMP = 0
 USE_HDF = 1
 
-PROJECT_TYPE = CPU
+PROJECT_TYPE = GPU
 
 # Module directory
 MODULE_DIR = ./../../../Project/${PROJECT_TYPE}/Src
