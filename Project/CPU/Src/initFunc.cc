@@ -1695,7 +1695,43 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
 
 }
 
+Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  // if (d->xmin != -3.0 || d->xmax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
+  // if (d->ymin != -3.0 || d->ymax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
+  //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
+  
+  double R = 3.0; // radius of star
+  double delta = 0.05; // transition rate at edge of star
+  double theta; // angle from x-axis
+  double weight;
+  double omega = 1; // ang vel
+  double B;
+  double r;
 
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        r = sqrt(d->x[i]*d->x[i] + d->y[j]*d->y[j] + d->z[k]*d->z[k]);
+        theta = atan2(d->y[j],d->x[i]);
+        weight = 0.5*(1+ tanh((R - r)/delta));
+
+        d->prims[ID(0, i, j, k)] = 0; // v_x
+        d->prims[ID(1, i, j, k)] = 0; // v_y
+        d->prims[ID(2, i, j, k)] = 0; // v_z
+        d->prims[ID(3, i, j, k)] = 10*weight; // p - constant throughout
+        d->prims[ID(5, i, j, k)] = (5 + 5*(r/R))*weight;// n goes from 
+        d->prims[ID(4, i, j, k)] = d->prims[ID(3, i, j, k)]/(d->gamma - 1) + d->prims[ID(5, i, j, k)]; // rho = p/(gamma-1) + n
+      }
+    }
+  }
+
+}
 
 
 

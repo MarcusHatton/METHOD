@@ -571,4 +571,16 @@ class Rotor : public InitialFunc
     virtual ~Rotor() { }     //!< Destructor
 };
 
+class Hot_Static_Star : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    Hot_Static_Star(Data * data);
+
+    virtual ~Hot_Static_Star() { }     //!< Destructor
+};
+
 #endif
