@@ -93,7 +93,10 @@ ISCE::ISCE(Data * data) : Model(data)
   this->data->auxLabels.push_back("q0");    this->data->auxLabels.push_back("qv");
   this->data->auxLabels.push_back("pi00");  this->data->auxLabels.push_back("pi01");
   this->data->auxLabels.push_back("pi02");  this->data->auxLabels.push_back("pi03");
-  this->data->auxLabels.push_back("Theta"); this->data->auxLabels.push_back("vsqrd");
+  this->data->auxLabels.push_back("Theta"); 
+  // 11
+  this->data->auxLabels.push_back("vsqrd"); this->data->auxLabels.push_back("rhohWsq");
+  this->data->auxLabels.push_back("S_sqrd");
   // 12
   this->data->auxLabels.push_back("q1NS");  this->data->auxLabels.push_back("q2NS");
   this->data->auxLabels.push_back("q3NS");
@@ -235,52 +238,34 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
 
 void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
-  // Syntax
-  Data * d(this->data);
+    // Sbarsq, tauBar
+    aux[Aux::S_sqrd] = cons[Cons::S1] * cons[Cons::S1] + cons[Cons::S2] * cons[Cons::S2] + cons[Cons::S3] * cons[Cons::S3];
+ 
+    // Solve
+    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], args->gamma);
 
-  // Hybrd1 set-up
-  Args args;                      // Additional arguments structure
-  const int sys_size(1);                     // Size of system
-  double sol[sys_size];                      // Guess and solution vector
-  double res[sys_size];                      // Residual/fvec vector
-  int info;                           // Rootfinder flag
-  const double tol = 1e-5;          // Tolerance of rootfinder
-  const int lwa = 8;                 // Length of work array = n * (3*n + 13) / 2
-  double wa[lwa];                     // Work array
+    double E = cons[Cons::Tau] + cons[Cons::D];
+    
+    // vsq
+    aux[Aux::vsqrd] = aux[Aux::S_sqrd] / ((E + prims[Prims::p]) * (E + prims[Prims::p]));
+    // W
+    aux[Aux::W] = 1.0 / sqrt(1 - aux[Aux::vsqrd]);
+    // rho
+    prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
+    // rho_plus_p
+    aux[Aux::rho_plus_p] = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    // p  
+    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    // rho
+    prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
+    // vx, vy, vz
+    prims[Prims::v1] = cons[Cons::S1] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S2] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S3] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
 
-  // Set additional args for rootfind
-  args.D_rf = cons[Cons::D];
-  args.S1_rf = cons[Cons::S1];
-  args.S2_rf = cons[Cons::S2];
-  args.S3_rf = cons[Cons::S3];
-  args.Tau_rf = cons[Cons::Tau];
-  args.gamma = d->gamma;
-  
-  sol[0] = prims[Prims::p]; // Guess the pressure
-
-  // Solve residual = 0
-  info = __cminpack_func__(hybrd1) (&ISCEresidual, &args, sys_size, sol, res,
-                                    tol, wa, lwa);
-  // If root find fails, add failed cell to the list
-  if (info!=1) {
-    //printf("C2P single cell failed for cell (%d, %d, %d), hybrd returns info=%d\n", i, j, k, info);
-    throw std::runtime_error("C2P could not converge.\n");
-  }
-  aux[Aux::vsqrd] = (cons[Cons::S1]*cons[Cons::S1] + cons[Cons::S2]*cons[Cons::S2] 
-                      + cons[Cons::S3]*cons[Cons::S3] - sol[3])
-                      /((cons[Cons::Tau] + cons[Cons::D] + sol[0])*(cons[Cons::Tau]  + cons[Cons::D] + sol[0]));
-  aux[Aux::W] = 1 / sqrt((1-aux[Aux::vsqrd]));
-  prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
-  double rho_plus_p = (cons[Cons::Tau] + cons[Cons::D] + sol[0])/(aux[Aux::W]*aux[Aux::W]);
-  prims[Prims::v1] = cons[Cons::S1]/(rho_plus_p*aux[Aux::W]*aux[Aux::W]);
-  prims[Prims::v2] = cons[Cons::S2]/(rho_plus_p*aux[Aux::W]*aux[Aux::W]);
-  prims[Prims::v3] = cons[Cons::S3]/(rho_plus_p*aux[Aux::W]*aux[Aux::W]);
-  prims[Prims::p] = (rho_plus_p - prims[Prims::n])*((d->gamma-1)/d->gamma);
-  prims[Prims::rho] = rho_plus_p - prims[Prims::p];
-  
-  aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
-  aux[Aux::T] = prims[Prims::p] / prims[Prims::n];     
-  aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
+    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
+    aux[Aux::T] = prims[Prims::p] / prims[Prims::n];
+    aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
 
 }
 
@@ -298,7 +283,7 @@ void ISCE::getPrimitiveVars(double *cons, double *prims, double *aux)
         for (int var(0); var < d->Ncons; var++) {
           c2pArgs->cons_h[IDCons(var, i, j, k)] = cons[ID(var, i, j, k)];
         }
-        c2pArgs->guess_h[ID(0, i, j, k)] = aux[ID(10, i, j, k)];
+        c2pArgs->guess_h[ID(0, i, j, k)] = prims[ID(Prims::p, i, j, k)];
       }
     }
   }
@@ -388,35 +373,34 @@ void ISCE::primsToAll(double *cons, double *prims, double *aux)
   }
 }
 
-static double residual(const double Z, const double StildeSq, const double D, const double tauTilde, double gamma)
+static double residual(const double Z, const double S_sqrd, const double D, const double tau, double gamma)
 {
   // Decalre variables
-  double vsq, W, rho, h, p, resid;
+  double vsq, E, W, rho, h, p, resid;
 
-  vsq = StildeSq / (Z * Z);
+  E = tau + D;
+  v_sqrd = S_sqrd / ((E + Z)*(E + Z));
 
   // Sanity check
   if (vsq >= 1.0 || Z < 0) return 1.0e6;
 
-  // Continue
-  W = 1 / sqrt(1 - vsq);
-  rho = D / W;
-  h = Z / (rho * W * W);
-  p = (gamma - 1) * (h - rho) / gamma;
+  W = 1/sqrt(1 - v_sqrd);
+  n = D / W;
+  rho_plus_p = (E + Z)/(W*W);
+  p = (rho_plus_p_rf - n_rf)*((gamma-1)/gamma);
+  rho = rho_plus_p_rf - p_rf;
 
   // Second sanity check
-  if (rho < 0 || p < 0 || W < 1 || h < 0) return 1.0e6;
+  if (rho < 0 || p < 0 || W < 1 ) return 1.0e6;
 
   // Values are physical, compute residual
-  resid = (1 - (gamma - 1) / (W * W * gamma)) * Z + ((gamma - 1) /
-          (W * gamma) - 1) * D - tauTilde;
-
+  resid = p - Z;
   return resid;
 
 }
 
 
-static int newton(double *Z, const double StildeSq, const double D, const double tauTilde, double gamma, int i, int j, int k)
+static int newton(double *Z, const double S_sqrd, const double D, const double Tau, double gamma, int i, int j, int k)
 {
   // Rootfind data
   double bestX;
@@ -426,8 +410,8 @@ static int newton(double *Z, const double StildeSq, const double D, const double
   double tol(TOL);
   double x2;
   double bestF;
-  double f0(residual(x0, StildeSq, D, tauTilde, gamma));
-  double f1(residual(x1, StildeSq, D, tauTilde, gamma));
+  double f0(residual(x0, S_sqrd, D, Tau, gamma));
+  double f1(residual(x1, S_sqrd, D, Tau, gamma));
   int iter;
   int maxiter(MAXITER);
   int found(0);
@@ -445,7 +429,7 @@ static int newton(double *Z, const double StildeSq, const double D, const double
     x1 = x0;
     x0 = x2;
     f1 = f0;
-    f0 = residual(x0, StildeSq, D, tauTilde, gamma);
+    f0 = residual(x0, S_sqrd, D, Tau, gamma);
     if (fabs(f0) < fabs(bestF)) {
       bestX = x0;
       bestF = f0;
@@ -453,7 +437,7 @@ static int newton(double *Z, const double StildeSq, const double D, const double
   }
 
   if (!found) {
-    // Store result of Z=rho*h*W**2
+    // Store result of Z=p
     *Z = bestX;
     char s[200];
     sprintf(s, "C2P could not converge in cell (%d, %d, %d)\n", i, j, k);
@@ -485,55 +469,37 @@ static void getPrimitiveVarsParallel(double *streamCons, double *streamPrims, do
 
     // Load conserved vector into shared memory, and the initial guess
     for (int i(0); i < Ncons; i++) cons[i] = streamCons[lID * Ncons + i];
-    aux[10] = guess[lID];
+    // p is guessed
+    prims[3] = guess[lID];
 
-    // Set Bx/y/z and Ex/y/z field in prims
-    prims[5] = cons[5]; prims[6] = cons[6]; prims[7] = cons[7];
-    prims[8] = cons[8]; prims[9] = cons[9]; prims[10] = cons[10];
-
-    // Bsq, Esq
-    aux[7] = cons[5] * cons[5] + cons[6] * cons[6] + cons[7] * cons[7];
-    aux[8] = cons[8] * cons[8] + cons[9] * cons[9] + cons[10] * cons[10];
-
-    // Sbarx, Sbary, Sbarz
-    aux[12] = cons[1] - (cons[9] * cons[7] - cons[10] * cons[6]);
-    aux[13] = cons[2] - (cons[10] * cons[5] - cons[8] * cons[7]);
-    aux[14] = cons[3] - (cons[8] * cons[6] - cons[9] * cons[5]);
     // Sbarsq, tauBar
-    aux[15] = aux[12] * aux[12] + aux[13] * aux[13] + aux[14] * aux[14];
-    aux[16] = cons[4] - 0.5 * (aux[7] + aux[8]);
-
+    aux[Aux::S_sqrd] = cons[Cons::S1] * cons[Cons::S1] + cons[Cons::S2] * cons[Cons::S2] + cons[Cons::S3] * cons[Cons::S3];
+ 
     // Solve
-    newtonParallel(&aux[10], aux[15], cons[0], aux[16], gamma);
+    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], args->gamma);
 
+    double E = cons[Cons::Tau] + cons[Cons::D];
+    
     // vsq
-    aux[9] = aux[15] / (aux[10] * aux[10]);
-
+    aux[Aux::vsqrd] = aux[Aux::S_sqrd] / ((E + prims[Prims::p]) * (E + prims[Prims::p]));
     // W
-    aux[1] = 1.0 / sqrt(1 - aux[9]);
+    aux[Aux::W] = 1.0 / sqrt(1 - aux[Aux::vsqrd]);
     // rho
-    prims[0] = cons[0] / aux[1];
-    // h
-    aux[0] = aux[10] / (prims[0] * aux[1] * aux[1]);
-    // e
-    aux[2] = (aux[0] - 1) / gamma;
-    // c
-    aux[3] = sqrt((aux[2] * gamma * (gamma - 1)) / aux[0]);
-    // p
-    prims[4] = prims[0] * aux[2] * (gamma - 1);
+    prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
+    // rho_plus_p
+    aux[Aux::rho_plus_p] = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    // p  
+    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    // rho
+    prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
-    prims[1] = aux[12] / aux[10];
-    prims[2] = aux[13] / aux[10];
-    prims[3] = aux[14] / aux[10];
-    // vE
-    aux[11] = prims[1] * cons[8] + prims[2] * cons[9] + prims[3] * cons[10];
-    // Jx, Jy, Jz
-    aux[4] = cons[13] * prims[1] + aux[1] * sigma * (cons[8] + (prims[2] * cons[7] -
-             prims[3] * cons[6]) - aux[11] * prims[1]);
-    aux[5] = cons[13] * prims[2] + aux[1] * sigma * (cons[9] + (prims[3] * cons[5] -
-             prims[1] * cons[7]) - aux[11] * prims[2]);
-    aux[6] = cons[13] * prims[3] + aux[1] * sigma * (cons[10] + (prims[1] * cons[6] -
-             prims[2] * cons[5]) - aux[11] * prims[3]);
+    prims[Prims::v1] = cons[Cons::S1] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S2] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S3] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+
+    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
+    aux[Aux::T] = prims[Prims::p] / prims[Prims::n];
+    aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
 
   }
 
@@ -571,20 +537,29 @@ static int newtonParallel(double *Z, const double StildeSq, const double D, cons
 }
 
 __device__
-static double residualParallel(const double Z, const double StildeSq, const double D, const double tauTilde, double gamma)
+static double residualParallel(const double Z, const double S_sqrd, const double D, const double tau, double gamma)
 {
   // Declare variables
-  double  W;
+  double vsq, E, W, rho, h, p, resid;
+
+  E = tau + D;
+  v_sqrd = S_sqrd / ((E + Z)*(E + Z));
 
   // Sanity check
-  if (Z < 0) return 1.0e6;
+  if (vsq >= 1.0 || Z < 0) return 1.0e6;
 
-  // Continue
-  W = 1 / sqrt(1 - (StildeSq / (Z * Z)));
+  W = 1/sqrt(1 - v_sqrd);
+  n = D / W;
+  rho_plus_p = (E + Z)/(W*W);
+  p = (rho_plus_p_rf - n_rf)*((gamma-1)/gamma);
+  rho = rho_plus_p_rf - p_rf;
+
+  // Second sanity check
+  if (rho < 0 || p < 0 || W < 1 ) return 1.0e6;
 
   // Values are physical, compute residual
-  return (1 - (gamma - 1) / (W * W * gamma)) * Z + ((gamma - 1) /
-          (W * gamma) - 1) * D - tauTilde;
+  resid = p - Z;
+  return resid;
 
 }
 
@@ -592,54 +567,34 @@ static double residualParallel(const double Z, const double StildeSq, const doub
 __device__
 void ISCE_D::getPrimitiveVarsSingleCell(double * cons, double * prims, double * aux)
 {
-
-    // Set Bx/y/z and Ex/y/z field in prims
-    prims[5] = cons[5]; prims[6] = cons[6]; prims[7] = cons[7];
-    prims[8] = cons[8]; prims[9] = cons[9]; prims[10] = cons[10];
-
-    // Bsq, Esq
-    aux[7] = cons[5] * cons[5] + cons[6] * cons[6] + cons[7] * cons[7];
-    aux[8] = cons[8] * cons[8] + cons[9] * cons[9] + cons[10] * cons[10];
-
-    // Sbarx, Sbary, Sbarz
-    aux[12] = cons[1] - (cons[9] * cons[7] - cons[10] * cons[6]);
-    aux[13] = cons[2] - (cons[10] * cons[5] - cons[8] * cons[7]);
-    aux[14] = cons[3] - (cons[8] * cons[6] - cons[9] * cons[5]);
     // Sbarsq, tauBar
-    aux[15] = aux[12] * aux[12] + aux[13] * aux[13] + aux[14] * aux[14];
-    aux[16] = cons[4] - 0.5 * (aux[7] + aux[8]);
-
-
+    aux[Aux::S_sqrd] = cons[Cons::S1] * cons[Cons::S1] + cons[Cons::S2] * cons[Cons::S2] + cons[Cons::S3] * cons[Cons::S3];
+ 
     // Solve
-    newtonParallel(&aux[10], aux[15], cons[0], aux[16], args->gamma);
+    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], args->gamma);
 
+    double E = cons[Cons::Tau] + cons[Cons::D];
+    
     // vsq
-    aux[9] = aux[15] / (aux[10] * aux[10]);
+    aux[Aux::vsqrd] = aux[Aux::S_sqrd] / ((E + prims[Prims::p]) * (E + prims[Prims::p]));
     // W
-    aux[1] = 1.0 / sqrt(1 - aux[9]);
+    aux[Aux::W] = 1.0 / sqrt(1 - aux[Aux::vsqrd]);
     // rho
-    prims[0] = cons[0] / aux[1];
-    // h
-    aux[0] = aux[10] / (prims[0] * aux[1] * aux[1]);
-    // e
-    aux[2] = (aux[0] - 1) / args->gamma;
-    // c
-    aux[3] = sqrt((aux[2] * args->gamma * (args->gamma - 1)) / aux[0]);
-    // p
-    prims[4] = prims[0] * aux[2] * (args->gamma - 1);
+    prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
+    // rho_plus_p
+    aux[Aux::rho_plus_p] = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    // p  
+    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    // rho
+    prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
-    prims[1] = aux[12] / aux[10];
-    prims[2] = aux[13] / aux[10];
-    prims[3] = aux[14] / aux[10];
-    // vE
-    aux[11] = prims[1] * cons[8] + prims[2] * cons[9] + prims[3] * cons[10];
-    // Jx, Jy, Jz
-    aux[4] = cons[13] * prims[1] + aux[1] * args->sigma * (cons[8] + (prims[2] * cons[7] -
-             prims[3] * cons[6]) - aux[11] * prims[1]);
-    aux[5] = cons[13] * prims[2] + aux[1] * args->sigma * (cons[9] + (prims[3] * cons[5] -
-             prims[1] * cons[7]) - aux[11] * prims[2]);
-    aux[6] = cons[13] * prims[3] + aux[1] * args->sigma * (cons[10] + (prims[1] * cons[6] -
-             prims[2] * cons[5]) - aux[11] * prims[3]);
+    prims[Prims::v1] = cons[Cons::S1] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S2] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S3] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+
+    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
+    aux[Aux::T] = prims[Prims::p] / prims[Prims::n];
+    aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
 }
 
 __device__
