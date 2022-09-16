@@ -123,6 +123,10 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   double dzux;
   double dzuy;
 
+  double u_x;
+  double u_y;
+  double u_z;
+
 /*
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
     for (int j(d->js_minus.at(0)); j < d->je_plus.at(0); j++) {
@@ -147,6 +151,10 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         dyuz = (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v3, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v3, i, j-1, k)])/(2*d->dy);
         dzux = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v1, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v1, i, j, k-1)])/(2*d->dz);
         dzuy = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)])/(2*d->dz);
+
+        u_x = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)];
+        u_y = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)];
+        u_z = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
 
         // dxT = midmodGradSO(aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], d->dx);
         // dyT = midmodGradSO(aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], d->dy);
@@ -227,25 +235,22 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // Pi,NS = -zeta*Theta
         aux[ID(Aux::PiNS, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)];
   
-        // pi^l_j,NS 14 - STILL NOT FULLY CORRECT - NEED MORE h_munu factors in front of big bracket!
+        // pi^l_j,NS 14 - STILL NOT FULLY CORRECT (but much better, I think only missing O(u^4) terms now!)
         // 11
-        aux[ID(Aux::pi11NS, i, j, k)] = -2*eta*( 2*dxux 
-          - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        aux[ID(Aux::pi11NS, i, j, k)] = -eta*( 2*dxux - (2/3)*(1 + u_x*u_x)*aux[ID(Aux::Theta, i, j, k)] 
+          + 2*u_x * ( 1 + u_x*u_x + u_y*u_y + u_z*u_z ) * ( 2*u_x*dxux + u_y*dxuy + u_z*dxuz + u_y*dyux + u_z*dzux ) );
         // 12
-        aux[ID(Aux::pi12NS, i, j, k)] = -2*eta*( dxuy + dyux
-          - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        aux[ID(Aux::pi12NS, i, j, k)] = -eta*( dxuy + dyux - (2/3)*(2 + u_x*u_x + u_y*u_y + u_z*u_z )*aux[ID(Aux::Theta, i, j, k)] );
         // 13
-        aux[ID(Aux::pi13NS, i, j, k)] = -2*eta*( dxuz + dzux
-          - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        aux[ID(Aux::pi13NS, i, j, k)] = -eta*( dxuz + dzux - (2/3)*(2 + u_x*u_x + u_y*u_y + u_z*u_z )*aux[ID(Aux::Theta, i, j, k)] );
         // 22
-        aux[ID(Aux::pi22NS, i, j, k)] = -2*eta*( 2*dyuy
-          - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        aux[ID(Aux::pi22NS, i, j, k)] = -eta*( 2*dyuy - (2/3)*(1 + u_y*u_y)*aux[ID(Aux::Theta, i, j, k)] 
+          + 2*u_y * ( 1 + u_x*u_x + u_y*u_y + u_z*u_z ) * ( 2*u_y*dyuy + u_z*dyuz + u_x*dyux + u_z*dzuy + u_x*dxuy ) );
         // 23
-        aux[ID(Aux::pi23NS, i, j, k)] = -2*eta*( dyuz + dzuy
-          - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        aux[ID(Aux::pi23NS, i, j, k)] = -eta*( dyuz + dzuy - (2/3)*(2 + u_x*u_x + u_y*u_y + u_z*u_z )*aux[ID(Aux::Theta, i, j, k)] );
         // 33
-        aux[ID(Aux::pi33NS, i, j, k)] = -2*eta*( 2*dzuz
-          - (2/3)*(1 + (aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        aux[ID(Aux::pi33NS, i, j, k)] = -eta*( 2*dzuz - (2/3)*(1 + u_z*u_z)*aux[ID(Aux::Theta, i, j, k)] 
+          + 2*u_z * ( 1 + u_x*u_x + u_y*u_y + u_z*u_z ) * ( 2*u_z*dzuz + u_x*dzux + u_y*dzuy + u_x*dxuz + u_y*dyuz ) );
 
         aux[ID(TDerivs::dtE, i, j, k)] = aux[ID(TDerivs::dtTau, i, j, k)] + aux[ID(TDerivs::dtD, i, j, k)];
 
