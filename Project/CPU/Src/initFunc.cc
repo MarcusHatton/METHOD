@@ -1708,10 +1708,8 @@ Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
   
   double R = 3.0; // radius of star
   double delta = 0.05; // transition rate at edge of star
-  double theta; // angle from x-axis
+  // double theta; // angle from x-axis
   double weight;
-  double omega = 1; // ang vel
-  double B;
   double r;
 
   for (int i(0); i<d->Nx; i++) {
