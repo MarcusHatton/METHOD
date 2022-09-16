@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(0.0);
-  double endTime(20.0);
+  double endTime(50.0);
   double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 

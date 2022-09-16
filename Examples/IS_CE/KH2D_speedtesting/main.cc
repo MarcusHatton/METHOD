@@ -8,7 +8,8 @@
 #include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
-#include "RKPlus.h"
+// #include "RKPlus.h"
+#include "RK2.h"
 // #include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "parallelEnv.h"
@@ -27,8 +28,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(400);
-  int ny(400);
+  int nx(200);
+  int ny(200);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -63,7 +64,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-4,  1.0e-15, 1.0e-4,  1.0e-2, 1.0e-4} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-4,  1.0e-15, 1.0e-4,  5.0e-3, 1.0e-4} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -91,7 +92,7 @@ int main(int argc, char *argv[]) {
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   // RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
-  RK4 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
   // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
 
   ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);

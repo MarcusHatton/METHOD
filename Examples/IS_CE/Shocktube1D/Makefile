@@ -4,6 +4,7 @@
 # Compiler
 CC = mpic++
 ##CC = g++
+##CC = nvcc
 
 USE_MPI = 0
 USE_OMP = 0
@@ -112,10 +113,10 @@ RTFIND = buildRootfinder
 
 
 # Build everything
-build : $(RTFIND) $(EXEC)
+build : $(EXEC)
 
 # Make and run all tests on simulation scripts and run main
-all : $(RTFIND) $(EXEC)
+all : $(EXEC)
 	cd $(TEST_DIR) && $(MAKE) test
 	@$(MAKE) run
 
