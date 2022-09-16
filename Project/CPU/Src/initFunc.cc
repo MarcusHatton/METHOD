@@ -1716,7 +1716,7 @@ Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
     for (int j(0); j<d->Ny; j++) {
       for (int k(0); k<d->Nz; k++) {
         r = sqrt(d->x[i]*d->x[i] + d->y[j]*d->y[j] + d->z[k]*d->z[k]);
-        theta = atan2(d->y[j],d->x[i]);
+        // theta = atan2(d->y[j],d->x[i]);
         weight = 0.5*(1+ tanh((R - r)/delta));
 
         d->prims[ID(0, i, j, k)] = 0; // v_x
