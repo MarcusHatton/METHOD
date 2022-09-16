@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.sfunctionalTau(functionalTau);
   data_args.sTau(tau);
-  double eta_0 = 1.0e-15;
+  double eta_0 = 1.0;
   const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  5.0e-2, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
