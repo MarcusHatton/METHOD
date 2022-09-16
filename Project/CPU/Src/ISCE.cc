@@ -474,54 +474,6 @@ void ISCE::primsToAll(double *cons, double *prims, double *aux)
     }
   }
 
-/*
-  for (int i(0); i < d->Nx; i++) {
-    for (int j(0); j < d->Ny; j++) {
-      for (int k(0); k < d->Nz; k++) {
-        // D
-        cons[ID(Cons::D, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)];
-        
-        // S1,2,3
-        cons[ID(Cons::S1, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]**2 + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
-        + tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]**2 + aux[ID(Aux::q1LO, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]
-        + tau_pi*(aux[ID(Aux::pi11LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]);
-
-        cons[ID(Cons::S2, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]**2 + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi21NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
-        + tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)]**2 + aux[ID(Aux::q2LO, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)]
-        + tau_pi*(aux[ID(Aux::pi21LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi22LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi23LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]);
-
-        cons[ID(Cons::S3, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]**2 + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)] + aux[ID(Aux::pi31NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi32NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
-        + tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]**2 + aux[ID(Aux::q3LO, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)]
-        + tau_pi*(aux[ID(Aux::pi31LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi32LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi33LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)]);
-
-        // E
-        cons[ID(Cons::Tau, i, j, k)] = aaux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)]) - aux[ID(Aux::PiNS, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::p, i, j, k)] + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::rho, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + 2*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] - prims[ID(Prims::p, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]
-        + 2*tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-        + tau_Pi*(sqr(aux[ID(Aux::W, i, j, k)]) - 1)*aux[ID(Aux::PiLO, i, j, k)]
-        + tau_pi*(aux[ID(Aux::pi11LO, i, j, k)] + aux[ID(Aux::pi22LO, i, j, k)] + aux[ID(Aux::pi33LO, i, j, k)]);
-
-        // Y1-3
-        cons[ID(Cons::Y1, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q1, i, j, k)];
-        cons[ID(Cons::Y2, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q2, i, j, k)];
-        cons[ID(Cons::Y3, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::q3, i, j, k)];
-        //printf("%f, %f, %f, q123\n", prims[ID(Prims::q1, i, j, k)], cons[ID(Cons::Y1, i, j, k)]);
-        // U
-        cons[ID(Cons::U, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::Pi, i, j, k)];
-        // Z11-33
-        cons[ID(Cons::Z11, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi11, i, j, k)];
-        cons[ID(Cons::Z12, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi12, i, j, k)]; 
-        cons[ID(Cons::Z13, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi13, i, j, k)];
-        cons[ID(Cons::Z22, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi22, i, j, k)];        
-        cons[ID(Cons::Z23, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi23, i, j, k)];
-        cons[ID(Cons::Z33, i, j, k)] = prims[ID(Prims::n, i, j, k)] * aux[ID(Aux::W, i, j, k)] * prims[ID(Prims::pi33, i, j, k)];
-      }  
-    }
-  }
-*/
-
 }
 
 void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const int dir)
@@ -536,36 +488,13 @@ void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const
         f[ID(0, i, j, k)] = cons[ID(Cons::D, i, j, k)]*prims[ID(dir, i, j, k)];
         // Sv + ..
         for (int nvar(0); nvar < 3; nvar++) {
-          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)]; // + ( prims[ID(Prims::q1+dir, i, j, k)] * prims[ID(Prims::v1+nvar, i, j, k)]  
-            // - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+nvar, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)] ) * aux[ID(Aux::W, i, j, k)];
-          // (p+Pi)delta_ij
+          f[ID(1+nvar, i, j, k)] = cons[ID(Cons::S1+nvar, i, j, k)]*prims[ID(dir, i, j, k)]; 
           if (dir == nvar) {
-            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)]); // + prims[ID(Prims::Pi, i, j, k)]);
+            f[ID(1+nvar, i, j, k)] += (prims[ID(Prims::p, i, j, k)]);
           }
         }
-        /*
-        //  pi^i_j  
-        if (dir == 0) {
-          for (int nvar(0); nvar < 3; nvar++) {
-            f[ID(1+nvar, i, j, k)] += prims[ID(Prims::pi11+nvar, i, j, k)];
-          }
-        } else if (dir == 1) {
-          f[ID(1, i, j, k)] += prims[ID(Prims::pi12, i, j, k)];
-          f[ID(2, i, j, k)] += prims[ID(Prims::pi22, i, j, k)];
-          f[ID(3, i, j, k)] += prims[ID(Prims::pi23, i, j, k)];
-        } else if (dir == 2) {
-          f[ID(1, i, j, k)] += prims[ID(Prims::pi13, i, j, k)];
-          f[ID(2, i, j, k)] += prims[ID(Prims::pi23, i, j, k)];
-          f[ID(3, i, j, k)] += prims[ID(Prims::pi33, i, j, k)];
-        } else {
-          throw std::runtime_error("Flux direction is not 0, 1 or 2");
-        }
-        */
-
-        // (Tau+p)*v + ...
+        // (Tau+p)*v 
         f[ID(4, i, j, k)] = (cons[ID(Cons::Tau, i, j, k)] + prims[ID(Prims::p, i, j, k)]) * prims[ID(dir, i, j, k)];
-          // + (prims[ID(Prims::q1+dir, i, j, k)] - aux[ID(Aux::qv, i, j, k)]*prims[ID(Prims::v1+dir, i, j, k)])*aux[ID(Aux::W, i, j, k)]
-          // + aux[ID(Aux::pi01+dir, i, j, k)];
       } // End k loop
     } // End j loop
   } // End i loop
