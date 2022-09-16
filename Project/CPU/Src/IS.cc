@@ -147,11 +147,11 @@ void IS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *
 
   bool thermo_timescales = false;
 
-  // double kappa = this->data->optionalSimArgs[0];
+  double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
-  // double zeta = this->data->optionalSimArgs[2];
+  double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
-  // double eta = this->data->optionalSimArgs[4];
+  double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
 
   // Thermodynamic calculation of timescales
@@ -202,11 +202,11 @@ void IS::sourceTerm(double *cons, double *prims, double *aux, double *source)
 
   bool thermo_timescales = false;
 
-  // double kappa = this->data->optionalSimArgs[0];
+  double kappa = this->data->optionalSimArgs[0];
   double tau_q = this->data->optionalSimArgs[1];
-  // double zeta = this->data->optionalSimArgs[2];
+  double zeta = this->data->optionalSimArgs[2];
   double tau_Pi = this->data->optionalSimArgs[3];
-  // double eta = this->data->optionalSimArgs[4];
+  double eta = this->data->optionalSimArgs[4];
   double tau_pi = this->data->optionalSimArgs[5];
 
   calcNSvars(cons, prims, aux);
@@ -835,7 +835,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
         for(int count(0); count < 10; count++) {
-          prims[ID(Prims::6, i, j, k)] = aux[ID(Aux::10, i, j, k)]; // Set the dissipative variables to start with their NS values
+          prims[ID(6, i, j, k)] = aux[ID(10, i, j, k)]; // Set the dissipative variables to start with their NS values
         }
       }  
     }
