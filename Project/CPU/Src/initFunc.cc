@@ -1706,7 +1706,7 @@ Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
   // if (d->ymin != -3.0 || d->ymax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
   //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
   
-  double R = 3.0; // radius of star
+  double R = 1.0; // radius of star
   double delta = 0.05; // transition rate at edge of star
   // double theta; // angle from x-axis
   double weight;
