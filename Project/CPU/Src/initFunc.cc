@@ -1722,14 +1722,14 @@ Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
         d->prims[ID(0, i, j, k)] = 0; // v_x
         d->prims[ID(1, i, j, k)] = 0; // v_y
         d->prims[ID(2, i, j, k)] = 0; // v_z
-        d->prims[ID(3, i, j, k)] = 10*weight; // p - constant throughout
-        d->prims[ID(5, i, j, k)] = (5 + 5*(r/R))*weight;// n goes from 
+        d->prims[ID(3, i, j, k)] = 2 + 10*weight; // p - constant throughout
+        // d->prims[ID(5, i, j, k)] = (1 + 1*(r/R))*weight;// n goes from 
+        d->prims[ID(5, i, j, k)] = 1 + 2*weight; // n goes from 
         d->prims[ID(4, i, j, k)] = d->prims[ID(3, i, j, k)]/(d->gamma - 1) + d->prims[ID(5, i, j, k)]; // rho = p/(gamma-1) + n
       }
     }
   }
 
 }
-
 
 
