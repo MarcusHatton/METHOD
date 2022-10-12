@@ -179,4 +179,50 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
   }
 }
 
+// double minmidGradSOGeneral(int enum_number, int dir, int c_p_or_a, double * cons, double * prims, double * aux, int i, int j, int k) {
+//   double dx = d->dx;
+//   double dy = d->dy;
+//   double dz = d->dz;
+//   double FDSum [3] = {0.0, 0.0, 0.0};
+//   double BDSum [3] = {0.0, 0.0, 0.0};
+//   double dXQ [3] = {0.0, 0.0, 0.0};
+//   int FDstencil [3] = {-1.5, 2.0, -0.5};
+//   int BDstencil [3] = {1.5, -2.0, +0.5};
+//   switch (dir) {
+//     case 0:
+//       dX = d->dx;
+//       stencil = {1,0,0};
+//     case 1:
+//       dX = d->dy;
+//       stencil = {0,1,0};
+//     case 2:
+//       dX = d->dz;
+//       stencil = {0,0,1};
+//     }
+
+//   if (c_p_or_a == 0) {
+//     for (int dir=0; dir<3; dir++) {
+//       for (int step=0; i<3; i++) {
+//         FDSum[dir] += FDstencil[i]*cons[ID(enum_number, i+step, j, k)];
+//         BDSum[dir] += FDstencil[i]*cons[ID(enum_number, i+step, j, k)];
+//       }
+//     }
+//     FDGrad = ( -1.5*cons[ID(enum_number, i, j, k)] + 2*cons[ID(enum_number, i+stencil[0], j+stencil[1], k+stencil[2])] 
+//              - 0.5*cons[ID(enum_number, i+2*stencil[0], j+2*stencil[1], k+2*stencil[2])] )/ dx;
+//     BDGrad = 1.5*cons[ID(enum_number, i, j, k)] - 2*cons[ID(enum_number, i-stencil[0], j-stencil[1], k-stencil[2])] 
+//              + 0.5*cons[ID(enum_number, i-2*stencil[0], j-2*stencil[1], k-2*stencil[2])];
+//   } else if (c_p_or_a == 1) {
+//     FDGrad = -1.5*prims[ID(enum_number, i, j, k)] + 2*prims[ID(enum_number, i+stencil[0], j+stencil[1], k+stencil[2])] 
+//              - 0.5*prims[ID(enum_number, i+2*stencil[0], j+2*stencil[1], k+2*stencil[2])];
+//   } else if c_p_or_a == 2) {
+//     FDGrad = -1.5*aux[ID(enum_number, i, j, k)] + 2*aux[ID(enum_number, i+stencil[0], j+stencil[1], k+stencil[2])] 
+//              - 0.5*aux[ID(enum_number, i+2*stencil[0], j+2*stencil[1], k+2*stencil[2])];
+//   } else {
+    
+//   }
+//   double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/d->dX;
+//   double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;  
+
+// }
+
 #endif
