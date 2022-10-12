@@ -146,9 +146,9 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // dzux = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v1, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v1, i, j, k-1)])/(2*d->dz);
         // dzuy = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)])/(2*d->dz);
 
-        // u_x = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)];
-        // u_y = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)];
-        // u_z = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
+        u_x = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)];
+        u_y = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)];
+        u_z = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
 
         // dxT = minmodGradSO(aux[ID(Aux::T, i-2, j, k)], aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], aux[ID(Aux::T, i+2, j, k)], d->dx);
         // dyT = minmodGradSO(aux[ID(Aux::T, i, j-2, k)], aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], aux[ID(Aux::T, i, j+2, k)], d->dy);
