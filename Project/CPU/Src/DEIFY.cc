@@ -3,7 +3,7 @@
 #include <cmath>
 #include <ctime>
 
-First and second order "minmod" functions for slope-limiting
+// First and second order "minmod" functions for slope-limiting
 double minmodGradFO(double im1, double i, double ip1, double dX) {
 
   double FDGrad = (-1.0*i + 1*ip1)/dX;
