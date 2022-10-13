@@ -99,28 +99,28 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
 }
 
 
-// First and second order "minmod" functions for slope-limiting
-double minmodGradFO(double im1, double i, double ip1, double dX) {
+// // First and second order "minmod" functions for slope-limiting
+// double minmodGradFO(double im1, double i, double ip1, double dX) {
 
-  double FDGrad = (-1.0*i + 1*ip1)/dX;
-  double BDGrad = (1.0*i - 1*im1)/dX;
-  if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
-    return 0;
-  } else {
-    return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
-  }
-}
+//   double FDGrad = (-1.0*i + 1*ip1)/dX;
+//   double BDGrad = (1.0*i - 1*im1)/dX;
+//   if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+//     return 0;
+//   } else {
+//     return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+//   }
+// }
 
-double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, double dX) {
+// double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, double dX) {
   
-  double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
-  double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
-  if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
-    return 0;
-  } else {
-    return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
-  }
-}
+//   double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
+//   double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
+//   if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+//     return 0;
+//   } else {
+//     return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+//   }
+// }
 
 void DEIFY::set_vars(double * cons, double * prims, double * aux)
 {
@@ -201,9 +201,9 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // dzuy = minmodGradSO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
         //                     aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
 
-        dxT = minmodGradFO(aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], d->dx);
-        dyT = minmodGradFO(aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], d->dy);
-        dzT = minmodGradFO(aux[ID(Aux::T, i, j, k-1)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j, k+1)], d->dz);
+        // dxT = minmodGradFO(aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], d->dx);
+        // dyT = minmodGradFO(aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], d->dy);
+        // dzT = minmodGradFO(aux[ID(Aux::T, i, j, k-1)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j, k+1)], d->dz);
         
         dxux = minmodGradFO(aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)],
                             aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)], d->dx);
@@ -226,6 +226,21 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
                             aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v1, i, j, k+1)], d->dz);  
         dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
                             aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
+
+        dxT = minmidGradSOGeneral(Aux::T, 0, 2, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        dyT = minmidGradSOGeneral(Aux::T, 1, 2, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        dzT = minmidGradSOGeneral(Aux::T, 2, 2, double * cons, double * prims, double * aux, i, j, k, Data * d);
+
+        // dxvx = minmidGradSOGeneral(Prims::v1, 0, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dyvx = minmidGradSOGeneral(Prims::v1, 1, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dzvx = minmidGradSOGeneral(Prims::v1, 2, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dxvy = minmidGradSOGeneral(Prims::v2, 0, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dyvy = minmidGradSOGeneral(Prims::v2, 1, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dzvy = minmidGradSOGeneral(Prims::v2, 2, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dxvz = minmidGradSOGeneral(Prims::v3, 0, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dyvz = minmidGradSOGeneral(Prims::v3, 1, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+        // dzvz = minmidGradSOGeneral(Prims::v3, 2, 1, double * cons, double * prims, double * aux, i, j, k, Data * d);
+
 
         aux[ID(Aux::a1, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtv1, i, j, k)] 
           + prims[ID(Prims::v1, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxux
