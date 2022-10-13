@@ -3,6 +3,7 @@
 
 #include "modelExtension.h"
 #include "flux.h"
+#include <stdexcept>
 
 //! <b> DEIFY: // Dissipative Extension for Ideal Fluid dYnamics </b>
 /*!
