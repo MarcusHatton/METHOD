@@ -183,6 +183,7 @@ double minmidGradSOGeneral(int enum_number, int dir, int c_p_or_a, double * cons
   double FDSum = 0.0;
   double BDSum = 0.0;
   float Coeff_stencil [3] = {-1.5, 2.0, -0.5};
+  int stencil [3] = {0,0,0};
   Data * d(this->data);
   switch (dir) {
     case 0:
