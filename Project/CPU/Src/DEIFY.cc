@@ -227,19 +227,19 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
                             aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
 
-        dxT = minmidGradSOGeneral(Aux::T, 0, 2, cons, prims, aux, i, j, k, Data * d);
-        dyT = minmidGradSOGeneral(Aux::T, 1, 2, cons, prims, aux, i, j, k, Data * d);
-        dzT = minmidGradSOGeneral(Aux::T, 2, 2, cons, prims, aux, i, j, k, Data * d);
+        dxT = minmidGradSOGeneral(Aux::T, 0, 2, cons, prims, aux, i, j, k, d);
+        dyT = minmidGradSOGeneral(Aux::T, 1, 2, cons, prims, aux, i, j, k, d);
+        dzT = minmidGradSOGeneral(Aux::T, 2, 2, cons, prims, aux, i, j, k, d);
 
-        // dxvx = minmidGradSOGeneral(Prims::v1, 0, 1, cons, prims, aux, i, j, k, Data * d);
-        // dyvx = minmidGradSOGeneral(Prims::v1, 1, 1, cons, prims, aux, i, j, k, Data * d);
-        // dzvx = minmidGradSOGeneral(Prims::v1, 2, 1, cons, prims, aux, i, j, k, Data * d);
-        // dxvy = minmidGradSOGeneral(Prims::v2, 0, 1, cons, prims, aux, i, j, k, Data * d);
-        // dyvy = minmidGradSOGeneral(Prims::v2, 1, 1, cons, prims, aux, i, j, k, Data * d);
-        // dzvy = minmidGradSOGeneral(Prims::v2, 2, 1, cons, prims, aux, i, j, k, Data * d);
-        // dxvz = minmidGradSOGeneral(Prims::v3, 0, 1, cons, prims, aux, i, j, k, Data * d);
-        // dyvz = minmidGradSOGeneral(Prims::v3, 1, 1, cons, prims, aux, i, j, k, Data * d);
-        // dzvz = minmidGradSOGeneral(Prims::v3, 2, 1, cons, prims, aux, i, j, k, Data * d);
+        // dxvx = minmidGradSOGeneral(Prims::v1, 0, 1, cons, prims, aux, i, j, k, d);
+        // dyvx = minmidGradSOGeneral(Prims::v1, 1, 1, cons, prims, aux, i, j, k, d);
+        // dzvx = minmidGradSOGeneral(Prims::v1, 2, 1, cons, prims, aux, i, j, k, d);
+        // dxvy = minmidGradSOGeneral(Prims::v2, 0, 1, cons, prims, aux, i, j, k, d);
+        // dyvy = minmidGradSOGeneral(Prims::v2, 1, 1, cons, prims, aux, i, j, k, d);
+        // dzvy = minmidGradSOGeneral(Prims::v2, 2, 1, cons, prims, aux, i, j, k, d);
+        // dxvz = minmidGradSOGeneral(Prims::v3, 0, 1, cons, prims, aux, i, j, k, d);
+        // dyvz = minmidGradSOGeneral(Prims::v3, 1, 1, cons, prims, aux, i, j, k, d);
+        // dzvz = minmidGradSOGeneral(Prims::v3, 2, 1, cons, prims, aux, i, j, k, d);
 
 
         aux[ID(Aux::a1, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtv1, i, j, k)] 
