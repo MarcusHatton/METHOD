@@ -184,16 +184,17 @@ double minmidGradSOGeneral(int enum_number, int dir, int c_p_or_a, double * cons
   double BDSum = 0.0;
   float Coeff_stencil [3] = {-1.5, 2.0, -0.5};
   int stencil [3] = {0,0,0};
+  double dX = 0.0;
   switch (dir) {
     case 0:
       dX = d->dx;
-      stencil = {1,0,0};
+      stencil[0] = 1;
     case 1:
       dX = d->dy;
-      stencil = {0,1,0};
+      stencil[1] = 1;
     case 2:
       dX = d->dz;
-      stencil = {0,0,1};
+      stencil[2] = 1;
     }
 
   if (c_p_or_a == 0) {
