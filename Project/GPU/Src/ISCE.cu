@@ -489,15 +489,15 @@ static void getPrimitiveVarsParallel(double *streamCons, double *streamPrims, do
     // rho
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
     // rho_plus_p
-    aux[Aux::rho_plus_p] = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    double rho_plus_p = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
     // p  
     prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
     // rho
     prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
-    prims[Prims::v1] = cons[Cons::S1] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
-    prims[Prims::v1] = cons[Cons::S2] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
-    prims[Prims::v1] = cons[Cons::S3] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S1] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S2] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S3] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
 
     aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
     aux[Aux::T] = prims[Prims::p] / prims[Prims::n];
@@ -541,20 +541,20 @@ static int newtonParallel(double *Z, const double StildeSq, const double D, cons
 __device__
 static double residualParallel(const double Z, const double S_sqrd, const double D, const double tau, double gamma)
 {
-  // Declare variables
-  double vsq, E, W, rho, h, p, resid;
+  // Decalre variables
+  double v_sqrd, E, W, rho, p, n, rho_plus_p, resid;
 
   E = tau + D;
   v_sqrd = S_sqrd / ((E + Z)*(E + Z));
 
   // Sanity check
-  if (vsq >= 1.0 || Z < 0) return 1.0e6;
+  if (v_sqrd >= 1.0 || Z < 0) return 1.0e6;
 
   W = 1/sqrt(1 - v_sqrd);
   n = D / W;
   rho_plus_p = (E + Z)/(W*W);
-  p = (rho_plus_p_rf - n_rf)*((gamma-1)/gamma);
-  rho = rho_plus_p_rf - p_rf;
+  p = (rho_plus_p - n)*((gamma-1)/gamma);
+  rho = rho_plus_p - p;
 
   // Second sanity check
   if (rho < 0 || p < 0 || W < 1 ) return 1.0e6;
