@@ -224,13 +224,13 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
       for (int k(0); k < this->data->Nz; k++) {
 
         // D
-        source[ID(D, i, j, k)] = 0.0;
+        source[ID(Cons::D, i, j, k)] = 0.0;
         // S1,2,3
-        source[ID(S1, i, j, k)] = 0.0;
-        source[ID(S2, i, j, k)] = 0.0;
-        source[ID(S3, i, j, k)] = 0.0;
+        source[ID(Cons::S1, i, j, k)] = 0.0;
+        source[ID(Cons::S2, i, j, k)] = 0.0;
+        source[ID(Cons::S3, i, j, k)] = 0.0;
         // Tau
-        source[ID(Tau, i, j, k)] = 0.0;        
+        source[ID(Cons::Tau, i, j, k)] = 0.0;        
       }
     }
   }
@@ -255,9 +255,9 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
     // rho
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
     // rho_plus_p
-    rho_plus_p = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    double rho_plus_p = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
     // p  
-    prims[Prims::p] = (rho_plus_p - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    prims[Prims::p] = (rho_plus_p - prims[Prims::n]) / ((d->gamma-1)/d->gamma);
     // rho
     prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
@@ -378,19 +378,19 @@ void ISCE::primsToAll(double *cons, double *prims, double *aux)
 static double residual(const double Z, const double S_sqrd, const double D, const double tau, double gamma)
 {
   // Decalre variables
-  double vsq, E, W, rho, h, p, resid;
+  double v_sqrd, E, W, rho, p, n, rho_plus_p, resid;
 
   E = tau + D;
   v_sqrd = S_sqrd / ((E + Z)*(E + Z));
 
   // Sanity check
-  if (vsq >= 1.0 || Z < 0) return 1.0e6;
+  if (v_sqrd >= 1.0 || Z < 0) return 1.0e6;
 
   W = 1/sqrt(1 - v_sqrd);
   n = D / W;
   rho_plus_p = (E + Z)/(W*W);
-  p = (rho_plus_p_rf - n_rf)*((gamma-1)/gamma);
-  rho = rho_plus_p_rf - p_rf;
+  p = (rho_plus_p - n)*((gamma-1)/gamma);
+  rho = rho_plus_p - p;
 
   // Second sanity check
   if (rho < 0 || p < 0 || W < 1 ) return 1.0e6;
