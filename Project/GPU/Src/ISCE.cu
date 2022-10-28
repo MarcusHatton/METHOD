@@ -204,7 +204,7 @@ void ISCE::fluxVector(double *cons, double *prims, double *aux, double *f, const
 void ISCE::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
 {
   // Syntax
-  Data * d(this->data);
+  // Data * d(this->data);
 
   // D
   source[0] = 0.0;
@@ -238,11 +238,13 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
 
 void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
 {
+    Data * d(this->data);
+
     // Sbarsq, tauBar
     aux[Aux::S_sqrd] = cons[Cons::S1] * cons[Cons::S1] + cons[Cons::S2] * cons[Cons::S2] + cons[Cons::S3] * cons[Cons::S3];
  
     // Solve
-    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], args->gamma);
+    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], d->gamma);
 
     double E = cons[Cons::Tau] + cons[Cons::D];
     
@@ -253,15 +255,15 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
     // rho
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
     // rho_plus_p
-    aux[Aux::rho_plus_p] = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    rho_plus_p = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
     // p  
-    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    prims[Prims::p] = (rho_plus_p - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
     // rho
     prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
-    prims[Prims::v1] = cons[Cons::S1] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
-    prims[Prims::v1] = cons[Cons::S2] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
-    prims[Prims::v1] = cons[Cons::S3] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S1] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S2] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S3] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
 
     aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
     aux[Aux::T] = prims[Prims::p] / prims[Prims::n];

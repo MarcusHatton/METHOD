@@ -5,7 +5,7 @@
 #include "deviceArguments.h"
 
 //!< Identifier for the model that has been selected in main()
-enum class ModelType { SRMHD, SRRMHD, TFEMHD };
+enum class ModelType { SRMHD, SRRMHD, TFEMHD, ISCE };
 
 //! <b> Physics model that we want to use </b>
 /*!
