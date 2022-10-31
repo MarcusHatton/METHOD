@@ -233,7 +233,6 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
-        // D
         source[ID(0, i, j, k)] = 0.0;
         // S1,2,3
         source[ID(Cons::S1, i, j, k)] = 0.0;
