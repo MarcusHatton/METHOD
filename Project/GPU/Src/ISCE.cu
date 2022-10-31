@@ -236,6 +236,7 @@ void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
 
         // D
         source[ID(Cons::D, i, j, k)] = 0.0;
+        // source[ID(Cons::D, i, j, k)] = 0.0;
         // S1,2,3
         source[ID(Cons::S1, i, j, k)] = 0.0;
         source[ID(Cons::S2, i, j, k)] = 0.0;
