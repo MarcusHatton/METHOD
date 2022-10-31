@@ -500,7 +500,7 @@ static void getPrimitiveVarsParallel(double *streamCons, double *streamPrims, do
     aux[Aux::S_sqrd] = cons[Cons::S1] * cons[Cons::S1] + cons[Cons::S2] * cons[Cons::S2] + cons[Cons::S3] * cons[Cons::S3];
  
     // Solve
-    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], args->gamma);
+    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], gamma);
 
     double E = cons[Cons::Tau] + cons[Cons::D];
     
@@ -513,7 +513,7 @@ static void getPrimitiveVarsParallel(double *streamCons, double *streamPrims, do
     // rho_plus_p
     double rho_plus_p = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
     // p  
-    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    prims[Prims::p] = (rho_plus_p - prims[Prims::n]) / ((gamma-1)/gamma);
     // rho
     prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
@@ -521,7 +521,7 @@ static void getPrimitiveVarsParallel(double *streamCons, double *streamPrims, do
     prims[Prims::v1] = cons[Cons::S2] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
     prims[Prims::v1] = cons[Cons::S3] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
 
-    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
+    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(gamma-1));
     aux[Aux::T] = prims[Prims::p] / prims[Prims::n];
     aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
 
@@ -606,17 +606,17 @@ void ISCE_D::getPrimitiveVarsSingleCell(double * cons, double * prims, double * 
     // rho
     prims[Prims::n] = cons[Cons::D] / aux[Aux::W];
     // rho_plus_p
-    aux[Aux::rho_plus_p] = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
+    double rho_plus_p = (E + prims[Prims::p]) / (aux[Aux::W] * aux[Aux::W]);
     // p  
-    prims[Prims::p] = (aux[Aux::rho_plus_p] - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
+    prims[Prims::p] = (rho_plus_p - prims[Prims::n]) / ((args->gamma-1)/args->gamma);
     // rho
     prims[Prims::rho] = rho_plus_p - prims[Prims::p];    
     // vx, vy, vz
-    prims[Prims::v1] = cons[Cons::S1] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
-    prims[Prims::v1] = cons[Cons::S2] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
-    prims[Prims::v1] = cons[Cons::S3] / (aux[Aux::rho_plus_p]*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S1] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S2] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
+    prims[Prims::v1] = cons[Cons::S3] / (rho_plus_p*aux[Aux::W] * aux[Aux::W]);
 
-    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(d->gamma-1));
+    aux[Aux::e] = prims[Prims::p] / (prims[Prims::n]*(args->gamma-1));
     aux[Aux::T] = prims[Prims::p] / prims[Prims::n];
     aux[Aux::h] = 1 + aux[Aux::e] + prims[Prims::p] / prims[Prims::n];
 }
