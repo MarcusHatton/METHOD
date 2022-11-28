@@ -385,7 +385,7 @@ class BlobToyQ : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    BlobToyQ(Data * data);
+    BlobToyQ(Data * data, bool initial_flux=false);
 
     virtual ~BlobToyQ() { }     //!< Destructor
 };

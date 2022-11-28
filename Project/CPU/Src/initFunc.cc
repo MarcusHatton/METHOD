@@ -1119,7 +1119,7 @@ FancyMETHODData::FancyMETHODData(Data * data) : InitialFunc(data)
   }
 }
 
-BlobToyQ::BlobToyQ(Data * data) : InitialFunc(data)
+BlobToyQ::BlobToyQ(Data * data, bool initial_flux) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1153,7 +1153,12 @@ BlobToyQ::BlobToyQ(Data * data) : InitialFunc(data)
 
         for (int nvar(1); nvar < 4; nvar++) {
           d->prims[ID(nvar, i, j, k)] = 0.0;
-        }
+	}
+	
+	if (initial_flux) {
+	  d->prims[ID(1, i, j, k)] = 1.0; // Start with large right-moving heat-flux
+	}
+
       }
     }
   }
