@@ -2,9 +2,9 @@
 # and links for main.cc
 
 # Compiler
-CC = mpic++
+##CC = mpic++
 ##CC = g++
-##CC = nvcc
+CC = nvcc
 
 USE_MPI = 0
 USE_OMP = 0
