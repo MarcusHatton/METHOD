@@ -230,6 +230,9 @@ void ISCE::sourceTermSingleCell(double *cons, double *prims, double *aux, double
 
 void ISCE::sourceTerm(double *cons, double *prims, double *aux, double *source)
 {
+
+  Data * d(this->data);
+
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
@@ -256,7 +259,7 @@ void ISCE::getPrimitiveVarsSingleCell(double *cons, double *prims, double *aux, 
     aux[Aux::S_sqrd] = cons[Cons::S1] * cons[Cons::S1] + cons[Cons::S2] * cons[Cons::S2] + cons[Cons::S3] * cons[Cons::S3];
  
     // Solve
-    newtonParallel(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], d->gamma);
+    newton(&prims[Prims::p], aux[Aux::S_sqrd], cons[Cons::D], cons[Cons::Tau], d->gamma, i, j, k);
 
     double E = cons[Cons::Tau] + cons[Cons::D];
     
