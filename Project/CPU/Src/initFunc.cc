@@ -1119,7 +1119,7 @@ FancyMETHODData::FancyMETHODData(Data * data) : InitialFunc(data)
   }
 }
 
-BlobToyQ::BlobToyQ(Data * data, bool initial_flux) : InitialFunc(data)
+BlobToyQ::BlobToyQ(Data * data, float initial_flux) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1155,9 +1155,8 @@ BlobToyQ::BlobToyQ(Data * data, bool initial_flux) : InitialFunc(data)
           d->prims[ID(nvar, i, j, k)] = 0.0;
 	}
 	
-	if (initial_flux) {
-	  d->prims[ID(1, i, j, k)] = 1.0; // Start with large right-moving heat-flux
-	}
+	d->prims[ID(1, i, j, k)] = initial_flux*(1+sin(6*PI*d->x[i])); // Start with large right-moving heat-flux
+	d->prims[ID(1, i, j, k)] = initial_flux*(1+sin(6*PI*d->x[i])); // Start with large right-moving heat-flux
 
       }
     }
@@ -1194,7 +1193,7 @@ Blob2dToyQ::Blob2dToyQ(Data * data) : InitialFunc(data)
   }
 }
 
-BlobToyQ_CE::BlobToyQ_CE(Data * data) : InitialFunc(data)
+BlobToyQ_CE::BlobToyQ_CE(Data * data, float initial_flux) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1203,7 +1202,7 @@ BlobToyQ_CE::BlobToyQ_CE(Data * data) : InitialFunc(data)
   double Tmax(1.0);
   double x_l(0.3);
   double x_r(0.7);
-  double transition_width(0.0000000001);
+  double transition_width(1e-3);
 
   if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
 //  if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n");
@@ -1213,6 +1212,7 @@ BlobToyQ_CE::BlobToyQ_CE(Data * data) : InitialFunc(data)
       for (int k(0); k < d->Nz; k++) {
 
         d->prims[ID(0, i, j, k)] = Tmin + (Tmax - Tmin) * (tanh((d->x[i]-x_l)/transition_width) + tanh((x_r-d->x[i])/transition_width)) / 2;
+	d->prims[ID(0, i, j, k)] += -data->optionalSimArgs[1]*initial_flux*(6*PI*cos(6*PI*d->x[i])); // Start with large right-moving heat-flux
 
       }
     }
