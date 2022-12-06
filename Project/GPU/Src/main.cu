@@ -15,6 +15,7 @@
 #include "parallelSaveDataHDF5.h"
 #include "fluxVectorSplitting.h"
 #include "serialEnv.h"
+#include "weno.h"
 
 #include <cstdio>
 #include <cstdlib>
