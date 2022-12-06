@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
   DEIFY ModelExtension(&data, &fluxMethod);
 
-  FVS fluxMethod(&data, &model);
+  FVS fluxMethod(&data, &weno, &model);
 
   // ParallelFlow bcs(&data, &env);
   ParallelOutflow bcs(&data, &env);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
   Simulation sim(&data, &env);
 
   //KHInstabilitySingleFluid init(&data, 1);
-  ParallelCheckpointRestart init(&data, filename, &env);
+  //ParallelCheckpointRestart init(&data, filename, &env);
   ISCE_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
 
   RK2 timeInt(&data, &model, &bcs, &fluxMethod);
