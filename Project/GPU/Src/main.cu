@@ -100,8 +100,9 @@ int main(int argc, char *argv[]) {
   // Choose particulars of simulation
   // SRMHD model(&data);
   ISCE model(&data);  
-
   DEIFY ModelExtension(&data, &fluxMethod);
+
+  Weno3 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
 
@@ -111,8 +112,8 @@ int main(int argc, char *argv[]) {
   Simulation sim(&data, &env);
 
   //KHInstabilitySingleFluid init(&data, 1);
-  //ParallelCheckpointRestart init(&data, filename, &env);
-  ISCE_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
+  ParallelCheckpointRestart init(&data, filename, &env);
+  //ISCE_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
 
   RK2 timeInt(&data, &model, &bcs, &fluxMethod);
 
