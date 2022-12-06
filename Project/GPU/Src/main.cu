@@ -76,9 +76,9 @@ int main(int argc, char *argv[]) {
   Data data = Data(checkpointArgs, &env);
 */
 
-  const int nOptionalSimArgs = 1;
-  std::vector<double> optionalSimArgs = {100};
-  std::vector<std::string> optionalSimArgNames = {"seed"};
+  const int nOptionalSimArgs = 7;
+  std::vector<double> optionalSimArgs = {100, 1.0e-15, 1.0e-1,  1.0e-3, 1.0e-1,  1.0e-15, 1.0e-1};
+  std::vector<std::string> optionalSimArgNames = {"seed", "kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
 
   // Create an arg object that will contain all parameters needed by the simulation, that will be stored on the Data object.  
   // The DataArgs constructor takes those parameters that are required rather than optional.
@@ -97,18 +97,21 @@ int main(int argc, char *argv[]) {
   */
 
   // Choose particulars of simulation
-  SRMHD model(&data);
+  // SRMHD model(&data);
   ISCE model(&data);  
+
+  DEIFY ModelExtension(&data, &fluxMethod);
 
   FVS fluxMethod(&data, &model);
 
-  ParallelFlow bcs(&data, &env);
+  // ParallelFlow bcs(&data, &env);
+  ParallelOutflow bcs(&data, &env);
   
-
   Simulation sim(&data, &env);
 
   //KHInstabilitySingleFluid init(&data, 1);
   ParallelCheckpointRestart init(&data, filename, &env);
+  ISCE_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
 
   RK2 timeInt(&data, &model, &bcs, &fluxMethod);
 
