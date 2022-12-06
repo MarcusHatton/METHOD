@@ -6,6 +6,7 @@
 #include "parallelInitFuncFromCheckpoint.h"
 #include "srmhd.h"
 #include "srrmhd.h"
+#include "ISCE.h"
 #include "boundaryConds.h"
 #include "parallelBoundaryConds.h"
 #include "rkSplit.h"
@@ -97,10 +98,12 @@ int main(int argc, char *argv[]) {
 
   // Choose particulars of simulation
   SRMHD model(&data);
+  ISCE model(&data);  
 
   FVS fluxMethod(&data, &model);
 
   ParallelFlow bcs(&data, &env);
+  
 
   Simulation sim(&data, &env);
 
