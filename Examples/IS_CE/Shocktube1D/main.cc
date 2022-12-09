@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 
   Weno3 weno(&data);
 
-  FVS fluxMethod(&data, &weno, &model);
+  FVS fluxMethod(&data, &model);
 
   DEIFY ModelExtension(&data, &fluxMethod);
 
