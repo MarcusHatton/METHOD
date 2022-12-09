@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
-  const std::vector<double> toy_params { {1.0e-3, 1.0e-2} };
+  const std::vector<double> toy_params { {1.0e-5, 1.0e-5} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q"};
   const int n_toy_params(2);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -58,8 +58,8 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  // ToyQ_CE model(&data);
-  ToyQ_CE_Functional model(&data);
+  ToyQ_CE model(&data);
+  // ToyQ_CE_Functional model(&data);
 
   Weno3 weno(&data);
 
