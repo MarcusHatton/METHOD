@@ -1212,7 +1212,7 @@ BlobToyQ_CE::BlobToyQ_CE(Data * data, float initial_flux) : InitialFunc(data)
       for (int k(0); k < d->Nz; k++) {
 
         d->prims[ID(0, i, j, k)] = Tmin + (Tmax - Tmin) * (tanh((d->x[i]-x_l)/transition_width) + tanh((x_r-d->x[i])/transition_width)) / 2;
-	d->prims[ID(0, i, j, k)] += -data->optionalSimArgs[1]*initial_flux*(6*PI*cos(6*PI*d->x[i])); // Start with large right-moving heat-flux
+	d->prims[ID(0, i, j, k)] += -data->optionalSimArgs[1]*initial_flux*(6*PI*cos(6*PI*d->x[i])); // Off-set of temperature
 
       }
     }
