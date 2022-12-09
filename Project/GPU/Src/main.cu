@@ -4,10 +4,9 @@
 #include "simulation.h"
 #include "initFunc.h"
 #include "parallelInitFuncFromCheckpoint.h"
-//#include "srmhd.h"
-//#include "srrmhd.h"
+#include "srmhd.h"
+#include "srrmhd.h"
 #include "ISCE.h"
-#include "DEIFY.h"
 #include "boundaryConds.h"
 #include "parallelBoundaryConds.h"
 #include "rkSplit.h"
@@ -15,7 +14,6 @@
 #include "parallelSaveDataHDF5.h"
 #include "fluxVectorSplitting.h"
 #include "serialEnv.h"
-#include "weno.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -49,8 +47,8 @@ int main(int argc, char *argv[]) {
   double sigma(0);
   bool output(true);
   int safety(180);
-  int nxRanks(2);
-  int nyRanks(2);
+  int nxRanks(1);
+  int nyRanks(1);
   int nzRanks(1);
 
   char * ptr(0);
@@ -78,9 +76,9 @@ int main(int argc, char *argv[]) {
   Data data = Data(checkpointArgs, &env);
 */
 
-  const int nOptionalSimArgs = 7;
-  std::vector<double> optionalSimArgs = {100, 1.0e-15, 1.0e-1,  1.0e-3, 1.0e-1,  1.0e-15, 1.0e-1};
-  std::vector<std::string> optionalSimArgNames = {"seed", "kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
+  const int nOptionalSimArgs = 1;
+  std::vector<double> optionalSimArgs = {100};
+  std::vector<std::string> optionalSimArgNames = {"seed"};
 
   // Create an arg object that will contain all parameters needed by the simulation, that will be stored on the Data object.  
   // The DataArgs constructor takes those parameters that are required rather than optional.
@@ -99,22 +97,16 @@ int main(int argc, char *argv[]) {
   */
 
   // Choose particulars of simulation
-  // SRMHD model(&data);
-  ISCE model(&data);  
-  DEIFY ModelExtension(&data, &fluxMethod);
+  SRMHD model(&data);
 
-  Weno3 weno(&data);
+  FVS fluxMethod(&data, &model);
 
-  FVS fluxMethod(&data, &weno, &model);
+  ParallelFlow bcs(&data, &env);
 
-  // ParallelFlow bcs(&data, &env);
-  ParallelOutflow bcs(&data, &env);
-  
   Simulation sim(&data, &env);
 
   //KHInstabilitySingleFluid init(&data, 1);
   ParallelCheckpointRestart init(&data, filename, &env);
-  //ISCE_Shocktube_1D_Para init(&data, 0); //direction given by second arg (int)
 
   RK2 timeInt(&data, &model, &bcs, &fluxMethod);
 
