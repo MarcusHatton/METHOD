@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(2048);
+  int nx(256);
   int ny(0);
   int nz(0);
   double xmin(0.0);
@@ -43,14 +43,14 @@ int main(int argc, char *argv[]) {
   // It does seem to fail at 16k, but at 8k is still stable. So the scaling with dx
   // doesn't seem as fast as I expected (more testing needed).
   bool output(false);
-  int nreports(50);
+  int nreports(100);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
-  const std::vector<double> toy_params { {1.0e-2, 1.0e-3} };
+  const std::vector<double> toy_params { {1.0e-3, 1.0e-4} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q"};
   const int n_toy_params(2);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -70,13 +70,13 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  BlobToyQ_CE init(&data);
+  BlobToyQ_CE init(&data, 1.0);
   // Blob2dToyQ_CE init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/data_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/data_IF_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
