@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(100);
+  int nreports(10);
 
   //SerialEnv env(&argc, &argv, 1, 1, 1);
   ParallelEnv env(&argc, &argv, 2, 1, 1);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
   SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
 
   //SerialSaveDataHDF5 save(&data, &env, "1d/Initial_Flux_Test/data_1em4_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
-  ParallelSaveDataHDF5 save(&data, &env, "1d/Initial_Flux_Test/data_IF_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  ParallelSaveDataHDF5 save(&data, &env, "1d/data_IF_0", ParallelSaveDataHDF5::OUTPUT_ALL);
   //SerialSaveDataHDF5 save(&data, &env, "1d/data_1em4_serial0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
@@ -97,9 +97,9 @@ int main(int argc, char *argv[]) {
   save.saveAll();
 
   for (int n(0); n<nreports; n++) {
-    data.endTime = (n+1)*endTime/(nreports);
+    data.endTime = (n+1)*endTime/(10*nreports);
     //SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/Initial_Flux_Test/data_1em4_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, "1d/Initial_Flux_Test/data_IF_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, "1d/data_IF_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     //SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_1em4_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
