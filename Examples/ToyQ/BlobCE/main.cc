@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(0.01);
+  double endTime(0.03);
   double cfl(0.1);
   // The whole point of the C-E expansion is that it works for small
   // tau_q (sigma).
