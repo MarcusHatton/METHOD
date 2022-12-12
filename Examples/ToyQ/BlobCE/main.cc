@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   // It does seem to fail at 16k, but at 8k is still stable. So the scaling with dx
   // doesn't seem as fast as I expected (more testing needed).
   bool output(false);
-  int nreports(100);
+  int nreports(10);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  BlobToyQ_CE init(&data, 1.0);
+  BlobToyQ_CE init(&data, 10.0);
   // Blob2dToyQ_CE init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
   save.saveAll();
 
   for (int n(0); n<nreports; n++) {
-    data.endTime = (n+1)*endTime/(nreports);
+    data.endTime = (n+1)*endTime/(100*nreports);
     SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_IF_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
