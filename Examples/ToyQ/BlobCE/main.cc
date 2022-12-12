@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(0.1);
+  double endTime(0.01);
   double cfl(0.1);
   // The whole point of the C-E expansion is that it works for small
   // tau_q (sigma).
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   // It does seem to fail at 16k, but at 8k is still stable. So the scaling with dx
   // doesn't seem as fast as I expected (more testing needed).
   bool output(false);
-  int nreports(10);
+  int nreports(5);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
