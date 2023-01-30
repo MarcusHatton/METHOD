@@ -8,8 +8,7 @@
 #include "RKPlus.h"
 #include "fluxVectorSplitting.h"
 #include "serialEnv.h"
-//#include "serialSaveDataHDF5.h"
-#include "serialSaveData.h"
+#include "serialSaveDataHDF5.h"
 #include "weno.h"
 #include <cstring>
 
@@ -30,7 +29,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(5.0);
+  double endTime(50.0);
   double cfl(0.4);
   // The whole point of the C-E expansion is that it works for small
   // tau_q (sigma).
@@ -44,7 +43,7 @@ int main(int argc, char *argv[]) {
   // It does seem to fail at 16k, but at 8k is still stable. So the scaling with dx
   // doesn't seem as fast as I expected (more testing needed).
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -77,19 +76,18 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  //SerialSaveDataHDF5 save(&data, &env, "1d/data_1em4_serial0", SerialSaveDataHDF5::OUTPUT_ALL);
-  //SerialSaveData save(&data, &env, "1d/data_1em4_serial0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/data_1em4_serial0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
-  sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
+  sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
 
-  //save.saveAll();
+  save.saveAll();
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    //SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_1em4_serial"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_1em4_serial"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
-    //save_in_loop.saveAll();
+    save_in_loop.saveAll();
   }
 
   return 0;
