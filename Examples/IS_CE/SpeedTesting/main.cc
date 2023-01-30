@@ -4,7 +4,7 @@
 #include "initFunc.h"
 #include "ISCE.h"
 #include "boundaryConds.h"
-// #include "rkSplit.h"
+#include "rkSplit.h"
 // #include "backwardsRK.h"
 #include "RKPlus.h"
 // #include "SSP2.h"
@@ -23,16 +23,16 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(80);
-  int ny(80);
+  int nx(400);
+  int ny(400);
   int nz(0);
-  double xmin(-3.0);
-  double xmax(3.0);
-  double ymin(-3.0);
-  double ymax(3.0);
+  double xmin(-1.0);
+  double xmax(1.0);
+  double ymin(-1.0);
+  double ymax(1.0);
   double zmin(0.0);
   double zmax(0.0);
-  double endTime(5.0);
+  double endTime(50.0);
   double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(50);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK3 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
   SerialSaveDataHDF5 save(&data, &env, "rotor/data_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
 

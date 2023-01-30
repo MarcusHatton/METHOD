@@ -31,7 +31,7 @@ ifeq ($(USE_OMP), 1)
 endif
 
 # C++ compiler flags
-CXXFLAGS = -Wall -std=c++11 -O3 $(OMP_FLAGS) -Wno-unknown-pragmas -g
+CXXFLAGS = -Wall -std=c++11 -O0 $(OMP_FLAGS) -Wno-unknown-pragmas -g
 
 # Sources
 SRCS = simulation.cc \

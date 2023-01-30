@@ -3,7 +3,8 @@
 #include "simulation.h"
 #include "serialEnv.h"
 #include "boundaryConds.h"
-#include "IS.h"
+//#include "IS.h"
+#include "ISCE.h"
 #include <cstring>
 #include <math.h>
 #include <cmath>
@@ -50,7 +51,8 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, alt_C2P); // alt_C2P?
+  // IS model(&data, alt_C2P); // alt_C2P?
+  ISCE model(&data);
   Outflow bcs(&data);
   Simulation sim(&data, &env);
   

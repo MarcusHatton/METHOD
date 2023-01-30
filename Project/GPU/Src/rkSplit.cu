@@ -20,6 +20,22 @@ void RKSplit::step(double * cons, double * prims, double * aux, double dt)
   // Add source contribution
   this->model->sourceTerm(cons, prims, aux, d->source);
 
+  // If there is a subgrid model, set that contribution
+  if (modelExtension != NULL && modelExtension->sourceExists) {
+    modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
+
+    for (int var(0); var < d->Ncons; var++) {
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {
+            d->source[ID(var, i, j, k)] += d->sourceExtension[ID(var, i, j, k)];
+          }
+        }
+      }
+    }
+  }
+
+
   #pragma omp parallel for
   for (int var=0; var < d->Ncons; var++) {
     #pragma omp parallel for

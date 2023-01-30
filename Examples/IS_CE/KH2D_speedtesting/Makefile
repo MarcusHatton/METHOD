@@ -4,6 +4,7 @@
 # Compiler
 CC = mpic++
 ##CC = g++
+##CC = nvcc
 
 USE_MPI = 1
 USE_OMP = 0

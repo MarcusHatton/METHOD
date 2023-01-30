@@ -5,6 +5,7 @@
 #include "model.h"
 #include "boundaryConds.h"
 #include "flux.h"
+#include "modelExtension.h"
 
 // There are some optimisations that can be made if we allow the parallel and
 // serial verions to differ. The simulations are still accurate to within the
@@ -34,6 +35,8 @@ class TimeIntegrator
 
     FluxMethod * fluxMethod;    //!< Pointer to FluxMethod object
 
+    ModelExtension * modelExtension;      //!< Pointer to model extension class
+
     //! Constructor
     /*!
       @par
@@ -46,7 +49,8 @@ class TimeIntegrator
 
     */
     TimeIntegrator(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod) :
-                   data(data), model(model), bcs(bcs), fluxMethod(fluxMethod) { }
+                   data(data), model(model), bcs(bcs), fluxMethod(fluxMethod), modelExtension(modelExtension) { }
+//                   data(data), model(model), bcs(bcs), fluxMethod(fluxMethod) { }
 
     //! Step function
     /*!

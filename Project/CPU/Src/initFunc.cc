@@ -1119,7 +1119,7 @@ FancyMETHODData::FancyMETHODData(Data * data) : InitialFunc(data)
   }
 }
 
-BlobToyQ::BlobToyQ(Data * data) : InitialFunc(data)
+BlobToyQ::BlobToyQ(Data * data, float initial_flux) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1153,7 +1153,11 @@ BlobToyQ::BlobToyQ(Data * data) : InitialFunc(data)
 
         for (int nvar(1); nvar < 4; nvar++) {
           d->prims[ID(nvar, i, j, k)] = 0.0;
-        }
+	}
+	
+	d->prims[ID(1, i, j, k)] = initial_flux*(1+sin(6*PI*d->x[i])); // Start with large right-moving heat-flux
+	d->prims[ID(1, i, j, k)] = initial_flux*(1+sin(6*PI*d->x[i])); // Start with large right-moving heat-flux
+
       }
     }
   }
@@ -1189,7 +1193,7 @@ Blob2dToyQ::Blob2dToyQ(Data * data) : InitialFunc(data)
   }
 }
 
-BlobToyQ_CE::BlobToyQ_CE(Data * data) : InitialFunc(data)
+BlobToyQ_CE::BlobToyQ_CE(Data * data, float initial_flux) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1198,7 +1202,7 @@ BlobToyQ_CE::BlobToyQ_CE(Data * data) : InitialFunc(data)
   double Tmax(1.0);
   double x_l(0.3);
   double x_r(0.7);
-  double transition_width(0.0000000001);
+  double transition_width(1e-3);
 
   if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
 //  if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n");
@@ -1208,6 +1212,7 @@ BlobToyQ_CE::BlobToyQ_CE(Data * data) : InitialFunc(data)
       for (int k(0); k < d->Nz; k++) {
 
         d->prims[ID(0, i, j, k)] = Tmin + (Tmax - Tmin) * (tanh((d->x[i]-x_l)/transition_width) + tanh((x_r-d->x[i])/transition_width)) / 2;
+	d->prims[ID(0, i, j, k)] += -data->optionalSimArgs[1]*initial_flux*(6*PI*cos(6*PI*d->x[i])); // Off-set of temperature
 
       }
     }
@@ -1695,7 +1700,41 @@ Rotor::Rotor(Data * data) : InitialFunc(data)
 
 }
 
+Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  if (d->xmin != -3.0 || d->xmax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [-3.0, 3.0]\n");
+  if (d->ymin != -3.0 || d->ymax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-3.0, 3.0]\n"); 
+  if (d->zmin != -3.0 || d->zmax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [-3.0, 3.0]\n"); 
+  
+  double R = 1.0; // radius of star
+  double delta = 0.05; // transition rate at edge of star
+  // double theta; // angle from x-axis
+  double weight;
+  double r;
 
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        r = sqrt(d->x[i]*d->x[i] + d->y[j]*d->y[j] + d->z[k]*d->z[k]);
+        // theta = atan2(d->y[j],d->x[i]);
+        weight = 0.5*(1+ tanh((R - r)/delta));
 
+        d->prims[ID(0, i, j, k)] = 0; // v_x
+        d->prims[ID(1, i, j, k)] = 0; // v_y
+        d->prims[ID(2, i, j, k)] = 0; // v_z
+        d->prims[ID(3, i, j, k)] = 2 + 10*weight; // p - constant throughout
+        // d->prims[ID(5, i, j, k)] = (1 + 1*(r/R))*weight;// n goes from 
+        d->prims[ID(5, i, j, k)] = 1 + 2*weight; // n goes from 
+        d->prims[ID(4, i, j, k)] = d->prims[ID(3, i, j, k)]/(d->gamma - 1) + d->prims[ID(5, i, j, k)]; // rho = p/(gamma-1) + n
+      }
+    }
+  }
+
+}
 
 

@@ -54,7 +54,7 @@ RTFIND_SRC_DIR = ./CminpackLibrary/Src
 #MPI_FLAGS = -lmpi -L${MPI_LIBRARY_PATH}/lib -I${MPI_LIBRARY_PATH}/include
 
 # C++ compiler flags
-CXXFLAGS = -fopenmp -Wall -std=c++11 -O3 -lineinfo
+CXXFLAGS = -fopenmp -Wall -std=c++11 -O0 -lineinfo 
 
 # NVIDIA compiler flags
 NVFLAGS = -std=c++11 \
@@ -77,6 +77,8 @@ SRCS = main.cu \
 			 simulation.cu \
 			 srmhd.cu \
 			 twoFluidEMHD.cu \
+			 ISCE.cu \
+			 DEIFY.cu \
 			 initFunc.cu \
 			 simData.cu \
 			 weno.cu \
@@ -195,6 +197,12 @@ srmhd.o : $(MODULE_DIR)/srmhd.cu $(INC_DIR)/srmhd.h
 	$(CC_GPU)	$<	-c	$(NVFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR) -Xcompiler -fopenmp
 
 srrmhd.o : $(MODULE_DIR)/srrmhd.cu $(INC_DIR)/srrmhd.h $(INC_DIR)/C2PArgs.h
+	$(CC_GPU)	$<	-c	$(NVFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
+
+ISCE.o : $(MODULE_DIR)/ISCE.cu $(INC_DIR)/ISCE.h $(INC_DIR)/C2PArgs.h
+	$(CC_GPU)	$<	-c	$(NVFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
+
+DEIFY.o : $(MODULE_DIR)/DEIFY.cu $(INC_DIR)/DEIFY.h
 	$(CC_GPU)	$<	-c	$(NVFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 simulation.o : $(MODULE_DIR)/simulation.cu	$(INC_DIR)/simulation.h $(INC_DIR)/model.h	$(INC_DIR)/simData.h $(INC_DIR)/saveData.h

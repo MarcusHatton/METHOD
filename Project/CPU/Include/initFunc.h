@@ -385,7 +385,7 @@ class BlobToyQ : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    BlobToyQ(Data * data);
+    BlobToyQ(Data * data, float initial_flux=0.0);
 
     virtual ~BlobToyQ() { }     //!< Destructor
 };
@@ -417,7 +417,7 @@ class BlobToyQ_CE : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    BlobToyQ_CE(Data * data);
+    BlobToyQ_CE(Data * data, float initial_flux);
 
     virtual ~BlobToyQ_CE() { }     //!< Destructor
 };
@@ -569,6 +569,18 @@ class Rotor : public InitialFunc
     Rotor(Data * data);
 
     virtual ~Rotor() { }     //!< Destructor
+};
+
+class Hot_Static_Star : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    Hot_Static_Star(Data * data);
+
+    virtual ~Hot_Static_Star() { }     //!< Destructor
 };
 
 #endif

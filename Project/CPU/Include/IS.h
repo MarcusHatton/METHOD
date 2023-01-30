@@ -45,7 +45,7 @@ class IS : public Model
       @parm
       @param *data Pointer to Data class containing global simulation data
     */
-    IS(Data * data, bool alternative_C2P);
+    IS(Data * data);
 
     virtual ~IS();     //!< Destructor
 
@@ -190,8 +190,10 @@ class IS : public Model
         } // End j-loop
       } // End i-loop
 
-//      -calc derivatives
       };
+
+    //! Calculate the NS variables' values (requires derivs, also done in full source)
+    void calcNSvars(double *cons, double *prims, double *aux);
 
     //! <b> Additional arguments for the IS residual function </b>
     /*!

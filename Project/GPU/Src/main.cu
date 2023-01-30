@@ -6,6 +6,7 @@
 #include "parallelInitFuncFromCheckpoint.h"
 #include "srmhd.h"
 #include "srrmhd.h"
+#include "ISCE.h"
 #include "boundaryConds.h"
 #include "parallelBoundaryConds.h"
 #include "rkSplit.h"
@@ -46,8 +47,8 @@ int main(int argc, char *argv[]) {
   double sigma(0);
   bool output(true);
   int safety(180);
-  int nxRanks(2);
-  int nyRanks(2);
+  int nxRanks(1);
+  int nyRanks(1);
   int nzRanks(1);
 
   char * ptr(0);

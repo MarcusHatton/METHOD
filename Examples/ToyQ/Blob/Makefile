@@ -5,7 +5,7 @@
 ##CC = mpic++
 CC = g++
 
-USE_MPI = 0
+USE_MPI = 1
 USE_OMP = 0
 USE_HDF = 0
 
