@@ -1737,4 +1737,38 @@ Hot_Static_Star::Hot_Static_Star(Data * data) : InitialFunc(data)
 
 }
 
+PlateVortices::PlateVortices(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  // if (d->xmin != -3.0 || d->xmax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [-3.0, 3.0]\n");
+  // if (d->ymin != -3.0 || d->ymax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-3.0, 3.0]\n"); 
+  // if (d->zmin != -3.0 || d->zmax != 3.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [-3.0, 3.0]\n"); 
+  
+  double W = 0.2; // Width of the plate
+  double D = 0.1; // Depth of the plate
+  double v = 0.1; // Constant and max speed of water
 
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+          d->prims[ID(0, i, j, k)] = 0; // v_x
+          d->prims[ID(2, i, j, k)] = 0; // v_z
+        if (d->x[i] >= 0.4 && d->x[i] <= 0.6 &&
+            && d->y[j] >= 0.1 && y[j] <= 0.4 &&
+            && d->z[k] <= 0.1) {
+          d->prims[ID(1, i, j, k)] = v*sin(pi*(d->x[i]/W) - 2.0*pi)*cos((pi/2)*(d->z[k]/0.1)); // v_y
+        } else {
+          d->prims[ID(1, i, j, k)] = 0; // v_y
+        }
+        d->prims[ID(3, i, j, k)] = 2; // p
+        d->prims[ID(5, i, j, k)] = 2; // n
+        d->prims[ID(4, i, j, k)] = d->prims[ID(3, i, j, k)]/(d->gamma - 1) + d->prims[ID(5, i, j, k)]; // rho = p/(gamma-1) + n
+      }
+    }
+  }
+
+}

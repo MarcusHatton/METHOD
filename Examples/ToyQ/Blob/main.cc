@@ -9,6 +9,9 @@
 // #include "backwardsRK.h"
 #include "SSP2.h"
 #include "fluxVectorSplitting.h"
+#include "serialEnv.h"
+// #include "serialSaveDataHDF5.h"
+#include "serialSaveData.h"
 //#include "serialEnv.h"
 //#include "parallelEnv.h"
 #include "platformEnv.h"
@@ -35,6 +38,9 @@ int main(int argc, char *argv[]) {
   double zmin(0.0);
   double zmax(1.0);
   double endTime(0.03);
+  double endTime(5.0);
+  double cfl(0.4);
+  double endTime(0.1);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -51,7 +57,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(100);
 
   //SerialEnv env(&argc, &argv, 1, 1, 1);
   ParallelEnv env(&argc, &argv, 2, 1, 1);
@@ -87,22 +93,28 @@ int main(int argc, char *argv[]) {
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
 
+  //SerialSaveDataHDF5 save(&data, &env, "1d/data_1em4_serial0", SerialSaveDataHDF5::OUTPUT_ALL);  
+  //SerialSaveData save(&data, &env, "1d/data_1em4_serial0", SerialSaveData::saveAll);  
+
   //SerialSaveDataHDF5 save(&data, &env, "1d/Initial_Flux_Test/data_1em4_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
   ParallelSaveDataHDF5 save(&data, &env, "1d/data_IF_0", ParallelSaveDataHDF5::OUTPUT_ALL);
   //SerialSaveDataHDF5 save(&data, &env, "1d/data_1em4_serial0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
-  sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
+  sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
 
-  save.saveAll();
+  //save.saveAll();
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(100*nreports);
+    //data.endTime = (n+1)*endTime/(nreports);
+    //SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_1em4_serial"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    //SerialSaveData save_in_loop(&data, &env, "1d/data_1em4_serial"+std::to_string(n+1), SerialSaveData::saveAll);
     //SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/Initial_Flux_Test/data_1em4_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     ParallelSaveDataHDF5 save_in_loop(&data, &env, "1d/data_IF_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     //SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/data_1em4_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
-    save_in_loop.saveAll();
+    //save_in_loop.saveAll();
   }
 
   return 0;

@@ -2,12 +2,12 @@
 # and links for main.cc
 
 # Compiler
-##CC = mpic++
+#CC = mpic++
 CC = g++
 
 USE_MPI = 0
 USE_OMP = 0
-USE_HDF = 0
+USE_HDF = 1
 
 PROJECT_TYPE = CPU
 
@@ -35,16 +35,20 @@ CXXFLAGS = -Wall -std=c++11 -O0 $(OMP_FLAGS) -Wno-unknown-pragmas -g
 
 # Sources
 SRCS = simulation.cc \
-			 toy_q_ce.cc \
+			 IS.cc \
 			 initFunc.cc \
 			 simData.cc \
 			 wenoUpwinds.cc 				\
 			 weno.cc 								\
 			 RK2.cc \
-			 rkSplit.cc \
 			 RKPlus.cc \
+			 rkSplit.cc \
+			 backRKArgs.cc \
+			 backwardsRK.cc \
+			 IMEX2Args.cc \
+			 SSP2.cc \
 			 boundaryConds.cc \
-			 fluxVectorSplitting.cc \
+			 fluxVectorSplitting.cc
 
 SERIAL_SRCS = serialSaveData.cc \
 			  serialEnv.cc
@@ -138,7 +142,7 @@ simData.o : $(MODULE_DIR)/simData.cc $(INC_DIR)/simData.h
 initFunc.o : $(MODULE_DIR)/initFunc.cc $(INC_DIR)/initFunc.h	$(INC_DIR)/simData.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-toy_q_ce.o : $(MODULE_DIR)/toy_q_ce.cc $(INC_DIR)/toy_q_ce.h
+IS.o : $(MODULE_DIR)/IS.cc $(INC_DIR)/IS.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 simulation.o : $(MODULE_DIR)/simulation.cc	$(INC_DIR)/simulation.h $(INC_DIR)/model.h	$(INC_DIR)/simData.h $(INC_DIR)/saveData.h
@@ -156,11 +160,11 @@ weno.o : $(MODULE_DIR)/weno.cc $(INC_DIR)/weno.h $(INC_DIR)/wenoUpwinds.h
 RK2.o : $(MODULE_DIR)/RK2.cc $(INC_DIR)/RK2.h
 		$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
+RKPlus.o : $(MODULE_DIR)/RKPlus.cc $(INC_DIR)/RKPlus.h
+		$(CC)   $<      -c      $(CXXFLAGS) -I$(INC_DIR)
+
 rkSplit.o : $(MODULE_DIR)/rkSplit.cc $(INC_DIR)/rkSplit.h $(INC_DIR)/RK2.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-RKPlus.o : $(MODULE_DIR)/RKPlus.cc $(INC_DIR)/RKPlus.h
-		$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
 backRKArgs.o : $(MODULE_DIR)/backRKArgs.cc $(INC_DIR)/backRKArgs.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
