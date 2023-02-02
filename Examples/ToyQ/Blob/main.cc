@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(0.02);
+  double endTime(0.03);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
