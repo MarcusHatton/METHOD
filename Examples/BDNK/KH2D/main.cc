@@ -2,7 +2,7 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "IS.h"
+#include "BDNK.h"
 //#include "boundaryConds.h"
 #include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
-  int ny(800);
+  int nx(200);
+  int ny(200);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(30);
+  int nreports(10);
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  double eta_0 = 2.0e-4;
+  double eta_0 = 1.0e-4;
   const std::vector<double> toy_params           { {1.0e-15, (25/7)*eta_0,  1.0e-15, eta_0, (25/4)*eta_0} };
   const std::vector<std::string> toy_param_names = {"kappa", "lambda_0", "zeta", "eta_0", "chi_0"};
   const int n_toy_params(5);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/1em4/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/Shear/1em4/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

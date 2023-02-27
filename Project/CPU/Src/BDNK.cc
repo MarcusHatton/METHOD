@@ -697,7 +697,7 @@ void IS::getPrimitiveVars(double *cons, double *prims, double *aux)
           tau_epsilon = (3.0/4.0)*d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1) - (d->gamma -1)*(kappa*prims[ID(Prims::rho, i, j, k)]*
-            (prims[ID(Prims::rho, i, j, k)]+prims[ID(Prims::p, i, j, k)]))/(prims[ID(Prims::n, i, j, k)]**2 * prims[ID(Prims::p, i, j, k)]);
+            (prims[ID(Prims::rho, i, j, k)]+prims[ID(Prims::p, i, j, k)]))/(prims[ID(Prims::n, i, j, k)]*prims[ID(Prims::n, i, j, k)] * prims[ID(Prims::p, i, j, k)]);
 
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + dxux + dyuy + dzuz;
 
@@ -942,7 +942,7 @@ void IS::primsToAll(double *cons, double *prims, double *aux)
           tau_epsilon = (3.0/4.0)*d->optionalSimArgs[4]*pow(prims[ID(Prims::rho, i, j, k)],0.25);
           tau_Pi = tau_epsilon/3.0;
           beta_epsilon = tau_q*(d->gamma -1) - (d->gamma -1)*(kappa*prims[ID(Prims::rho, i, j, k)]*
-            (prims[ID(Prims::rho, i, j, k)]+prims[ID(Prims::p, i, j, k)]))/(prims[ID(Prims::n, i, j, k)]**2 * prims[ID(Prims::p, i, j, k)]);
+            (prims[ID(Prims::rho, i, j, k)]+prims[ID(Prims::p, i, j, k)]))/(prims[ID(Prims::n, i, j, k)]*prims[ID(Prims::n, i, j, k)] * prims[ID(Prims::p, i, j, k)]);
 
           aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + dxux + dyuy + dzuz;
 
