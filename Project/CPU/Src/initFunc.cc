@@ -1757,10 +1757,10 @@ PlateVortices::PlateVortices(Data * data) : InitialFunc(data)
       for (int k(0); k<d->Nz; k++) {
           d->prims[ID(0, i, j, k)] = 0; // v_x
           d->prims[ID(2, i, j, k)] = 0; // v_z
-        if (d->x[i] >= 0.4 && d->x[i] <= 0.6 &&
-            && d->y[j] >= 0.1 && y[j] <= 0.4 &&
-            && d->z[k] <= 0.1) {
-          d->prims[ID(1, i, j, k)] = v*sin(pi*(d->x[i]/W) - 2.0*pi)*cos((pi/2)*(d->z[k]/0.1)); // v_y
+        if (d->x[i] >= 0.4 && d->x[i] <= 0.6 
+            && d->y[j] >= 0.1 && d->y[j] <= 0.4
+            && d->z[k] <= D) {
+          d->prims[ID(1, i, j, k)] = v*sin(PI*(d->x[i]/W) - 2.0*PI)*cos((PI/2)*(d->z[k]/0.1)); // v_y
         } else {
           d->prims[ID(1, i, j, k)] = 0; // v_y
         }
