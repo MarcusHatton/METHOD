@@ -6,7 +6,7 @@ CC = mpic++
 ##CC = g++
 ##CC = nvcc
 
-USE_MPI = 1
+USE_MPI = 0
 USE_OMP = 0
 USE_HDF = 1
 

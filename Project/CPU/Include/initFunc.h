@@ -583,4 +583,16 @@ class Hot_Static_Star : public InitialFunc
     virtual ~Hot_Static_Star() { }     //!< Destructor
 };
 
+class PlateVortices : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    PlateVortices(Data * data);
+
+    virtual ~PlateVortices() { }     //!< Destructor
+};
+
 #endif
