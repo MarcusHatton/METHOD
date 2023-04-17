@@ -242,19 +242,35 @@ void SerialSaveDataHDF5::saveDomain()
 
   hsize_t length(d->nx);
   H5LTmake_dataset_double(group, "x", 1, &length, &d->x[d->Ng]);
-  hsize_t test_length(1);
-  H5LTmake_dataset_double(group, "xmin", 1, &test_length, &d->xmin);
-  // hsize_t test_length(1);
-  H5LTmake_dataset_int(group, "nx", 1, &test_length, &d->nx);
+  length = 1;
+  H5LTmake_dataset_int(group, "nx", 1, &length, &d->nx);
+  H5LTmake_dataset_int(group, "Nx", 1, &length, &d->Nx);
+  H5LTmake_dataset_double(group, "xmin", 1, &length, &d->xmin);
+  H5LTmake_dataset_double(group, "xmax", 1, &length, &d->xmax);
+  H5LTmake_dataset_double(group, "dx", 1, &length, &d->dx);
 
   if (d->ny) {
     length = d->ny;
     H5LTmake_dataset_double(group, "y", 1, &length, &d->y[d->Ng]);
+    length = 1;
+    H5LTmake_dataset_int(group, "ny", 1, &length, &d->ny);
+    H5LTmake_dataset_int(group, "Ny", 1, &length, &d->Ny);
+    H5LTmake_dataset_double(group, "ymin", 1, &length, &d->ymin);
+    H5LTmake_dataset_double(group, "ymax", 1, &length, &d->ymax);
+    H5LTmake_dataset_double(group, "dy", 1, &length, &d->dy);
   }
   if (d->nz) {
     length = d->nz;
     H5LTmake_dataset_double(group, "z", 1, &length, &d->z[d->Ng]);
+    length = 1;
+    H5LTmake_dataset_int(group, "nz", 1, &length, &d->nz);
+    H5LTmake_dataset_int(group, "Nz", 1, &length, &d->Nz);
+    H5LTmake_dataset_double(group, "zmin", 1, &length, &d->zmin);
+    H5LTmake_dataset_double(group, "zmax", 1, &length, &d->zmax);
+    H5LTmake_dataset_double(group, "dz", 1, &length, &d->dz);
   }
+  H5LTmake_dataset_double(group, "endTime", 1, &length, &d->endTime);
+  H5LTmake_dataset_double(group, "dt", 1, &length, &d->dt);
   H5Gclose(group);
 }
 
