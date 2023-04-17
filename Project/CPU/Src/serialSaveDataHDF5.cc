@@ -211,6 +211,14 @@ void SerialSaveDataHDF5::saveAux()
 void SerialSaveDataHDF5::saveDomain()
 {
   hid_t group = H5Gcreate(this->file, "Domain", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  // string varOrder;
+  // for(int var(0); var < d->Naux; var++) {
+  //   this->writeDataSetDouble(&group, d->auxLabels[var].c_str(), &var, d->aux);
+  //   varOrder += d->auxLabels[var] + ',';
+  // }
+
+
   H5LTset_attribute_int(group, ".", "nx", &d->nx, 1);
   H5LTset_attribute_int(group, ".", "ny", &d->ny, 1);
   H5LTset_attribute_int(group, ".", "nz", &d->nz, 1);
@@ -233,7 +241,9 @@ void SerialSaveDataHDF5::saveDomain()
   hsize_t length(d->nx);
   H5LTmake_dataset_double(group, "x", 1, &length, &d->x[d->Ng]);
   hsize_t test_length(1);
-  H5LTmake_dataset_int(group, "nx", 1, &test_length, &d->nx);
+  H5LTmake_dataset_double(group, "xmin", 1, &test_length, &d->xmin);
+  // hsize_t test_length(1);
+  // H5LTmake_dataset_int(group, "nx", 1, &test_length, &d->nx);
 
   if (d->ny) {
     length = d->ny;
