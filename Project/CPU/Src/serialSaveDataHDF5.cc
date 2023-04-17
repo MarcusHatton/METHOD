@@ -232,6 +232,8 @@ void SerialSaveDataHDF5::saveDomain()
 
   hsize_t length(d->nx);
   H5LTmake_dataset_double(group, "x", 1, &length, &d->x[d->Ng]);
+  hsize_t length(1);
+  H5LTmake_dataset_double(group, "nx", 1, &length, &d->nx);
 
   if (d->ny) {
     length = d->ny;
