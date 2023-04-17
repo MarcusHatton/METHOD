@@ -216,7 +216,7 @@ void SerialSaveDataHDF5::saveDomain()
   string nx_label = "nx";
   int var(0);
   // for(int var(0); var < d->Naux; var++) {
-  this->writeDataSetDouble(&group, nx_label.c_str(), &var, &d->nx);
+  this->writeDataSetInt(&group, nx_label.c_str(), &var, &d->nx);
   varOrder += "nx" + ',';
   // }
   H5LTset_attribute_string(group, ".", "varOrder", varOrder.c_str());
