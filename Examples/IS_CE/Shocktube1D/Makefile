@@ -2,15 +2,15 @@
 # and links for main.cc
 
 # Compiler
-##CC = mpic++
+CC = mpic++
 ##CC = g++
-CC = nvcc
+##CC = nvcc
 
 USE_MPI = 0
 USE_OMP = 0
 USE_HDF = 1
 
-PROJECT_TYPE = GPU
+PROJECT_TYPE = CPU
 
 # Module directory
 MODULE_DIR = ./../../../Project/${PROJECT_TYPE}/Src
