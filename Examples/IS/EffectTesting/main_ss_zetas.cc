@@ -19,7 +19,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  float zetas[] = {1e-3,5e-3,1e-2,5e-2,1e-1};
+  float zetas[] = {5e-1,1.0};
   float zeta = 0;
 
   for(int i=0; i<5; i++) {
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   
   // Set up domain
   int Ng(4);
-  int nx(400);
+  int nx(16000);
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
