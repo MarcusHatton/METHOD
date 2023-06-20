@@ -2,12 +2,12 @@
 # and links for main.cc
 
 # Compiler
-##CC = mpic++
-CC = g++
+CC = mpic++
+##CC = g++
 
 USE_MPI = 0
 USE_OMP = 0
-USE_HDF = 0
+USE_HDF = 1
 
 PROJECT_TYPE = CPU
 

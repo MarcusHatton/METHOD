@@ -53,7 +53,7 @@ void ToyQ_CE::sourceTerm(double *cons, double *prims, double *aux, double *sourc
       for (int k(d->ks); k < d->ke; k++) {
         double d2T = aux[ID(3, i, j, k)];
         double d4T = aux[ID(4, i, j, k)];
-        source[ID(0, i, j, k)] = kappa * (d2T + kappa*tau_q*d4T);
+        source[ID(0, i, j, k)] = kappa * (d2T - kappa*tau_q*d4T);
       }
     }
   }

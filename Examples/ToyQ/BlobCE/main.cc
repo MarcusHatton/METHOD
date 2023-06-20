@@ -8,8 +8,8 @@
 #include "RKPlus.h"
 #include "fluxVectorSplitting.h"
 #include "serialEnv.h"
-//#include "serialSaveDataHDF5.h"
-#include "serialSaveData.h"
+#include "serialSaveDataHDF5.h"
+//#include "serialSaveData.h"
 #include "weno.h"
 #include <cstring>
 
@@ -21,8 +21,8 @@ int main(int argc, char *argv[]) {
   int Ng(6);
   // int nx(65536);
   // int nx(32768);
-  int nx(2048);
-  int ny(0);
+  int nx(512);
+  int ny(512);
   int nz(0);
   double xmin(0.0);
   double xmax(1.0);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   // It does seem to fail at 16k, but at 8k is still stable. So the scaling with dx
   // doesn't seem as fast as I expected (more testing needed).
   bool output(false);
-  int nreports(100);
+  int nreports(5);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -71,13 +71,14 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  BlobToyQ_CE init(&data, 0.0);
-  // Blob2dToyQ_CE init(&data);
+  //BlobToyQ_CE init(&data, 0.0);
+  Blob2dToyQ_CE init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/Initial_Flux_Testing/data_1em4_serial_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  // SerialSaveDataHDF5 save(&data, &env, "stability_testing/2d/ds_"+std::to_string(nx)+"x"+std::to_string(ny)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/ds_"+std::to_string(nx)+"x"+std::to_string(ny)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
@@ -86,7 +87,8 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/Initial_Flux_Testing/data_1em4_serial_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    //SerialSaveDataHDF5 save_in_loop(&data, &env, "stability_testing/2d/ds_"+std::to_string(nx)+"x"+std::to_string(ny)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/ds_"+std::to_string(nx)+"x"+std::to_string(ny)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     //save_in_loop.saveAll();
   }

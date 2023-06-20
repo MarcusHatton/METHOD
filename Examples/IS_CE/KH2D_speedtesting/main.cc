@@ -5,16 +5,16 @@
 #include "ISCE.h"
 #include "DEIFY.h"
 #include "boundaryConds.h"
-#include "parallelBoundaryConds.h"
+//#include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 // #include "RKPlus.h"
-//#include "RK2.h"
-#include "SSP2.h"
+#include "RK2.h"
+// #include "SSP2.h"
 #include "fluxVectorSplitting.h"
-#include "parallelEnv.h"
-//#include "serialEnv.h"
-//#include "serialSaveDataHDF5.h"
+//#include "parallelEnv.h"
+#include "serialEnv.h"
+#include "serialSaveDataHDF5.h"
 #include "parallelSaveDataHDF5.h"
 //#include "serialSaveData.h"
 #include "weno.h"
@@ -37,8 +37,8 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(-0.1);
   double zmax(0.1);
-  double startTime(0.0); // When to start outputting HDF5 data
-  double endTime(5.0);
+  double startTime(9.98); // When to start outputting HDF5 data
+  double endTime(10.02);
   double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -57,15 +57,15 @@ int main(int argc, char *argv[]) {
   bool output(false);
   int nreports(5);
 
-  ParallelEnv env(&argc, &argv, 8, 5, 1);
-  //SerialEnv env(&argc, &argv, 1, 1, 1);
+  //ParallelEnv env(&argc, &argv, 8, 5, 1);
+  SerialEnv env(&argc, &argv, 1, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-4,  1.0e-15, 1.0e-4,  1.0e-3, 1.0e-3} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-4,  1.0e-15, 1.0e-4,  1.0e-15, 1.0e-4} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -81,8 +81,9 @@ int main(int argc, char *argv[]) {
 
   DEIFY ModelExtension(&data, &fluxMethod);
 
-  //ParallelOutflow bcs(&data, &env);
-  ParallelPeriodic bcs(&data, &env);
+//  ParallelOutflow bcs(&data, &env);
+  //ParallelPeriodic bcs(&data, &env);
+  Outflow bcs(&data);
 
   Simulation sim(&data, &env);
 
@@ -91,22 +92,24 @@ int main(int argc, char *argv[]) {
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
+  // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   // RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
-  // RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
   // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
 
-   ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+   //ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+   SerialSaveDataHDF5 save(&data, &env, "2d/Filtering/ds_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
 
   save.saveAll();
 
-  for (int n(1); n<=nreports; n++) {
+  for (int n(0); n<nreports; n++) {
     data.endTime = startTime + n*((endTime-startTime)/(nreports-1));
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n), ParallelSaveDataHDF5::OUTPUT_ALL);
-    //ParallelSaveDataHDF5 save_in_loop(&data, &env, "./../../../../../../scratch/mjh1n20/Filtering_Data/KH/Shear/t_998_1002/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n), ParallelSaveDataHDF5::OUTPUT_ALL);
+    //ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    // ParallelSaveDataHDF5 save_in_loop(&data, &env, "./../../../../../../scratch/mjh1n20/Filtering_Data/KH/Shear/t_998_1002/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n), ParallelSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "2d/Filtering/ds_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
