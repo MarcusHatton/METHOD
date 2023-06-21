@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     
   // Set up domain
   int Ng(4);
-  int nx(4000);
+  int nx(400);
   int ny(0);
   int nz(0);
   double xmin(-1.0);
