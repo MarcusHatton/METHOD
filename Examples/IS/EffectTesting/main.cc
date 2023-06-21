@@ -6,8 +6,8 @@
 #include "boundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
-#include "RKPlus.h"
-// #include "SSP2.h"
+// #include "RKPlus.h"
+#include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "serialEnv.h"
 #include "serialSaveDataHDF5.h"
@@ -94,8 +94,8 @@ int main(int argc, char *argv[]) {
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
+  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
+  // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
   SerialSaveDataHDF5 save(&data, &env, "1d/StillShock/Bulk/taus/"+std::to_string(tau_pi)+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
