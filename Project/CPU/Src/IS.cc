@@ -988,9 +988,9 @@ void IS::calcNSvars(double *cons, double *prims, double *aux)
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
 
-        dxT = (aux[ID(Aux::T, i+1, j, k)] - aux[ID(Aux::T, i-1, j, k)])/(2*d->dx);
-        dyT = (aux[ID(Aux::T, i, j+1, k)] - aux[ID(Aux::T, i, j-1, k)])/(2*d->dy);
-        dzT = (aux[ID(Aux::T, i, j, k+1)] - aux[ID(Aux::T, i, j, k-1)])/(2*d->dz);
+        // dxT = (aux[ID(Aux::T, i+1, j, k)] - aux[ID(Aux::T, i-1, j, k)])/(2*d->dx);
+        // dyT = (aux[ID(Aux::T, i, j+1, k)] - aux[ID(Aux::T, i, j-1, k)])/(2*d->dy);
+        // dzT = (aux[ID(Aux::T, i, j, k+1)] - aux[ID(Aux::T, i, j, k-1)])/(2*d->dz);
 
         dxux = (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx);
         dyuy = (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v1, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v1, i, j-1, k)])/(2*d->dy);
@@ -1007,10 +1007,6 @@ void IS::calcNSvars(double *cons, double *prims, double *aux)
         u_y = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)];
         u_z = aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
 
-        // dxT = midmodGradSO(aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], d->dx);
-        // dyT = midmodGradSO(aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], d->dy);
-        // dzT = midmodGradSO(aux[ID(Aux::T, i, j, k-1)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j, k+1)], d->dz);
-        
         // dxux = midmodGradSO(aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)],
         //                     aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)], d->dx);
         // dyuy = midmodGradSO(aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v2, i, j-1, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
@@ -1033,9 +1029,9 @@ void IS::calcNSvars(double *cons, double *prims, double *aux)
         // dzuy = midmodGradSO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
         //                     aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
 
-        // dxT = minmodGradFO(aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], d->dx);
-        // dyT = minmodGradFO(aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], d->dy);
-        // dzT = minmodGradFO(aux[ID(Aux::T, i, j, k-1)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j, k+1)], d->dz);
+        dxT = minmodGradFO(aux[ID(Aux::T, i-1, j, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i+1, j, k)], d->dx);
+        dyT = minmodGradFO(aux[ID(Aux::T, i, j-1, k)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j+1, k)], d->dy);
+        dzT = minmodGradFO(aux[ID(Aux::T, i, j, k-1)], aux[ID(Aux::T, i, j, k)], aux[ID(Aux::T, i, j, k+1)], d->dz);
         
         // dxux = minmodGradFO(aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)],
         //                     aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)], d->dx);
@@ -1059,16 +1055,16 @@ void IS::calcNSvars(double *cons, double *prims, double *aux)
         // dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
         //                     aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
 
-        aux[ID(Aux::a1, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtv1, i, j, k)] 
-          + prims[ID(Prims::v1, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxux
+        aux[ID(Aux::a1, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] 
+          + prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxux
           + prims[ID(Prims::v2, i, j, k)]*dyux + prims[ID(Prims::v3, i, j, k)]*dzux );
         
-        aux[ID(Aux::a2, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtv2, i, j, k)] 
-          + prims[ID(Prims::v2, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxuy
+        aux[ID(Aux::a2, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv2dt, i, j, k)] 
+          + prims[ID(Prims::v2, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxuy
           + prims[ID(Prims::v2, i, j, k)]*dyuy + prims[ID(Prims::v3, i, j, k)]*dzuy );
         
-        aux[ID(Aux::a3, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtv3, i, j, k)] 
-          + prims[ID(Prims::v3, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxuz
+        aux[ID(Aux::a3, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv3dt, i, j, k)] 
+          + prims[ID(Prims::v3, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxuz
           + prims[ID(Prims::v2, i, j, k)]*dyuz + prims[ID(Prims::v3, i, j, k)]*dzuz );
 
         aux[ID(Aux::q1NS, i, j, k)] = -kappa* ( (1+ sqr(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]))*dxT 
@@ -1082,7 +1078,7 @@ void IS::calcNSvars(double *cons, double *prims, double *aux)
           + sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*dyT );
 
         // Theta 20 then Pi,NS 13 
-        aux[ID(Aux::Theta, i, j, k)] = aux[ID(TDerivs::dtW, i, j, k)] + dxux + dyuy + dzuz;
+        aux[ID(Aux::Theta, i, j, k)] = aux[ID(Aux::dWdt, i, j, k)] + dxux + dyuy + dzuz;
         // Pi,NS = -zeta*Theta
         aux[ID(Aux::PiNS, i, j, k)] = -zeta * aux[ID(Aux::Theta, i, j, k)];
   
