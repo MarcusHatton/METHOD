@@ -180,6 +180,7 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   double zeta = this->data->optionalSimArgs[2];
 //  double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
+  printf("eta: %5.2f\n",eta);
 //  double tau_pi = this->data->optionalSimArgs[5];
 
   double dxT;

@@ -9,7 +9,7 @@
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 // #include "RKPlus.h"
-#include "RK2.h"
+// #include "RK2.h"
 // #include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "parallelEnv.h"
@@ -92,8 +92,8 @@ int main(int argc, char *argv[]) {
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   // RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
-  RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
-  // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
+  // RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  RKPlus timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
   ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/LO/m5em2/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
