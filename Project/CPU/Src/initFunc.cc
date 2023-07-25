@@ -1363,7 +1363,7 @@ Shocktube::Shocktube(Data * data, int dir) : InitialFunc(data)
 }
 
 
-ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : InitialFunc(data)
+KHInstability::KHInstability(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1381,18 +1381,11 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : I
   double rho0(0.55);
   double rho1(0.45);
 
-  double B0{0.1};
-
-  mag = false;
-
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
 
         d->prims[ID(p, i, j, k)] = 1.0;
-
-        // Magnetic Fields
-        if (mag) d->prims[ID(7, i, j, k)] = B0;
 
         if (d->y[j] > 0) {
           d->prims[ID(n, i, j, k)] = rho0 + rho1 * tanh((d->y[j] - 0.5)/a);
@@ -1404,11 +1397,6 @@ ISKHInstabilitySingleFluid::ISKHInstabilitySingleFluid(Data * data, int mag) : I
           d->prims[ID(n, i, j, k)] = rho0 - rho1 * tanh((d->y[j] + 0.5)/a);
           d->prims[ID(v1, i, j, k)] = - vShear * tanh((d->y[j] + 0.5)/a);
           d->prims[ID(v2, i, j, k)] = - A0 * vShear * sin(2*PI*d->x[i]) * (exp(-pow((d->y[j] + 0.5), 2)/(sig*sig)));
-        }
-
-        // If we have electric fields, set to the ideal values
-        for (int nvar(0); nvar < 10; nvar++) {
-          d->prims[ID(q1+nvar, i, j, k)] = 0;
         }
 
       }

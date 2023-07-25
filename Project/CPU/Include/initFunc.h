@@ -462,16 +462,16 @@ class Shocktube : public InitialFunc
     virtual ~Shocktube() { }     //!< Destructor
 };
 
-class ISKHInstabilitySingleFluid : public InitialFunc
+class KHInstability : public InitialFunc
 {
   public:
     /*! Constructor
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    ISKHInstabilitySingleFluid(Data * data, int mag);
+    KHInstability(Data * data);
 
-    virtual ~ISKHInstabilitySingleFluid() { }     //!< Destructor
+    virtual ~KHInstability() { }     //!< Destructor
 };
 
 class ISKHInstabilityTIIdeal : public InitialFunc
