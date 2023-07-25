@@ -1293,7 +1293,7 @@ IS_Shocktube_1D_Perp::IS_Shocktube_1D_Perp(Data * data, int dir) : InitialFunc(d
 
 }
 
-IS_Shocktube_1D_Para::IS_Shocktube_1D_Para(Data * data, int dir) : InitialFunc(data)
+Shocktube::Shocktube(Data * data, int dir) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
