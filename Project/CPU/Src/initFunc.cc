@@ -1293,6 +1293,7 @@ IS_Shocktube_1D_Perp::IS_Shocktube_1D_Perp(Data * data, int dir) : InitialFunc(d
 
 }
 
+
 Shocktube::Shocktube(Data * data, int dir) : InitialFunc(data)
 {
   // Syntax
@@ -1469,11 +1470,11 @@ ISKHInstabilityTIShear::ISKHInstabilityTIShear(Data * data) : InitialFunc(data)
         d->prims[ID(n, i, j, k)] = rho0 + rho1 * tanh(d->y[j]/a);
         d->prims[ID(v2, i, j, k)] = 0.0;
 
-        // Set all the dissipative variables to zero
+	// Set all the dissipative variables to zero - should be automatic
         for (int nvar(0); nvar < 10; nvar++) {
           d->prims[ID(6+nvar, i, j, k)] = 0;
         }
-
+	
       }
     }
   }
@@ -1503,10 +1504,11 @@ Shocktube_Chab21::Shocktube_Chab21(Data * data) : InitialFunc(data)
 
         d->prims[ID(v1, i, j, k)] = 0;
         d->prims[ID(v3, i, j, k)] = 0;
+	/* These are zero anyway, right...?
         for (int nvar(0); nvar < 10; nvar++) {
           d->prims[ID(q1+nvar, i, j, k)] = 0;
         }
-
+	*/
       }
     }
   }
