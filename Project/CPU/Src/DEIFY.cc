@@ -176,11 +176,13 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   Data * d(this->data);
 
   double kappa = this->data->optionalSimArgs[0];
+  //printf("kappa: %5.2f\n",kappa);
 //  double tau_q = this->data->optionalSimArgs[1];
   double zeta = this->data->optionalSimArgs[2];
+  //printf("zeta: %5.2f\n",zeta);
 //  double tau_Pi = this->data->optionalSimArgs[3];
   double eta = this->data->optionalSimArgs[4];
-  printf("eta: %5.2f\n",eta);
+  //printf("eta: %5.2f\n",eta);
 //  double tau_pi = this->data->optionalSimArgs[5];
 
   double dxT;
