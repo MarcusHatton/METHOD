@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {5.0e-2, tau,  5.0e-4, tau,  5.0e-3, tau} };
+  const std::vector<double> toy_params           { {5.0e-2, tau,  5.0e-2, tau, 1.0e-15, tau} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
