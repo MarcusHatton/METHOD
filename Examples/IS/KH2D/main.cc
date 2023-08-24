@@ -7,8 +7,8 @@
 #include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
-#include "RKPlus.h"
-// #include "SSP2.h"
+// #include "RKPlus.h"
+#include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "parallelEnv.h"
 //#include "serialEnv.h"
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   // int nx(65536);
   // int nx(32768);
   int nx(200);
-  int ny(200);
+  int ny(400);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(-0.1);
   double zmax(0.1);
-  double endTime(30.0);
+  double endTime(60.0);
   double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1e-15, 5.0e-1,  1e-15, 5.0e-1,  1.0e-3, 5.0e-3} };
+  const std::vector<double> toy_params           { {1e-15, 5.0e-1,  1e-15, 5.0e-1,  1.0e-2, 1.0e-2} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data, false);
+  IS model(&data);
 
   Weno3 weno(&data);
 
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
+  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
+  // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
   ParallelSaveDataHDF5 save(&data, &env, "2d/Shear/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
