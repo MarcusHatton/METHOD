@@ -421,7 +421,7 @@ void DEIFY::set_Fy(double * cons, double * prims, double * aux)
         Fy[ID(4, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v2, i, j, k)] - aux[ID(Aux::PiNS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*sqr(prims[ID(Prims::v2, i, j, k)]) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + 2*aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)];
 
         // Add NLO Piece
-        Fy[ID(0, i, j, k)] += ;
+        Fy[ID(0, i, j, k)] += 0;
         Fy[ID(1, i, j, k)] += tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::q2LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*aux[ID(Aux::W, i, j, k)]
                               + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)]
                               + tau_pi*(aux[ID(Aux::pi11LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v2, i, j, k)];
@@ -461,7 +461,7 @@ void DEIFY::set_Fz(double * cons, double * prims, double * aux)
         Fz[ID(4, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v3, i, j, k)] - aux[ID(Aux::PiNS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*sqr(prims[ID(Prims::v3, i, j, k)]) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)] + aux[ID(Aux::pi11NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + 2*aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
  
         // Add NLO Piece
-        Fz[ID(0, i, j, k)] += ;
+        Fz[ID(0, i, j, k)] += 0;
         Fz[ID(1, i, j, k)] += tau_q*(aux[ID(Aux::q1LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::q3LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*aux[ID(Aux::W, i, j, k)]
                               + tau_Pi*aux[ID(Aux::PiLO, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)]
                               + tau_pi*(aux[ID(Aux::pi11LO, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12LO, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13LO, i, j, k)]*prims[ID(Prims::v3, i, j, k)])*prims[ID(Prims::v3, i, j, k)];
