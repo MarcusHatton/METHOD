@@ -2,12 +2,13 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "IS.h"
+#include "ISCE.h"
 #include "boundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 #include "RKPlus.h"
 // #include "SSP2.h"
+#include "DEIFY.h"
 #include "fluxVectorSplitting.h"
 #include "serialEnv.h"
 #include "serialSaveDataHDF5.h"
@@ -19,8 +20,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-
-  float taus[] = {1.0, 1e-1, 1e-2, 1e-3 };
+  float taus[] = {1e-2, 1e-3, 1e-4 };
   float tau = 0;
 
   for(int i=0; i<4; i++) {
@@ -79,6 +79,8 @@ int main(int argc, char *argv[]) {
   Weno3 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
+
+  DEIFY modelExtension(&data, &fluxMethod);
 
   Outflow bcs(&data);
   // Periodic bcs(&data);
