@@ -20,29 +20,29 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  float tau_pis[] = {1.0, 1e-1, 1e-3, 1e-5 };
-  float tau_pi = 0;
+  float taus[] = {1.0, 1e-1, 1e-2, 1e-3 };
+  float tau = 0;
 
   for(int i=0; i<4; i++) {
-    tau_pi = tau_pis[i];
-    cout << tau_pi << std::endl;
-    std::string dirpath = "./1d/bulk/taus/"+std::to_string(tau_pi);
+    tau = taus[i];
+    cout << tau << std::endl;
+    std::string dirpath = "./1d/bulk/taus/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
   int Ng(4);
-  int nx(4000);
+  int nx(1200);
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
-  double xmin(-10.0);
-  double xmax(10.0);
+  double xmin(-2.0);
+  double xmax(3.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(6.0);
-  double cfl(0.1);
+  double endTime(2.0);
+  double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-2, tau_pi,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1e-1,  5.0e-2, tau, 1.0e-15, 1e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -95,9 +95,9 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &modelExtension);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/taus/"+std::to_string(tau_pi)+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/bulk/taus/"+std::to_string(tau)+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/bulk/taus/"+std::to_string(tau_pi)+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/bulk/taus/"+std::to_string(tau)+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
