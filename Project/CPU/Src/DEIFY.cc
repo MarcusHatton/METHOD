@@ -112,13 +112,22 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   double dxux;
   double dyuy;
   double dzuz;
-
   double dxuy;
   double dxuz;
   double dyux;
   double dyuz;
   double dzux;
   double dzuy;
+
+  double dxvx;
+  double dyvy;
+  double dzvz;
+  double dxvy;
+  double dxvz;
+  double dyvx;
+  double dyvz;
+  double dzvx;
+  double dzvy;
 
 /*
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
