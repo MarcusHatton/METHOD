@@ -32,6 +32,9 @@ class ISCE : public Model
     template<typename T>
     T sqr(T x) { return ((x) * (x)); }
 
+    template<typename T>
+    T cube(T x) { return ((x) * (x) * (x)); }
+
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
@@ -71,11 +74,11 @@ class ISCE : public Model
       int stencil = {0, 0, 0};
       stencil[direction] += 1;
 
-      if direction == 0
+      if (direction == 0)
         double dX = data->dx;
-      else if direction == 1:
+      else if (direction == 1)
         double dX = data->dy;
-      else if direction == 2:
+      else if (direction == 2)
         double dX = data->dz;
       else
         throw std::runtime_error("Direction chosen for derivative is neither x, y, nor z.");
