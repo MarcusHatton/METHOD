@@ -158,17 +158,17 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         dyT = Grad(Aux::T, 1, 2, cons, prims, aux, i, j, k);
         dzT = Grad(Aux::T, 2, 2, cons, prims, aux, i, j, k);
 
-        dxvx = Grad(prims::v1, 0, 1, cons, prims, aux, i, j, k);
-        dxvy = Grad(prims::v2, 0, 1, cons, prims, aux, i, j, k);
-        dxvz = Grad(prims::v3, 0, 1, cons, prims, aux, i, j, k);
+        dxvx = Grad(Prims::v1, 0, 1, cons, prims, aux, i, j, k);
+        dxvy = Grad(Prims::v2, 0, 1, cons, prims, aux, i, j, k);
+        dxvz = Grad(Prims::v3, 0, 1, cons, prims, aux, i, j, k);
 
-        dyvx = Grad(prims::v1, 1, 1, cons, prims, aux, i, j, k);
-        dyvy = Grad(prims::v2, 1, 1, cons, prims, aux, i, j, k);
-        dyvz = Grad(prims::v3, 1, 1, cons, prims, aux, i, j, k);
+        dyvx = Grad(Prims::v1, 1, 1, cons, prims, aux, i, j, k);
+        dyvy = Grad(Prims::v2, 1, 1, cons, prims, aux, i, j, k);
+        dyvz = Grad(Prims::v3, 1, 1, cons, prims, aux, i, j, k);
 
-        dzvx = Grad(prims::v1, 2, 1, cons, prims, aux, i, j, k);
-        dzvy = Grad(prims::v2, 2, 1, cons, prims, aux, i, j, k);
-        dzvz = Grad(prims::v3, 2, 1, cons, prims, aux, i, j, k);
+        dzvx = Grad(Prims::v1, 2, 1, cons, prims, aux, i, j, k);
+        dzvy = Grad(Prims::v2, 2, 1, cons, prims, aux, i, j, k);
+        dzvz = Grad(Prims::v3, 2, 1, cons, prims, aux, i, j, k);
 
         W = aux[ID(Aux::W, i, j, k)];
         vx = prims[ID(Prims::v1, i, j, k)];
