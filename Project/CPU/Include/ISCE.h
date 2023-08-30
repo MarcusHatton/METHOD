@@ -93,9 +93,6 @@ class ISCE : public Model
         var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
         var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
       }
-      else {
-        throw runtime_error("You can only take gradients of Prims or Aux variables.");
-      }
 
       // Min-Mod First-Order
       double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX[direction];
