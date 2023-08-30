@@ -119,6 +119,7 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   double dzux;
   double dzuy;
 
+  double vx, vy, vz;
   double dxvx;
   double dyvy;
   double dzvz;
