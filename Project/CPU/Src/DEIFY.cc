@@ -157,7 +157,7 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         dzvy = Grad(Prims::v2, 2, 1, cons, prims, aux, i, j, k);
         dzvz = Grad(Prims::v3, 2, 1, cons, prims, aux, i, j, k);
 
-        W = aux[ID(Aux::W, i, j, k)];
+        double W = aux[ID(Aux::W, i, j, k)];
         vx = prims[ID(Prims::v1, i, j, k)];
         vy = prims[ID(Prims::v2, i, j, k)];
         vz = prims[ID(Prims::v3, i, j, k)];

@@ -94,7 +94,7 @@ class ISCE : public Model
         var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
       }
       else {
-        throw std::runtime_error("You can only take gradients of Prims or Aux variables.");
+        throw runtime_error("You can only take gradients of Prims or Aux variables.");
       }
 
       // Min-Mod First-Order
