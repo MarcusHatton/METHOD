@@ -105,30 +105,16 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
   double zeta = this->data->optionalSimArgs[2];
   double eta = this->data->optionalSimArgs[4];
 
-  double dxT;
-  double dyT;
-  double dzT;
-  
-  double dxux;
-  double dyuy;
-  double dzuz;
-  double dxuy;
-  double dxuz;
-  double dyux;
-  double dyuz;
-  double dzux;
-  double dzuy;
+  double dxT, dyT, dzT;
+  double dxux, dyuy, dzuz;
+  double dxuy, dxuz, dyux;
+  double dyuz, dyux, dzuy;
 
   double vx, vy, vz;
-  double dxvx;
-  double dyvy;
-  double dzvz;
-  double dxvy;
-  double dxvz;
-  double dyvx;
-  double dyvz;
-  double dzvx;
-  double dzvy;
+  double dxvx, dyvy, dzvz;
+  double dxvy, dxvz, dyvx;
+  double dyvz, dzvx, dzvy;
+
 
 /*
   for (int i(d->is_minus.at(0)); i < d->ie_plus.at(0); i++) {
