@@ -71,7 +71,9 @@ class ISCE : public Model
 
     double TakeGradient(int enum_n, int direction, char P_or_A = "P") {
 
-      int stencil = {0, 0, 0};
+      Data * d(this->data);
+
+      int stencil[3] = {0, 0, 0};
       stencil[direction] += 1;
 
       if (direction == 0)
@@ -94,7 +96,7 @@ class ISCE : public Model
         var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
         var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
       }
-      else{
+      else {
         throw std::runtime_error("You can only take gradients of Prims or Aux variables.");
       }
 
