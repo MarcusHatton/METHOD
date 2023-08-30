@@ -69,7 +69,7 @@ class ISCE : public Model
     //   }
     // }
 
-    double Grad(int enum_n, int direction, int C_P_or_A, double * cons, double * prims, double * aux) {
+    double Grad(int enum_n, int direction, int C_P_or_A, double * cons, double * prims, double * aux, int i, int j, int k) {
 
       Data * d(this->data);
 
