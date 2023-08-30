@@ -69,7 +69,7 @@ class ISCE : public Model
     //   }
     // }
 
-    double Grad(int enum_n, int direction, char P_or_A, double * cons, double * prims, double * aux) {
+    double Grad(int enum_n, int direction, int C_P_or_A, double * cons, double * prims, double * aux) {
 
       Data * d(this->data);
 
@@ -78,12 +78,17 @@ class ISCE : public Model
       double dX[3] = {data->dx, data->dy, data->dz};
       double var_cen, var_fw, var_bw;
 
-      if (P_or_A == "P") {
+      if (C_P_or_A == 0) {
+        var_cen = cons[ID(enum_n, i, j, k)];
+        var_fw = cons[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_bw = cons[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+      }
+      else if (C_P_or_A == 1) {
         var_cen = prims[ID(enum_n, i, j, k)];
         var_fw = prims[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
         var_bw = prims[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
       }
-      else if (P_or_A == "A") {
+      else if (C_P_or_A == 2) {
         var_cen = aux[ID(enum_n, i, j, k)];
         var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
         var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
