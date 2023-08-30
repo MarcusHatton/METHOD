@@ -69,23 +69,15 @@ class ISCE : public Model
     //   }
     // }
 
-    double TakeGradient(int enum_n, int direction, char P_or_A = "P") {
+    double Grad(int enum_n, int direction, char P_or_A, double * cons, double * prims, double * aux) {
 
       Data * d(this->data);
 
       int stencil[3] = {0, 0, 0};
       stencil[direction] += 1;
-
-      if (direction == 0)
-        double dX = data->dx;
-      else if (direction == 1)
-        double dX = data->dy;
-      else if (direction == 2)
-        double dX = data->dz;
-      else
-        throw std::runtime_error("Direction chosen for derivative is neither x, y, nor z.");
-
+      double dX[3] = {data->dx, data->dy, data->dz};
       double var_cen, var_fw, var_bw;
+
       if (P_or_A == "P") {
         var_cen = prims[ID(enum_n, i, j, k)];
         var_fw = prims[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
@@ -101,8 +93,8 @@ class ISCE : public Model
       }
 
       // Min-Mod First-Order
-      double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX;
-      double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX;
+      double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX[direction];
+      double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX[direction];
       if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
         return 0;
       } else {

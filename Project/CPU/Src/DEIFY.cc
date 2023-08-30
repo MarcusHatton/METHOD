@@ -145,21 +145,21 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // dzux = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v1, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v1, i, j, k-1)])/(2*d->dz);
         // dzuy = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)])/(2*d->dz);
 
-        dxT = TakeGradient(Aux::T, aux[ID(Aux::T, i, j, k)], 0, "A");
-        dyT = TakeGradient(Aux::T, aux[ID(Aux::T, i, j, k)], 1, "A");
-        dzT = TakeGradient(Aux::T, aux[ID(Aux::T, i, j, k)], 2, "A");
+        dxT = Grad(Aux::T, aux[ID(Aux::T, i, j, k)], 0, "A", cons, prims, aux);
+        dyT = Grad(Aux::T, aux[ID(Aux::T, i, j, k)], 1, "A", cons, prims, aux);
+        dzT = Grad(Aux::T, aux[ID(Aux::T, i, j, k)], 2, "A", cons, prims, aux);
 
-        dxvx = TakeGradient(prims::v1, 0, "P");
-        dxvy = TakeGradient(prims::v2, 0, "P");
-        dxvz = TakeGradient(prims::v3, 0, "P");
+        dxvx = Grad(prims::v1, 0, "P", cons, prims, aux);
+        dxvy = Grad(prims::v2, 0, "P", cons, prims, aux);
+        dxvz = Grad(prims::v3, 0, "P", cons, prims, aux);
 
-        dyvx = TakeGradient(prims::v1, 1, "P");
-        dyvy = TakeGradient(prims::v2, 1, "P");
-        dyvz = TakeGradient(prims::v3, 1, "P");
+        dyvx = Grad(prims::v1, 1, "P", cons, prims, aux);
+        dyvy = Grad(prims::v2, 1, "P", cons, prims, aux);
+        dyvz = Grad(prims::v3, 1, "P", cons, prims, aux);
 
-        dzvx = TakeGradient(prims::v1, 2, "P");
-        dzvy = TakeGradient(prims::v2, 2, "P");
-        dzvz = TakeGradient(prims::v3, 2, "P");
+        dzvx = Grad(prims::v1, 2, "P", cons, prims, aux);
+        dzvy = Grad(prims::v2, 2, "P", cons, prims, aux);
+        dzvz = Grad(prims::v3, 2, "P", cons, prims, aux);
 
         W = aux[ID(Aux::W, i, j, k)];
         vx = prims[ID(Prims::v1, i, j, k)];
@@ -352,8 +352,6 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // aux[ID(Aux::pi22LO, i, j, k)] = -((aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*((prims[ID(Prims::v1, i+1, j, k)] - prims[ID(Prims::v1, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*((prims[ID(Prims::v2, i, j+1, k)] - prims[ID(Prims::v2, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*((prims[ID(Prims::v3, i, j, k+1)] - prims[ID(Prims::v3, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((aux[ID(Aux::pi22NS, i+1, j, k)] - aux[ID(Aux::pi22NS, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((aux[ID(Aux::pi22NS, i, j+1, k)] - aux[ID(Aux::pi22NS, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((aux[ID(Aux::pi22NS, i, j, k+1)] - aux[ID(Aux::pi22NS, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtpi22NS, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((aux[ID(Aux::W, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)])/(d->dx)) + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((aux[ID(Aux::W, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)])/(d->dy)) + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((aux[ID(Aux::W, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)])/(d->dz)) + aux[ID(Aux::pi22NS, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)])*prims[ID(Prims::n, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((prims[ID(Prims::n, i+1, j, k)] - prims[ID(Prims::n, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((prims[ID(Prims::n, i, j+1, k)] - prims[ID(Prims::n, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((prims[ID(Prims::n, i, j, k+1)] - prims[ID(Prims::n, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi22NS, i, j, k)]*aux[ID(TDerivs::dtn, i, j, k)])/prims[ID(Prims::n, i, j, k)];
         // aux[ID(Aux::pi23LO, i, j, k)] = -((aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*((prims[ID(Prims::v1, i+1, j, k)] - prims[ID(Prims::v1, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*((prims[ID(Prims::v2, i, j+1, k)] - prims[ID(Prims::v2, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*((prims[ID(Prims::v3, i, j, k+1)] - prims[ID(Prims::v3, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((aux[ID(Aux::pi23NS, i+1, j, k)] - aux[ID(Aux::pi23NS, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((aux[ID(Aux::pi23NS, i, j+1, k)] - aux[ID(Aux::pi23NS, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((aux[ID(Aux::pi23NS, i, j, k+1)] - aux[ID(Aux::pi23NS, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtpi23NS, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((aux[ID(Aux::W, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)])/(d->dx)) + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((aux[ID(Aux::W, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)])/(d->dy)) + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((aux[ID(Aux::W, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)])/(d->dz)) + aux[ID(Aux::pi23NS, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)])*prims[ID(Prims::n, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((prims[ID(Prims::n, i+1, j, k)] - prims[ID(Prims::n, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((prims[ID(Prims::n, i, j+1, k)] - prims[ID(Prims::n, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((prims[ID(Prims::n, i, j, k+1)] - prims[ID(Prims::n, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi23NS, i, j, k)]*aux[ID(TDerivs::dtn, i, j, k)])/prims[ID(Prims::n, i, j, k)];
         // aux[ID(Aux::pi33LO, i, j, k)] = -((aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*((prims[ID(Prims::v1, i+1, j, k)] - prims[ID(Prims::v1, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*((prims[ID(Prims::v2, i, j+1, k)] - prims[ID(Prims::v2, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*((prims[ID(Prims::v3, i, j, k+1)] - prims[ID(Prims::v3, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((aux[ID(Aux::pi33NS, i+1, j, k)] - aux[ID(Aux::pi33NS, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((aux[ID(Aux::pi33NS, i, j+1, k)] - aux[ID(Aux::pi33NS, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((aux[ID(Aux::pi33NS, i, j, k+1)] - aux[ID(Aux::pi33NS, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*aux[ID(TDerivs::dtpi33NS, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((aux[ID(Aux::W, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)])/(d->dx)) + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((aux[ID(Aux::W, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)])/(d->dy)) + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((aux[ID(Aux::W, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)])/(d->dz)) + aux[ID(Aux::pi33NS, i, j, k)]*aux[ID(TDerivs::dtW, i, j, k)])*prims[ID(Prims::n, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*((prims[ID(Prims::n, i+1, j, k)] - prims[ID(Prims::n, i-1, j, k)])/(d->dx)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)]*((prims[ID(Prims::n, i, j+1, k)] - prims[ID(Prims::n, i, j-1, k)])/(d->dy)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)]*((prims[ID(Prims::n, i, j, k+1)] - prims[ID(Prims::n, i, j, k-1)])/(d->dz)) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::pi33NS, i, j, k)]*aux[ID(TDerivs::dtn, i, j, k)])/prims[ID(Prims::n, i, j, k)];
-
-
 
       }
     }
