@@ -32,28 +32,6 @@ class ISCE : public Model
     template<typename T>
     T sqr(T x) { return ((x) * (x)); }
 
-    // First and second order "minmod" functions for slope-limiting
-    double minmodGradFO(double im1, double i, double ip1, double dX) {
-
-      double FDGrad = (-1.0*i + 1*ip1)/dX;
-      double BDGrad = (1.0*i - 1*im1)/dX;
-      if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
-        return 0;
-      } else {
-        return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
-      }
-    }
-
-    double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, double dX) {
-      
-      double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
-      double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
-      if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
-        return 0;
-      } else {
-        return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
-      }
-}
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
@@ -64,6 +42,71 @@ class ISCE : public Model
     enum TDerivs { dtp = 35, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
                dtTau, dtE};
+
+    // First and second order "minmod" functions for slope-limiting
+    // double minmodGradFO(double im1, double i, double ip1, double dX) {
+
+    //   double FDGrad = (-1.0*i + 1*ip1)/dX;
+    //   double BDGrad = (1.0*i - 1*im1)/dX;
+    //   if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+    //     return 0;
+    //   } else {
+    //     return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+    //   }
+    // }
+
+    // double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, double dX) {
+      
+    //   double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
+    //   double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
+    //   if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+    //     return 0;
+    //   } else {
+    //     return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+    //   }
+    // }
+
+    double TakeGradient(int enum_n, int direction, char P_or_A = "P") {
+
+      int stencil = {0, 0, 0};
+      stencil[direction] += 1;
+
+      if direction == 0
+        double dX = data->dx;
+      else if direction == 1:
+        double dX = data->dy;
+      else if direction == 2:
+        double dX = data->dz;
+      else
+        throw std::runtime_error("Direction chosen for derivative is neither x, y, nor z.");
+
+      double var_cen, var_fw, var_bw;
+      if (P_or_A == "P") {
+        var_cen = prims[ID(enum_n, i, j, k)];
+        var_fw = prims[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_bw = prims[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+      }
+      else if (P_or_A == "A") {
+        var_cen = aux[ID(enum_n, i, j, k)];
+        var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+      }
+      else{
+        throw std::runtime_error("You can only take gradients of Prims or Aux variables.");
+      }
+
+      // Min-Mod First-Order
+      double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX;
+      double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX;
+      if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+        return 0;
+      } else {
+        return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+      }
+    }
+
+
+
 
     int smartGuesses;     //!< Number of smart guess required
 
