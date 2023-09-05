@@ -148,8 +148,8 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         dzT = Grad(Aux::T, 2, 2, cons, prims, aux, i, j, k);
 
         dxn = Grad(Prims::n, 0, 0, cons, prims, aux, i, j, k);
-        dxn = Grad(Prims::n, 1, 0, cons, prims, aux, i, j, k);
-        dxn = Grad(Prims::n, 2, 0, cons, prims, aux, i, j, k);
+        dyn = Grad(Prims::n, 1, 0, cons, prims, aux, i, j, k);
+        dzn = Grad(Prims::n, 2, 0, cons, prims, aux, i, j, k);
 
         dxW = Grad(Aux::W, 0, 2, cons, prims, aux, i, j, k);
         dyW = Grad(Aux::W, 1, 2, cons, prims, aux, i, j, k);
