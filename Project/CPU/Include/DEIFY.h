@@ -76,29 +76,9 @@ class DEIFY : public ModelExtension
     template<typename T>
     T sqr(T x) { return ((x) * (x)); }
 
-    // First and second order "minmod" functions for slope-limiting
-    double minmodGradFO(double im1, double i, double ip1, double dX) {
+    template<typename T>
+    T cube(T x) { return ((x) * (x) * (x)); }
 
-      double FDGrad = (-1.0*i + 1*ip1)/dX;
-      double BDGrad = (1.0*i - 1*im1)/dX;
-      if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
-        return 0;
-      } else {
-        return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
-      }
-    }
-
-    double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, double dX) {
-      
-      double FDGrad = (-1.5*i + 2*ip1 - 0.5*ip2)/dX;
-      double BDGrad = (1.5*i - 2*im1 + 0.5*im2)/dX;
-      if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
-        return 0;
-      } else {
-        return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
-      }
-    }
-    
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
@@ -109,6 +89,41 @@ class DEIFY : public ModelExtension
     enum TDerivs { dtp = 35, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
                dtTau, dtE};
+
+    double Grad(int enum_n, int direction, int C_P_or_A, double * cons, double * prims, double * aux, int i, int j, int k) {
+
+      Data * d(this->data);
+
+      int stencil[3] = {0, 0, 0};
+      stencil[direction] += 1;
+      double dX[3] = {data->dx, data->dy, data->dz};
+      double var_cen, var_fw, var_bw;
+
+      if (C_P_or_A == 0) {
+        var_cen = cons[ID(enum_n, i, j, k)];
+        var_fw = cons[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_bw = cons[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+      }
+      else if (C_P_or_A == 1) {
+        var_cen = prims[ID(enum_n, i, j, k)];
+        var_fw = prims[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_bw = prims[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+      }
+      else if (C_P_or_A == 2) {
+        var_cen = aux[ID(enum_n, i, j, k)];
+        var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+      }
+
+      // Min-Mod First-Order
+      double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX[direction];
+      double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX[direction];
+      if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
+        return 0;
+      } else {
+        return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
+      }
+    }
 
     double *Fx, *Fy, *Fz;   //!< Diffusion vectors
 
