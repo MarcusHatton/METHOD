@@ -177,10 +177,17 @@ class IS : public Model
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
             // dW/dt \equiv du0/dt
-            aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
+            // aux[ID(Aux::dWdt, i, j, k)] = (aux[ID(Aux::W, i, j, k)] - prev_vars[ID(0, i, j, k)])/dt;
+
+            // Now with chain rule for dW/dt instead
             aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
             aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
             aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
+            aux[ID(Aux::dWdt, i, j, k)] = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::W, i, j, k)]
+               * ( prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)]
+               + prims[ID(Prims::v2, i, j, k)]*aux[ID(Aux::dv2dt, i, j, k)]
+               + prims[ID(Prims::v3, i, j, k)]*aux[ID(Aux::dv3dt, i, j, k)] );
+
             // Update previous values
             prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
             prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
@@ -269,12 +276,6 @@ class IS : public Model
   @sa [Original source](https://github.com/devernay/cminpack)
 */
 int residual(void *p, int n, const double *x, double *fvec, int iflag);
-
-
-
-
-  
-
 
 
 #endif

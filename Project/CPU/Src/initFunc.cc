@@ -1412,7 +1412,7 @@ ISKHInstabilityTIIdeal::ISKHInstabilityTIIdeal(Data * data) : InitialFunc(data)
 
 //  if (d->Nprims > 15) throw std::invalid_argument("Trying to implement a single fluid initial state on incorrect model.\n\tModel has wrong number of primitive variables to be single fluid model.");
   if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
-  if (d->xmin != -0.5 || d->xmax != 0.5) throw std::invalid_argument("Domain has incorrect values. Expected x E [-0.5, 0.5]\n");
+  if (d->xmin != -1.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [-1.0, 1.0]\n");
   if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
 
   double vShear(0.1);
@@ -1423,7 +1423,8 @@ ISKHInstabilityTIIdeal::ISKHInstabilityTIIdeal(Data * data) : InitialFunc(data)
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
 
-        if (d->y[j] > 0.01*sin(2*PI*d->x[i])) {
+        //if (d->y[j] > 0.01*sin(2*PI*d->x[i])) {
+        if (fabs(d->y[j]) > 0.5 + 0.01*sin(2*PI*d->x[i])) {
           d->prims[ID(p, i, j, k)] = 0.3;
           d->prims[ID(v1, i, j, k)] = vShear;
           d->prims[ID(n, i, j, k)] = rho0 + rho1;
