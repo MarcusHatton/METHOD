@@ -73,6 +73,10 @@ class DEIFY : public ModelExtension
 {
   public:
 
+    // Bool controlling whether to add NLO contributions from the
+    // CE-expanded fluxes (state vector contribution not yet implemented
+    bool NLO = false;
+
     template<typename T>
     T sqr(T x) { return ((x) * (x)); }
 
