@@ -2,6 +2,7 @@
 
 #SBATCH --ntasks-per-node=40
 #SBATCH --nodes=1
+#SBATCH --ntasks=40
 #SBATCH --time=48:00:00          # walltime
 
 module purge
