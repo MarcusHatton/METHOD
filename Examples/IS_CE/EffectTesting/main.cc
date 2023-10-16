@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     tau = taus[i];
     cout << tau << std::endl;
     //std::string dirpath = "./1d/all/stillshock/taus/"+std::to_string(tau);
-    std::string dirpath = "../../../../../../scratch/mjh1n20/StillShock/tau_scaling/ISCE/"+std::to_string(tau);
+    std::string dirpath = "../../../../../../scratch/mjh1n20/StillShock/tau_scaling/ISCE/small/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
-  double xmin(-2.0);
-  double xmax(3.0);
+  double xmin(-1.0);
+  double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(2.0);
+  double endTime(0.8);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
