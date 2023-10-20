@@ -20,10 +20,10 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  float taus[] = {10.0, 1.0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5 };
+  float taus[] = {1.0, 1e-1, 1e-2, 1e-3};
   float tau = 0;
 
-  for(int i=0; i<7; i++) {
+  for(int i=0; i<4; i++) {
     tau = taus[i];
     cout << tau << std::endl;
     std::string dirpath = "./1d/StillShock/All/tau_scaling/weak/"+std::to_string(tau);
