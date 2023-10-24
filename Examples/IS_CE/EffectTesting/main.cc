@@ -21,13 +21,14 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  float taus[] = {1.0, 1e-1, 1e-3};
+  float taus[] = {1e-1, 1e-2, 1e-3};
   float tau = 0;
 
   for(int i=0; i<3; i++) {
     tau = taus[i];
     cout << tau << std::endl;
-    std::string dirpath = "./1d/heatbulk/tau_scaling/5em2_5em3/"+std::to_string(tau);
+    //std::string dirpath = "./1d/heatbulk/tau_scaling/5em2_5em3/"+std::to_string(tau);
+    std::string dirpath = "../../../../../../scratch/mjh1n20/StillShock/tau_scaling/ISCE/heat_bulk/5em2_5em3/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
