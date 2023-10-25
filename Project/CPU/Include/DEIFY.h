@@ -125,6 +125,8 @@ class DEIFY : public ModelExtension
       }
     }
 
+    bool NLO{true};
+
     double *Fx, *Fy, *Fz;   //!< Diffusion vectors
 
     double *dtH;
