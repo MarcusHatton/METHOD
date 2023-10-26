@@ -19,14 +19,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  //float taus[] = {1.0e-3,1.0e-2,1.0e-1,1.0,10.0};
-  float taus[] = {1.0e-2};
+  float taus[] = {5e-2};
   float tau = 0;
 
-  for(int i=0; i<5; i++) {
+  for(int i=0; i<1; i++) {
     tau = taus[i];
     cout << tau << std::endl;
-    std::string dirpath = "./1d/StillShock/Bulk/tau_scaling/"+std::to_string(tau);
+    std::string dirpath = "./1d/StillShock/Ideal/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, tau,  1.0e-1, tau,  1e-15, tau} };
+  const std::vector<double> toy_params           { {1.0e-15, tau,  1.0e-15, tau,  1.0e-15, tau} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -97,7 +96,7 @@ int main(int argc, char *argv[]) {
   SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/StillShock/Bulk/tau_scaling/"+std::to_string(tau)+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -106,7 +105,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/StillShock/Bulk/tau_scaling/"+std::to_string(tau)+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
