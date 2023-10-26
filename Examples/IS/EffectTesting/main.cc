@@ -19,13 +19,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  float taus[] = {5e-2};
+  float taus[] = {1e-4};
   float tau = 0;
 
   for(int i=0; i<1; i++) {
     tau = taus[i];
     cout << tau << std::endl;
-    std::string dirpath = "./1d/StillShock/Ideal/"+std::to_string(tau);
+    std::string dirpath = "./1d/StillShock/Bulk/tau_scaling/5em2/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
