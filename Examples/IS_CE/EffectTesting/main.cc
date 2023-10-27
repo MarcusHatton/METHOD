@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     tau = taus[i];
     cout << tau << std::endl;
     //std::string dirpath = "./1d/all/stillshock/taus/"+std::to_string(tau);
-    std::string dirpath = "../../../../../../scratch/mjh1n20/StillShock/tau_scaling/ISCE/bulk/1em1/"+std::to_string(tau);
+    std::string dirpath = "../../../../../../scratch/mjh1n20/StillShock/tau_scaling/ISCE/all/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  //const std::vector<double> toy_params           { {1.0e-4, tau,  1.0e-2, tau, 1.0e-3, tau} };
-  const std::vector<double> toy_params           { {1.0e-15, 1e-12,  1.0e-1, tau, 1.0e-15, 1e-12} };
+  const std::vector<double> toy_params           { {1.0e-4, tau,  1.0e-2, tau, 1.0e-3, tau} };
+  //const std::vector<double> toy_params           { {1.0e-15, 1e-12,  1.0e-1, tau, 1.0e-15, 1e-12} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);

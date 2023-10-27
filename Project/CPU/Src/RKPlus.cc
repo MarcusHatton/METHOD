@@ -25,7 +25,7 @@ void RKPlus::rhs(double * cons, double * prims, double * aux, double * rhsVec)
 
   // If there is a subgrid model, add that contribution
   if (modelExtension != NULL && modelExtension->sourceExists) {
-    //printf("modelExtension running...");
+    printf("modelExtension running...");
     modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
 
     for (int var(0); var < d->Ncons; var++) {
