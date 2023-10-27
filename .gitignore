@@ -28,6 +28,7 @@ gtest.a
 
 *.dat
 *.hdf5
+*.pdf
 
 Doxumentation/html/*
 

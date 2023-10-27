@@ -1,0 +1,27 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import h5py
+import glob
+import os
+
+fss_IS_Id = []
+
+fss_IS_Id.append(h5py.File(f'2d/Ideal/dp_800x1600x0_5.hdf5', 'r'))
+fss_IS_Id.append(h5py.File(f'2d/Ideal/dp_80x160x0_5.hdf5', 'r'))
+fss_IS_Id.append(h5py.File(f'2d/Shear/LO/1em1/dp_400x800x0_5.hdf5', 'r'))
+    
+
+fig, axes = plt.subplots(1,3,figsize=(10,4),sharex=True, sharey=True)
+for i, fs, axis in zip(range(3), fss_IS_Id, axes.flatten()):
+    axis.imshow(fs['Primitive/n'][:], extent=[-1.0,1.0,-0.5,0.5])
+    if i == 0:
+        axis.set_ylabel(r'$x$')
+    if i == 0 or i == 1 or i == 2:
+        axis.set_xlabel(r'$y$') 
+
+axes[0].set_title(r'$Ideal, High-Res$') 
+axes[1].set_title(r'$Ideal, Low-Res$') 
+axes[2].set_title(r'$Shear, Medium-Res$') 
+
+fig.tight_layout()
+plt.savefig('KH_HRLRSh_Comp.pdf', dpi=1200)

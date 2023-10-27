@@ -1,0 +1,34 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import h5py
+import glob
+import os
+
+fss = []
+
+for n in range(2):
+    fss.append(h5py.File(f'2d/Shear/1em3_5em3/t_6.25/dp_800x1600x0_{n}.hdf5', 'r'))
+    #fss.append(h5py.File(f'2d/Ideal/dp_800x1600x0_{n}.hdf5', 'r'))
+
+
+fig, axes = plt.subplots(1,2,figsize=(12,6))#,sharex=True, sharey=True)
+for i, fs, axis in zip(range(2), fss, axes.flatten()):
+    axis.imshow(fs['Primitive/n'][:], extent=[-1.0,1.0,-0.5,0.5])
+    #axis.imshow(fs['Primitive/pi12'][:], extent=[-1.0,1.0,-0.5,0.5])
+    if i == 0:
+        axis.set_ylabel(r'$x$')
+    if i == 0 or i == 1:
+        axis.set_xlabel(r'$y$') 
+        #axis.set_xticks([])
+    if i == 1:
+        axis.set_yticks([])
+
+#axes[0,0].set_title(r'$Viscous, 400x800$') 
+#axes[0].set_title(r'$Viscous, 800x1600$') 
+#axes[0,0].set_title(r'$Ideal, 800x1600$') 
+#axes[0,0].set_title(r'$Ideal, 200x400$') 
+#axes[0,0].set_title(r'$Ideal, 80x160$') 
+#axes[-1].set_title(r'$t = 6.25$')
+
+fig.tight_layout()
+plt.savefig('testing.pdf', dpi=1200)
