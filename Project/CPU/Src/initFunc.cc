@@ -1364,7 +1364,7 @@ Shocktube::Shocktube(Data * data, int dir) : InitialFunc(data)
 }
 
 
-KHInstability::KHInstability(Data * data) : InitialFunc(data)
+KHInstability::KHInstability(Data * data, double vShear, double rhoLight, double rhoHeavy) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1375,12 +1375,14 @@ KHInstability::KHInstability(Data * data) : InitialFunc(data)
   if (d->ymin != -1.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [-1.0, 1.0]\n");
 
   double sig(0.1);
-  double vShear(0.5);
+  //double vShear(0.5);
   double A0(0.1);
   //double a(0.01);
   double a(0.0025);
-  double rho0(0.55);
-  double rho1(0.45);
+  //double rho0 (0.55);
+  //double rho1(0.45);
+  double rho0 { (rhoHeavy + rhoLight ) / 2};
+  double rho1 { (rhoHeavy - rhoLight ) / 2};
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {

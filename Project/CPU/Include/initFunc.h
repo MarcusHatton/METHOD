@@ -469,7 +469,7 @@ class KHInstability : public InitialFunc
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    KHInstability(Data * data);
+    KHInstability(Data * data, double vShear=0.5, double rhoLight=0.1, double rhoHeavy=1.0);
 
     virtual ~KHInstability() { }     //!< Destructor
 };
