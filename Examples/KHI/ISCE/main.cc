@@ -28,17 +28,23 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(1000);
-  int ny(2000);
+  int nx(200);
+  int ny(400);
   int nz(0);
-  double xmin(-1.0);
-  double xmax(1.0);
-  double ymin(-2.0);
-  double ymax(2.0);
+  double xmin(-0.5);
+  double xmax(0.5);
+  double ymin(-1.0);
+  double ymax(1.0);
   double zmin(-0.1);
   double zmax(0.1);
-  double endTime(30.0);
+  double startTime(49.0);
+  double endTime(50.0);
   double cfl(0.4);
+  string dirpath = "../../../../../../scratch/mjh1n20/Filtering_Data/KH/Ideal/t_49_50/8em1_1em1_1";
+  double vShear(0.8);
+  double rhoLight(0.1);
+  double rhoHeavy(1.0);
+
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
@@ -54,17 +60,17 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(10);
+  int nreports(5);
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
-  //SerialEnv env(&argc, &argv, 1, 1, 1);
+//  SerialEnv env(&argc, &argv, 1, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
-  data_args.gamma = 5.0/3.0;
+  data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15,  1.0e-3, 1.0e-15} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -82,12 +88,13 @@ int main(int argc, char *argv[]) {
 
 //  ParallelOutflow bcs(&data, &env);
   ParallelPeriodic bcs(&data, &env);
+//  Periodic bcs(&data);
 
   Simulation sim(&data, &env);
 
-  //KHInstability init(&data);
-  //ISKHInstabilitySingleFluid init(&data);
-  ISKHInstabilityTIIdeal init(&data);
+  KHInstability init(&data, vShear, rhoLight, rhoHeavy);
+//  ISKHInstabilitySingleFluid init(&data);
+//  ISKHInstabilityTIIdeal init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
@@ -96,16 +103,16 @@ int main(int argc, char *argv[]) {
   // RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
   // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
 
-  ParallelSaveDataHDF5 save(&data, &env, "2d/1em3/t_30/TI/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  // ParallelSaveDataHDF5 save(&data, &env, dirpath+"/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
 
-  save.saveAll();
+  // save.saveAll();
 
   for (int n(0); n<nreports; n++) {
-    data.endTime = (n+1)*endTime/(nreports);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/1em3/t_30/TI/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    data.endTime = startTime + n*(endTime-startTime)/(nreports-1);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

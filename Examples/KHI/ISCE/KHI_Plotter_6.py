@@ -3,11 +3,18 @@ import matplotlib.pyplot as plt
 import h5py
 import glob
 import os
+import sys
+
+filepath = sys.argv[1]
+print(filepath)
 
 fss = []
+n_files = 5
 
-for n in range(6):
-    fss.append(h5py.File(f'2d/1em3/dp_800x1600x0_{n}.hdf5', 'r'))
+for n in range(n_files):
+    fss.append(h5py.File(filepath+f'/dp_200x400x0_{n}.hdf5', 'r'))
+    #fss.append(h5py.File(f'../../../../../../scratch/mjh1n20/Filtering_Data/KH/Ideal/t_49_50/dp_200x400x0_{n}.hdf5', 'r'))
+    #fss.append(h5py.File(f'2d/1em3/dp_800x1600x0_{n}.hdf5', 'r'))
     #fss.append(h5py.File(f'2d/Shear/1em3_5em3/t_6.25/dp_400x800x0_{n}.hdf5', 'r'))
     #fss.append(h5py.File(f'2d/Shear/5em4_1em3/dp_800x1600x0_{n}.hdf5', 'r'))
     #fss.append(h5py.File(f'2d/Shear/1em3_5em3/dp_400x800x0_{n}.hdf5', 'r'))
@@ -22,7 +29,7 @@ plt.rcParams.update(params)
 quant_str= 'n'
 
 fig, axes = plt.subplots(3,2,figsize=(3.25,2.4),sharex=True, sharey=True)#, constrained_layout=True)
-for i, fs, axis in zip(range(6), fss, axes.flatten()):
+for i, fs, axis in zip(range(n_files), fss, axes.flatten()):
     axes = axes.flatten()
     extent = [-1.0,1.0,-0.5,0.5]
     im = axes[i].imshow(fs['Primitive/'+quant_str][:], extent=extent)
