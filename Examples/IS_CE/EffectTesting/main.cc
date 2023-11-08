@@ -21,29 +21,28 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  float taus[] = {1e-1, 1e-2, 1e-3};
-  float tau = 0;
+  int nxs[] = {500, 1000, 2000, 4000};
+  int nx = 0;
 
-  for(int i=0; i<3; i++) {
-    tau = taus[i];
-    cout << tau << std::endl;
-    //std::string dirpath = "./1d/heatbulk/tau_scaling/5em2_5em3/"+std::to_string(tau);
-    std::string dirpath = "../../../../../../scratch/mjh1n20/StillShock/tau_scaling/ISCE/heat_bulk/5em2_5em3/"+std::to_string(tau);
+  for(int i=0; i<4; i++) {
+    nx = nxs[i];
+    cout << nx << std::endl;
+    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/MISCE/t_50/1em3_1em1/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
   int Ng(4);
-  int nx(1200);
+  // int nx(1200);
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
-  double xmin(-2.0);
-  double xmax(3.0);
+  double xmin(-1.0);
+  double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(2.0);
+  double endTime(50.0);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -60,7 +59,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(6);
+  int nreports(5);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -68,7 +67,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {5.0e-3, tau,  5.0e-2, tau,  1.0e-15, 1.0e-12} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-3, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -93,8 +92,8 @@ int main(int argc, char *argv[]) {
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
-  //IS_ShearTest init(&data);
-  IS_BulkHeatTest init(&data);
+  IS_ShearTest init(&data);
+  //IS_BulkHeatTest init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
