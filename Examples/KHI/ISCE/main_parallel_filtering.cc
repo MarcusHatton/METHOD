@@ -24,12 +24,19 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
+  int nx = 0;
+  int nxs[] = { 100, 400, 800 };
+  int ny = 0;
+  int nys[] = { 200, 800, 1600 };
+
+  for (int i = 0; i<3; i++) {
+    nx = nxs[i];
+    ny = nys[i];
+
   // Set up domain
   int Ng(4);
-  // int nx(65536);
-  // int nx(32768);
-  int nx(200);
-  int ny(400);
+  //int nx(200);
+  //int ny(400);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -37,8 +44,14 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(-0.1);
   double zmax(0.1);
-  double endTime(6.25);
+  double startTime(49.0);
+  double endTime(50.0);
   double cfl(0.4);
+  string dirpath = "../../../../../../scratch/mjh1n20/Filtering_Data/KH/Ideal/t_49_50/5em1_1_50";
+  double vShear(0.5);
+  double rhoLight(1.0);
+  double rhoHeavy(50.0);
+
   // double gamma(0.001);
   // double sigma(0.001);
   // These parameters work with IMEX SSP2; given that tau_q << dt,
@@ -64,7 +77,7 @@ int main(int argc, char *argv[]) {
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15,  -1e-5, 1.0e-15} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -78,7 +91,7 @@ int main(int argc, char *argv[]) {
 
   FVS fluxMethod(&data, &weno, &model);
 
-  DEIFY ModelExtension(&data, &fluxMethod);
+  //DEIFY ModelExtension(&data, &fluxMethod);
 
 //  ParallelOutflow bcs(&data, &env);
   ParallelPeriodic bcs(&data, &env);
@@ -86,30 +99,32 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  KHInstability init(&data);
+  KHInstability init(&data, vShear, rhoLight, rhoHeavy);
 //  ISKHInstabilitySingleFluid init(&data);
 //  ISKHInstabilityTIIdeal init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod); //, &ModelExtension);
   // RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
   // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
 
-  ParallelSaveDataHDF5 save(&data, &env, "2d/m1em5/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  // ParallelSaveDataHDF5 save(&data, &env, dirpath+"/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
 
-  save.saveAll();
+  // save.saveAll();
 
   for (int n(0); n<nreports; n++) {
-    data.endTime = (n+1)*endTime/(nreports);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/m1em5/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    data.endTime = startTime + n*(endTime-startTime)/(nreports-1);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
+
+  } // end of resolution-loop
 
   return 0;
 

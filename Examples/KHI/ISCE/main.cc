@@ -24,12 +24,19 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
+  int nx = 0;
+  int nxs[] = { 100, 400, 800 };
+  int ny = 0;
+  int nys[] = { 200, 800, 1600 };
+
+  for (int i = 0; i<3; i++) {
+    nx = nxs[i];
+    ny = nys[i];
+
   // Set up domain
   int Ng(4);
-  // int nx(65536);
-  // int nx(32768);
-  int nx(200);
-  int ny(400);
+  //int nx(200);
+  //int ny(400);
   int nz(0);
   double xmin(-0.5);
   double xmax(0.5);
@@ -40,10 +47,11 @@ int main(int argc, char *argv[]) {
   double startTime(49.0);
   double endTime(50.0);
   double cfl(0.4);
-  string dirpath = "../../../../../../scratch/mjh1n20/Filtering_Data/KH/Ideal/t_49_50/8em1_1em1_1";
-  double vShear(0.8);
-  double rhoLight(0.1);
-  double rhoHeavy(1.0);
+  //string dirpath = "../../../../../../scratch/mjh1n20/Filtering_Data/KH/Ideal/t_49_50/5em1_1_50";
+  string dirpath = "../../../../../../mainfs/filtering/Filtering_Data/KHI/Ideal/t_49_50/5em1_1_50";
+  double vShear(0.5);
+  double rhoLight(1.0);
+  double rhoHeavy(50.0);
 
   // double gamma(0.001);
   // double sigma(0.001);
@@ -84,7 +92,7 @@ int main(int argc, char *argv[]) {
 
   FVS fluxMethod(&data, &weno, &model);
 
-  DEIFY ModelExtension(&data, &fluxMethod);
+  //DEIFY ModelExtension(&data, &fluxMethod);
 
 //  ParallelOutflow bcs(&data, &env);
   ParallelPeriodic bcs(&data, &env);
@@ -99,7 +107,7 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod); //, &ModelExtension);
   // RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
   // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
 
@@ -116,6 +124,8 @@ int main(int argc, char *argv[]) {
     sim.evolve(output);
     save_in_loop.saveAll();
   }
+
+  } // end of resolution-loop
 
   return 0;
 

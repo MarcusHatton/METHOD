@@ -63,7 +63,7 @@ RK2B::RK2B(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, Model
   // Syntax
   Data * d(this->data);
 
-  // New ones for time differential calcs
+  // New ones for time differential calcs (lagged updates)
 //  orig_cons  = new double[d->Ntot * d->Ncons](); // can be shortened to the number we need
 //  orig_prims = new double[d->Ntot * d->Ncons]();
 //  orig_aux   = new double[d->Ntot](); // only 1 needed for now
