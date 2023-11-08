@@ -1473,7 +1473,7 @@ ISKHInstabilityTIShear::ISKHInstabilityTIShear(Data * data) : InitialFunc(data)
         d->prims[ID(n, i, j, k)] = rho0 + rho1 * tanh(d->y[j]/a);
         d->prims[ID(v2, i, j, k)] = 0.0;
 
-	// Set all the dissipative variables to zero - should be automatic
+	      // Set all the dissipative variables to zero - should be automatic
         for (int nvar(0); nvar < 10; nvar++) {
           d->prims[ID(6+nvar, i, j, k)] = 0;
         }
@@ -1553,7 +1553,7 @@ IS_C2PStressTest::IS_C2PStressTest(Data * data) : InitialFunc(data)
 
 }
 
-IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
+Erf_ShearTest::Erf_ShearTest(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);
@@ -1561,8 +1561,6 @@ IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
   
   // Limit checking
   //if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
-  //if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n"); 
-  //if (d->zmin != 0.0 || d->zmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected z E [0.0, 1.0]\n"); 
 
   for (int i(0); i<d->Nx; i++) {
     for (int j(0); j<d->Ny; j++) {
@@ -1580,7 +1578,32 @@ IS_ShearTest::IS_ShearTest(Data * data) : InitialFunc(data)
 
 }
 
-IS_BulkHeatTest::IS_BulkHeatTest(Data * data) : InitialFunc(data)
+SinWave_ShearTest::SinWave_ShearTest(Data * data) : InitialFunc(data)
+{
+  // Syntax
+  Data * d(data);
+  //if (d->gamma != 5.0/3.0) throw std::invalid_argument("Expected the index gamma = 5/3\n");
+  
+  // Limit checking
+  if (d->xmin != -1.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [-1.0, 1.0]\n");
+
+  for (int i(0); i<d->Nx; i++) {
+    for (int j(0); j<d->Ny; j++) {
+      for (int k(0); k<d->Nz; k++) {
+        
+        d->prims[ID(3, i, j, k)] = 1.0;
+        d->prims[ID(5, i, j, k)] = 1.0;
+        d->prims[ID(1, i, j, k)] = 0.2*sin( PI*d->x[i] );
+        d->prims[ID(0, i, j, k)] = 0;
+        d->prims[ID(2, i, j, k)] = 0;
+
+      }
+    }
+  }
+
+}
+
+StillShock_BulkHeatTest::StillShock_BulkHeatTest(Data * data) : InitialFunc(data)
 {
   // Syntax
   Data * d(data);

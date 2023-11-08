@@ -523,28 +523,40 @@ class IS_C2PStressTest : public InitialFunc
     virtual ~IS_C2PStressTest() { }     //!< Destructor
 };
 
-class IS_ShearTest : public InitialFunc
+class Erf_ShearTest : public InitialFunc
 {
   public:
     /*! Constructor
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    IS_ShearTest(Data * data);
+    Erf_ShearTest(Data * data);
 
-    virtual ~IS_ShearTest() { }     //!< Destructor
+    virtual ~Erf_ShearTest() { }     //!< Destructor
 };
 
-class IS_BulkHeatTest : public InitialFunc
+class SinWave_ShearTest : public InitialFunc
 {
   public:
     /*! Constructor
       @param[in] *data Pointer to Data class containing global simulation data
       @sa InitialFunc
     */
-    IS_BulkHeatTest(Data * data);
+    SinWave_ShearTest(Data * data);
 
-    virtual ~IS_BulkHeatTest() { }     //!< Destructor
+    virtual ~SinWave_ShearTest() { }     //!< Destructor
+};
+
+class StillShock_BulkHeatTest : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    StillShock_BulkHeatTest(Data * data);
+
+    virtual ~StillShock_BulkHeatTest() { }     //!< Destructor
 };
 
 class Smeared_Shocktube_1D_Para : public InitialFunc
