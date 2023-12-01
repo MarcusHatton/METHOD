@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   int ny = 0;
   int nys[] = { 200, 800, 1600 };
 
-  for (int i = 0; i<3; i++) {
+  for (int i = 0; i<2; i++) {
     nx = nxs[i];
     ny = nys[i];
 
@@ -48,10 +48,10 @@ int main(int argc, char *argv[]) {
   double endTime(50.0);
   double cfl(0.4);
   //string dirpath = "../../../../../../scratch/mjh1n20/Filtering_Data/KH/Ideal/t_49_50/5em1_1_50";
-  string dirpath = "../../../../../../mainfs/filtering/Filtering_Data/KHI/Ideal/t_49_50/5em1_1_50";
-  double vShear(0.5);
-  double rhoLight(1.0);
-  double rhoHeavy(50.0);
+  string dirpath = "../../../../../../filtering/Filtering_Data/KHI/Ideal/t_49_50/2em1_1em1_1";
+  double vShear(0.2);
+  double rhoLight(0.1);
+  double rhoHeavy(1.0);
 
   // double gamma(0.001);
   // double sigma(0.001);

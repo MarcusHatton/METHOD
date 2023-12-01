@@ -2,8 +2,8 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "IS.h"
-//#include "DEIFY.h"
+#include "ISCE.h"
+#include "DEIFY.h"
 #include "boundaryConds.h"
 #include "rkSplit.h"
 #include "backwardsRK.h"
@@ -21,13 +21,14 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  int nxs[] = {250, 500, 1000, 2000, 4000};
+  int nxs[] = {25, 50, 100, 200, 400, 800};
   int nx = 0;
 
-  for(int i=0; i<4; i++) {
+  for(int i=0; i<6; i++) {
     nx = nxs[i];
     cout << nx << std::endl;
-    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/1em3_1em1/MIS/"+std::to_string(nx);
+    //std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/1em3_1em1/MIS/"+std::to_string(nx);
+    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/Ideal/MISCE/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(10);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-3, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -75,13 +76,13 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data);
+  ISCE model(&data);
 
   Weno3 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
 
-  //DEIFY modelExtension(&data, &fluxMethod);
+  DEIFY modelExtension(&data, &fluxMethod);
 
   //Outflow bcs(&data);
   Periodic bcs(&data);
@@ -98,8 +99,8 @@ int main(int argc, char *argv[]) {
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  //RK2B timeInt(&data, &model, &bcs, &fluxMethod, &modelExtension);
+  //SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &modelExtension);
 
   SerialSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
