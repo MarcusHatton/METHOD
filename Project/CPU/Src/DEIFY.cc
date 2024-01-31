@@ -52,7 +52,9 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
     for (int i(d->is); i < d->ie; i++) {
       for (int j(d->js); j < d->je; j++) {
         for (int k(d->ks); k < d->ke; k++) {
-            source[ID(var, i, j, k)] = -(Fx[ID(var, i+1, j, k)] - Fx[ID(var, i-1, j, k)]) / (2*d->dx);
+            //source[ID(var, i, j, k)] = -(Fx[ID(var, i+1, j, k)] - Fx[ID(var, i-1, j, k)]) / (2*d->dx);
+            source[ID(var, i, j, k)] = -(-0.08333*Fx[ID(var, i+2, j, k)] + 0.6667*Fx[ID(var, i+1, j, k)]
+                                         -0.6667*Fx[ID(var, i-1, j, k)] + 0.08333*Fx[ID(var, i-2, j, k)]) / (d->dx);
         }
       }
     }
@@ -64,7 +66,9 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
-              source[ID(var, i, j, k)] += -(Fy[ID(var, i, j+1, k)] - Fy[ID(var, i, j-1, k)]) / (2*d->dy);
+              //source[ID(var, i, j, k)] += -(Fy[ID(var, i, j+1, k)] - Fy[ID(var, i, j-1, k)]) / (2*d->dy);
+              source[ID(var, i, j, k)] = -(-0.08333*Fy[ID(var, i, j+2, k)] + 0.6667*Fy[ID(var, i, j+1, k)]
+                                           -0.6667*Fy[ID(var, i, j-1, k)] + 0.08333*Fy[ID(var, i, j-2, k)]) / (d->dy);
           }
         }
       }
@@ -77,7 +81,9 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
-            source[ID(var, i, j, k)] += -(Fz[ID(var, i, j, k+1)] - Fz[ID(var, i, j, k-1)]) / (2*d->dz);
+            //source[ID(var, i, j, k)] += -(Fz[ID(var, i, j, k+1)] - Fz[ID(var, i, j, k-1)]) / (2*d->dz);
+            source[ID(var, i, j, k)] = -(-0.08333*Fz[ID(var, i, j, k+2)] + 0.6667*Fz[ID(var, i, j, k+1)]
+                                         -0.6667*Fz[ID(var, i, j, k-1)] + 0.08333*Fz[ID(var, i, j, k-2)]) / (d->dz);
           }
         }
       }
@@ -147,9 +153,9 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         dyT = Grad(Aux::T, 1, 2, cons, prims, aux, i, j, k);
         dzT = Grad(Aux::T, 2, 2, cons, prims, aux, i, j, k);
 
-        dxn = Grad(Prims::n, 0, 0, cons, prims, aux, i, j, k);
-        dyn = Grad(Prims::n, 1, 0, cons, prims, aux, i, j, k);
-        dzn = Grad(Prims::n, 2, 0, cons, prims, aux, i, j, k);
+        dxn = Grad(Prims::n, 0, 1, cons, prims, aux, i, j, k);
+        dyn = Grad(Prims::n, 1, 1, cons, prims, aux, i, j, k);
+        dzn = Grad(Prims::n, 2, 1, cons, prims, aux, i, j, k);
 
         dxW = Grad(Aux::W, 0, 2, cons, prims, aux, i, j, k);
         dyW = Grad(Aux::W, 1, 2, cons, prims, aux, i, j, k);
