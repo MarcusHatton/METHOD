@@ -45,6 +45,9 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
 
   // Set vars - dissipative NS forms
   this->set_vars(cons, prims, aux);
+
+  //printf("HELLO");
+  //printf("%d", d->dims);
  
   // Determine the diffusion vectors
   this->set_Fx(cons, prims, aux);
@@ -53,6 +56,7 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
       for (int j(d->js); j < d->je; j++) {
         for (int k(d->ks); k < d->ke; k++) {
             //source[ID(var, i, j, k)] = -(Fx[ID(var, i+1, j, k)] - Fx[ID(var, i-1, j, k)]) / (2*d->dx);
+            //printf("var: %d, i: %d, Fx: %g\n", var, i, Fx[ID(var, i, j, k)]);
             source[ID(var, i, j, k)] = -(-0.08333*Fx[ID(var, i+2, j, k)] + 0.6667*Fx[ID(var, i+1, j, k)]
                                          -0.6667*Fx[ID(var, i-1, j, k)] + 0.08333*Fx[ID(var, i-2, j, k)]) / (d->dx);
         }
@@ -95,12 +99,13 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
     for (int i(d->is); i < d->ie; i++) {
       for (int j(d->js); j < d->je; j++) {
         for (int k(d->ks); k < d->ke; k++) {
+          //printf("var: %d, i: %d, dtH: %g\n", var, i, -dtH[ID(var, i, j, k)]);
           source[ID(var, i, j, k)] += -dtH[ID(var, i, j, k)];
         }
       }
     }
   }
-
+  //exit(0);
 }
 
 void DEIFY::set_vars(double * cons, double * prims, double * aux)
@@ -179,9 +184,16 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         vz = prims[ID(Prims::v3, i, j, k)];
 
         // Chain rule for derivatives of u (W*v)
-        dxux = W*dxvx + cube(W)*(vx*dxvx + vy*dxvy + vz*dxvz);
-        dxuy = W*dxvy + cube(W)*(vx*dxvx + vy*dxvy + vz*dxvz);
-        dxuz = W*dxvz + cube(W)*(vx*dxvx + vy*dxvy + vz*dxvz);
+        //dxux = W*dxvx + cube(W)*(vx*dxvx + vy*dxvy + vz*dxvz);
+        //dxuy = W*dxvy + cube(W)*(vx*dxvx + vy*dxvy + vz*dxvz);
+        //dxuz = W*dxvz + cube(W)*(vx*dxvx + vy*dxvy + vz*dxvz);
+
+        // Using gradient of W directly
+        dxux = W*dxvx + vx*dxW;
+        dxuy = W*dxvy + vy*dyW;
+        dxuz = W*dxvz + vz*dzW;
+
+        //printf("dxuy: %g\n", dxuy);
 
         dyux = W*dyvx + cube(W)*(vx*dyvx + vy*dyvy + vz*dyvz);
         dyuy = W*dyvy + cube(W)*(vx*dyvx + vy*dyvy + vz*dyvz);
@@ -225,6 +237,16 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
         // 12
         aux[ID(Aux::pi12NS, i, j, k)] = -2*eta*( dxuy + dyux
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
+        //printf("var: %d, i: %d, pi12NS: %g\n", Aux::pi12NS, i, aux[ID(Aux::pi12NS, i, j, k)]);
+        //printf("dxvy, dyvx: %g, %g\n", dxvy, dyvx);
+        //printf("dxuy, dyux: %g, %g\n", dxuy, dyux);
+        //printf("dxvx, dxvz: %g, %g\n", dxvx, dxvz);
+        //printf("vx, vy: %g, %g\n", vx, vy);
+        //printf("W: %g\n", W);
+   
+        //printf("var: %d, i: %d, Theta: %g\n", Aux::Theta, i, aux[ID(Aux::Theta, i, j, k)]);
+        //printf("var: %d, i: %d, v1: %g\n", Prims::v1, i, prims[ID(Prims::v1, i, j, k)]);
+        //printf("var: %d, i: %d, v2: %g\n", Prims::v2, i, prims[ID(Prims::v2, i, j, k)]);
         // 13
         aux[ID(Aux::pi13NS, i, j, k)] = -2*eta*( dxuz + dzux
           - (2/3)*((aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v1, i, j, k)])*(aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v3, i, j, k)]))*aux[ID(Aux::Theta, i, j, k)] );
@@ -359,6 +381,8 @@ void DEIFY::set_vars(double * cons, double * prims, double * aux)
     }
   }   
 
+  //exit(0);
+
 }
 
 void DEIFY::set_dtH(double * cons, double * prims, double * aux)
@@ -415,7 +439,7 @@ void DEIFY::set_Fx(double * cons, double * prims, double * aux)
   double tau_Pi = d->optionalSimArgs[3];
   double tau_pi = d->optionalSimArgs[5];
 
-  for (int i(d->is); i < d->ie; i++) {
+  for (int i(d->is-4); i < d->ie+4; i++) {
     for (int j(d->js); j < d->je; j++) {
       for (int k(d->ks); k < d->ke; k++) {
         // Now can set the diffusion vector
@@ -425,6 +449,19 @@ void DEIFY::set_Fx(double * cons, double * prims, double * aux)
         Fx[ID(2, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*sqr(prims[ID(Prims::v1, i, j, k)]) + aux[ID(Aux::pi12NS, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
         Fx[ID(3, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*sqr(prims[ID(Prims::v1, i, j, k)]) + aux[ID(Aux::pi23NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
         Fx[ID(4, i, j, k)] = aux[ID(Aux::PiNS, i, j, k)]*sqr(aux[ID(Aux::W, i, j, k)])*prims[ID(Prims::v1, i, j, k)] - aux[ID(Aux::PiNS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)]*sqr(prims[ID(Prims::v1, i, j, k)]) + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q1NS, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q2NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::q3NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + 2*aux[ID(Aux::pi11NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi12NS, i, j, k)]*prims[ID(Prims::v2, i, j, k)] + aux[ID(Aux::pi13NS, i, j, k)]*prims[ID(Prims::v3, i, j, k)] + aux[ID(Aux::pi22NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)] + aux[ID(Aux::pi33NS, i, j, k)]*prims[ID(Prims::v1, i, j, k)];
+
+        //printf("var: %d, i: %d, Fx[2]: %g\n", 2, i, Fx[ID(2, i, j, k)]);
+        //printf("var: %d, i: %d, W: %g\n", 2, i, aux[ID(Aux::W, i, j, k)]);
+        //printf("var: %d, i: %d, PiNS: %g\n", 2, i, aux[ID(Aux::PiNS, i, j, k)]);
+        //printf("var: %d, i: %d, pi12NS: %g\n", 2, i, aux[ID(Aux::pi12NS, i, j, k)]);
+        //printf("var: %d, i: %d, pi22NS: %g\n", 2, i, aux[ID(Aux::pi22NS, i, j, k)]);
+        //printf("var: %d, i: %d, pi23NS: %g\n", 2, i, aux[ID(Aux::pi23NS, i, j, k)]);
+        //printf("var: %d, i: %d, q1NS: %g\n", 2, i, aux[ID(Aux::q1NS, i, j, k)]);
+        //printf("var: %d, i: %d, q2NS: %g\n", 2, i, aux[ID(Aux::q2NS, i, j, k)]);
+        //printf("var: %d, i: %d, q2NS: %g\n", 2, i, aux[ID(Aux::q3NS, i, j, k)]);
+        //printf("var: %d, i: %d, v1: %g\n", 2, i, aux[ID(Prims::v1, i, j, k)]);
+        //printf("var: %d, i: %d, v2: %g\n", 2, i, aux[ID(Prims::v2, i, j, k)]);
+        //printf("var: %d, i: %d, v3: %g\n", 2, i, aux[ID(Prims::v3, i, j, k)]);
 
 	if (NLO) {
 

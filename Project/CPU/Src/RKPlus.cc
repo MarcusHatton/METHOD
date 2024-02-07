@@ -32,12 +32,12 @@ void RKPlus::rhs(double * cons, double * prims, double * aux, double * rhsVec)
         for (int j(d->js); j < d->je; j++) {
           for (int k(d->ks); k < d->ke; k++) {
             d->source[ID(var, i, j, k)] += d->sourceExtension[ID(var, i, j, k)];
-            printf('var: %d, i: %d, source: %g', var, i, d->sourceExtension[ID(var, i, j, k)]);
+            //printf('var: %d, i: %d, source: %g', var, i, d->sourceExtension[ID(var, i, j, k)]);
           }
         }
       }
     }
-    exit 0;
+    //exit 0;
   }
 
   // Sum the contributions

@@ -77,6 +77,10 @@ class DEIFY : public ModelExtension
     // CE-expanded fluxes (state vector contribution not yet implemented anyway)
     bool NLO = false;
 
+    // Whether to use simple central differencing for gradients.
+    // When false, used a MinMod slope-limiting scheme.
+    bool SimpleCentreDifference = true;
+
     template<typename T>
     T sqr(T x) { return ((x) * (x)); }
 
@@ -86,10 +90,10 @@ class DEIFY : public ModelExtension
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
-    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, vsqrd,
+    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03,
                q1NS, q2NS, q3NS, PiNS, pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS,
                q1LO, q2LO, q3LO, PiLO, pi11LO, pi12LO, pi13LO, pi22LO, pi23LO, pi33LO,  
-               a1, a2, a3 };
+               Theta, vsqrd, a1, a2, a3 };
     enum TDerivs { dtp = 35, dtrho, dtn, dtv1, dtv2, dtv3, dtW, dtT, dtq1NS, dtq2NS, dtq3NS, dtPiNS,
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
                dtTau, dtE};
@@ -99,29 +103,50 @@ class DEIFY : public ModelExtension
       Data * d(this->data);
 
       int stencil[3] = {0, 0, 0};
+      int stencil2[3] = {0, 0, 0};
       stencil[direction] += 1;
+      stencil2[direction] += 2;
       double dX[3] = {data->dx, data->dy, data->dz};
-      double var_cen, var_fw, var_bw;
+      double var_cen, var_fw, var_fw2, var_bw, var_bw2;
 
       if (C_P_or_A == 0) {
         var_cen = cons[ID(enum_n, i, j, k)];
         var_fw = cons[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_fw2 = cons[ID(enum_n, i+stencil2[0], j+stencil2[1], k+stencil2[2])];
         var_bw = cons[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+        var_bw2 = cons[ID(enum_n, i-stencil2[0], j-stencil2[1], k-stencil2[2])];
       }
       else if (C_P_or_A == 1) {
         var_cen = prims[ID(enum_n, i, j, k)];
         var_fw = prims[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_fw2 = prims[ID(enum_n, i+stencil2[0], j+stencil2[1], k+stencil2[2])];
         var_bw = prims[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+        var_bw2 = prims[ID(enum_n, i-stencil2[0], j-stencil2[1], k-stencil2[2])];
       }
       else if (C_P_or_A == 2) {
         var_cen = aux[ID(enum_n, i, j, k)];
         var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
+        var_fw2 = aux[ID(enum_n, i+stencil2[0], j+stencil2[1], k+stencil2[2])];
         var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
+        var_bw2 = aux[ID(enum_n, i-stencil2[0], j-stencil2[1], k-stencil2[2])];
       }
+      
+      //double CDGrad = (var_fw - var_bw)/(2*dX[direction]);
+      double CDGrad = (-0.08333*var_fw2 + 0.6667*var_fw - 0.6667*var_bw + 0.08333*var_bw2)/(dX[direction]);
 
       // Min-Mod First-Order
       double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX[direction];
       double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX[direction];
+      //printf("CDGrad: %f", CDGrad);
+      //printf("FDGrad: %f", FDGrad);
+      //printf("BDGrad: %f", BDGrad);
+
+      if (SimpleCentreDifference) {
+        return CDGrad;
+      }
+
+      printf("EEK EEK EEK");
+
       if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
         return 0;
       } else {

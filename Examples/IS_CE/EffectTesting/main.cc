@@ -4,14 +4,17 @@
 #include "initFunc.h"
 #include "ISCE.h"
 #include "DEIFY.h"
-#include "boundaryConds.h"
+//#include "boundaryConds.h"
+#include "parallelBoundaryConds.h"
 #include "rkSplit.h"
 #include "backwardsRK.h"
 #include "RKPlus.h"
-#include "SSP2.h"
+//#include "SSP2.h"
 #include "fluxVectorSplitting.h"
-#include "serialEnv.h"
-#include "serialSaveDataHDF5.h"
+//#include "serialEnv.h"
+#include "parallelEnv.h"
+//#include "serialSaveDataHDF5.h"
+#include "parallelSaveDataHDF5.h"
 #include "weno.h"
 #include <cstring>
 #include "sys/stat.h"
@@ -20,15 +23,15 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-
-  int nxs[] = {25, 50, 100, 200, 400, 800};
+  std::vector<int> nxs = {3200};
   int nx = 0;
 
-  for(int i=0; i<6; i++) {
+  for(int i=0; i<nxs.size(); i++) {
     nx = nxs[i];
     cout << nx << std::endl;
     //std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/1em3_1em1/MIS/"+std::to_string(nx);
-    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/Ideal/MISCE/"+std::to_string(nx);
+    //std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/Shear/MISCE/SimpleCD/HHO/"+std::to_string(nx);
+    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/Ideal/Euler/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -60,15 +63,16 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(10);
+  int nreports(50);
 
-  SerialEnv env(&argc, &argv, 1, 1, 1);
+  //SerialEnv env(&argc, &argv, 1, 1, 1);
+  ParallelEnv env(&argc, &argv, 40, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-3, 5.0e-4} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -78,14 +82,15 @@ int main(int argc, char *argv[]) {
   // Choose particulars of simulation
   ISCE model(&data);
 
-  Weno3 weno(&data);
+  Weno5 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
 
-  DEIFY modelExtension(&data, &fluxMethod);
+  //DEIFY modelExtension(&data, &fluxMethod);
 
   //Outflow bcs(&data);
-  Periodic bcs(&data);
+  //Periodic bcs(&data);
+  ParallelPeriodic bcs(&data, &env);
 
   Simulation sim(&data, &env);
 
@@ -100,9 +105,10 @@ int main(int argc, char *argv[]) {
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   //SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &modelExtension);
+  RK4 timeInt(&data, &model, &bcs, &fluxMethod);//, &modelExtension);
 
-  SerialSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  //SerialSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  ParallelSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -111,7 +117,8 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    //SerialSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

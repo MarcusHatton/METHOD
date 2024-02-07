@@ -54,7 +54,8 @@ class ISCE : public Model
       } else {
         return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
       }
-}
+    }
+
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
