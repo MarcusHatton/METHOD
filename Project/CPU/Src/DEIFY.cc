@@ -46,7 +46,6 @@ void DEIFY::sourceExtension(double * cons, double * prims, double * aux, double 
   // Set vars - dissipative NS forms
   this->set_vars(cons, prims, aux);
 
-  //printf("HELLO");
   //printf("%d", d->dims);
  
   // Determine the diffusion vectors

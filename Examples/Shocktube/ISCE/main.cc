@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(100);
+  int nx(1200);
   int ny(0);
   int nz(0);
   double xmin(-2.0);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(6);
 
   SerialEnv env(&argc, &argv, 1, 1, 1);
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  5.0e-2, 1.0e-2,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {5.0e-3, 5.0e-3,  5.0e-2, 5.0e-3,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -78,21 +78,21 @@ int main(int argc, char *argv[]) {
 
   Simulation sim(&data, &env);
 
-  Shocktube init(&data); //direction given by second arg (int)
+  //Shocktube init(&data); //direction given by second arg (int)
   //ISCE_Shocktube_1D_Perp init(&data, 0); // para = v aligned with dir, 
 					 // perp = v2 always non-trivial one
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
   //IS_ShearTest init(&data);
-  //IS_BulkHeatTest init(&data);
+  StillShock_BulkHeatTest init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/Bulk/ds_"+std::to_string(nx)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/HeatBulk/ds_"+std::to_string(nx)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/Bulk/ds_"+std::to_string(nx)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/HeatBulk/ds_"+std::to_string(nx)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

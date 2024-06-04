@@ -98,54 +98,58 @@ class DEIFY : public ModelExtension
                dtpi11NS, dtpi12NS, dtpi13NS, dtpi22NS, dtpi23NS, dtpi33NS, dtD, dtS1, dtS2, dtS3,
                dtTau, dtE};
 
-    double Grad(int enum_n, int direction, int C_P_or_A, double * cons, double * prims, double * aux, int i, int j, int k) {
+    double Grad(int enum_n, int direction, int C_P_or_A, double * cons, double * prims, double * aux, int i, int j, int k, int order=1) {
 
       Data * d(this->data);
 
-      int stencil[3] = {0, 0, 0};
-      int stencil2[3] = {0, 0, 0};
-      stencil[direction] += 1;
-      stencil2[direction] += 2;
+      int fo_stencil[3] = {0,0,0};
+      int so_stencil[3] = {0,0,0};
+      fo_stencil[direction] += 1;
+      so_stencil[direction] += 2;
+      //std::vector<float> fo_coeffs = {-0.5, 0.5};
+      //std::vector<float> so_coeffs = {0.08333, -0.6667, 0.6667, -0.08333};
       double dX[3] = {data->dx, data->dy, data->dz};
       double var_cen, var_fw, var_fw2, var_bw, var_bw2;
 
       if (C_P_or_A == 0) {
         var_cen = cons[ID(enum_n, i, j, k)];
-        var_fw = cons[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
-        var_fw2 = cons[ID(enum_n, i+stencil2[0], j+stencil2[1], k+stencil2[2])];
-        var_bw = cons[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
-        var_bw2 = cons[ID(enum_n, i-stencil2[0], j-stencil2[1], k-stencil2[2])];
+        var_fw = cons[ID(enum_n, i+fo_stencil[0], j+fo_stencil[1], k+fo_stencil[2])];
+        var_fw2 = cons[ID(enum_n, i+so_stencil[0], j+so_stencil[1], k+so_stencil[2])];
+        var_bw = cons[ID(enum_n, i-fo_stencil[0], j-fo_stencil[1], k-fo_stencil[2])];
+        var_bw2 = cons[ID(enum_n, i-so_stencil[0], j-so_stencil[1], k-so_stencil[2])];
       }
       else if (C_P_or_A == 1) {
         var_cen = prims[ID(enum_n, i, j, k)];
-        var_fw = prims[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
-        var_fw2 = prims[ID(enum_n, i+stencil2[0], j+stencil2[1], k+stencil2[2])];
-        var_bw = prims[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
-        var_bw2 = prims[ID(enum_n, i-stencil2[0], j-stencil2[1], k-stencil2[2])];
+        var_fw = prims[ID(enum_n, i+fo_stencil[0], j+fo_stencil[1], k+fo_stencil[2])];
+        var_fw2 = prims[ID(enum_n, i+so_stencil[0], j+so_stencil[1], k+so_stencil[2])];
+        var_bw = prims[ID(enum_n, i-fo_stencil[0], j-fo_stencil[1], k-fo_stencil[2])];
+        var_bw2 = prims[ID(enum_n, i-so_stencil[0], j-so_stencil[1], k-so_stencil[2])];
       }
       else if (C_P_or_A == 2) {
         var_cen = aux[ID(enum_n, i, j, k)];
-        var_fw = aux[ID(enum_n, i+stencil[0], j+stencil[1], k+stencil[2])];
-        var_fw2 = aux[ID(enum_n, i+stencil2[0], j+stencil2[1], k+stencil2[2])];
-        var_bw = aux[ID(enum_n, i-stencil[0], j-stencil[1], k-stencil[2])];
-        var_bw2 = aux[ID(enum_n, i-stencil2[0], j-stencil2[1], k-stencil2[2])];
+        var_fw = aux[ID(enum_n, i+fo_stencil[0], j+fo_stencil[1], k+fo_stencil[2])];
+        var_fw2 = aux[ID(enum_n, i+so_stencil[0], j+so_stencil[1], k+so_stencil[2])];
+        var_bw = aux[ID(enum_n, i-fo_stencil[0], j-fo_stencil[1], k-fo_stencil[2])];
+        var_bw2 = aux[ID(enum_n, i-so_stencil[0], j-so_stencil[1], k-so_stencil[2])];
       }
-      
-      //double CDGrad = (var_fw - var_bw)/(2*dX[direction]);
-      double CDGrad = (-0.08333*var_fw2 + 0.6667*var_fw - 0.6667*var_bw + 0.08333*var_bw2)/(dX[direction]);
 
-      // Min-Mod First-Order
-      double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX[direction];
-      double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX[direction];
-      //printf("CDGrad: %f", CDGrad);
-      //printf("FDGrad: %f", FDGrad);
-      //printf("BDGrad: %f", BDGrad);
+      double CDGrad;
+      if (order == 1) {
+          CDGrad = (var_fw - var_bw)/(2*dX[direction]);
+      } else if (order == 2) {
+          CDGrad = (-0.08333*var_fw2 + 0.6667*var_fw - 0.6667*var_bw + 0.08333*var_bw2)/(dX[direction]);
+      } else {
+          printf("First-derivative order of accuracy must be 1 or 2");
+          //throw std::runtime_error("First-derivative order of accuracy must be 1 or 2");
+      }
 
       if (SimpleCentreDifference) {
         return CDGrad;
       }
 
-      printf("EEK EEK EEK");
+      // Min-Mod First-Order
+      double FDGrad = (-1.0*var_cen + 1.0*var_fw)/dX[direction];
+      double BDGrad = (1.0*var_cen - 1.0*var_bw)/dX[direction];
 
       if ( (FDGrad < 0 && BDGrad > 0) || (FDGrad > 0 && BDGrad < 0) ) {
         return 0;

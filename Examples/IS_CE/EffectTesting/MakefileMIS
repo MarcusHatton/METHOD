@@ -6,7 +6,7 @@ CC = mpic++
 ##CC = g++
 ##CC = nvcc
 
-USE_MPI = 0
+USE_MPI = 1
 USE_OMP = 0
 USE_HDF = 1
 
@@ -176,7 +176,7 @@ backwardsRK.o : $(MODULE_DIR)/backwardsRK.cc $(INC_DIR)/backwardsRK.h $(INC_DIR)
 IMEX2Args.o : $(MODULE_DIR)/IMEX2Args.cc $(INC_DIR)/IMEX2Args.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-SSP2.o : $(MODULE_DIR)/SSP2.cc $(INC_DIR)/SSP2.h $(RTFIND_INC_DIR)/cminpack.h
+SSP3.o : $(MODULE_DIR)/SSP3.cc $(INC_DIR)/SSP3.h $(RTFIND_INC_DIR)/cminpack.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 boundaryConds.o : $(MODULE_DIR)/boundaryConds.cc $(INC_DIR)/boundaryConds.h

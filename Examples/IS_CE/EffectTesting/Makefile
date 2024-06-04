@@ -36,7 +36,7 @@ CXXFLAGS = -Wall -std=c++11 -O0 $(OMP_FLAGS) -Wno-unknown-pragmas -g
 
 # Sources
 SRCS = simulation.cc \
-			 ISCE.cc \
+			 IS.cc \
 			 initFunc.cc \
 			 simData.cc \
 			 wenoUpwinds.cc 				\
@@ -50,7 +50,6 @@ SRCS = simulation.cc \
 			 SSP2.cc \
 			 boundaryConds.cc \
 			 fluxVectorSplitting.cc \
-			 DEIFY.cc \
 
 SERIAL_SRCS = serialSaveData.cc \
 			  serialEnv.cc
@@ -144,7 +143,7 @@ simData.o : $(MODULE_DIR)/simData.cc $(INC_DIR)/simData.h
 initFunc.o : $(MODULE_DIR)/initFunc.cc $(INC_DIR)/initFunc.h	$(INC_DIR)/simData.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-ISCE.o : $(MODULE_DIR)/ISCE.cc $(INC_DIR)/ISCE.h
+IS.o : $(MODULE_DIR)/IS.cc $(INC_DIR)/IS.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 simulation.o : $(MODULE_DIR)/simulation.cc	$(INC_DIR)/simulation.h $(INC_DIR)/model.h	$(INC_DIR)/simData.h $(INC_DIR)/saveData.h
@@ -177,7 +176,7 @@ backwardsRK.o : $(MODULE_DIR)/backwardsRK.cc $(INC_DIR)/backwardsRK.h $(INC_DIR)
 IMEX2Args.o : $(MODULE_DIR)/IMEX2Args.cc $(INC_DIR)/IMEX2Args.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-SSP2.o : $(MODULE_DIR)/SSP2.cc $(INC_DIR)/SSP2.h $(RTFIND_INC_DIR)/cminpack.h
+SSP3.o : $(MODULE_DIR)/SSP3.cc $(INC_DIR)/SSP3.h $(RTFIND_INC_DIR)/cminpack.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 boundaryConds.o : $(MODULE_DIR)/boundaryConds.cc $(INC_DIR)/boundaryConds.h
@@ -199,10 +198,6 @@ parallelSaveDataHDF5.o : $(MODULE_DIR)/parallelSaveDataHDF5.cc $(INC_DIR)/parall
 	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
 
 fluxVectorSplitting.o : $(MODULE_DIR)/fluxVectorSplitting.cc $(INC_DIR)/fluxVectorSplitting.h $(INC_DIR)/weno.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-# Dissipative extension model
-DEIFY.o : $(MODULE_DIR)/DEIFY.cc $(INC_DIR)/DEIFY.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
 serialEnv.o : $(MODULE_DIR)/serialEnv.cc $(INC_DIR)/serialEnv.h
