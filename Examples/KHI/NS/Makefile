@@ -4,7 +4,6 @@
 # Compiler
 CC = mpic++
 ##CC = g++
-##CC = nvcc
 
 USE_MPI = 1
 USE_OMP = 0
@@ -36,7 +35,7 @@ CXXFLAGS = -Wall -std=c++11 -O0 $(OMP_FLAGS) -Wno-unknown-pragmas -g
 
 # Sources
 SRCS = simulation.cc \
-			 ISCE.cc \
+			 NS.cc \
 			 initFunc.cc \
 			 simData.cc \
 			 wenoUpwinds.cc 				\
@@ -50,7 +49,6 @@ SRCS = simulation.cc \
 			 SSP2.cc \
 			 boundaryConds.cc \
 			 fluxVectorSplitting.cc \
-			 DEIFY.cc \
 
 SERIAL_SRCS = serialSaveData.cc \
 			  serialEnv.cc
@@ -144,7 +142,7 @@ simData.o : $(MODULE_DIR)/simData.cc $(INC_DIR)/simData.h
 initFunc.o : $(MODULE_DIR)/initFunc.cc $(INC_DIR)/initFunc.h	$(INC_DIR)/simData.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-ISCE.o : $(MODULE_DIR)/ISCE.cc $(INC_DIR)/ISCE.h
+NS.o : $(MODULE_DIR)/NS.cc $(INC_DIR)/NS.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 simulation.o : $(MODULE_DIR)/simulation.cc	$(INC_DIR)/simulation.h $(INC_DIR)/model.h	$(INC_DIR)/simData.h $(INC_DIR)/saveData.h
@@ -199,10 +197,6 @@ parallelSaveDataHDF5.o : $(MODULE_DIR)/parallelSaveDataHDF5.cc $(INC_DIR)/parall
 	$(CC)   $<  -c  $(CXXFLAGS) -I$(INC_DIR)
 
 fluxVectorSplitting.o : $(MODULE_DIR)/fluxVectorSplitting.cc $(INC_DIR)/fluxVectorSplitting.h $(INC_DIR)/weno.h
-	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
-
-# Dissipative extension model
-DEIFY.o : $(MODULE_DIR)/DEIFY.cc $(INC_DIR)/DEIFY.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
 serialEnv.o : $(MODULE_DIR)/serialEnv.cc $(INC_DIR)/serialEnv.h

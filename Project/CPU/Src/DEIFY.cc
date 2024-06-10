@@ -402,7 +402,7 @@ void DEIFY::set_dtH(double * cons, double * prims, double * aux)
   }
 
 /*
-        // These are HNLO NOT!! dtHNLO - needs more work to do that...
+        // These are HNLO NOT dtHNLO!! - needs more work to do that...
         HNLO_0 (like D)
         0
 

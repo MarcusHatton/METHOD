@@ -1,22 +1,22 @@
-// Parallel main
+// Navier-Stokes-like simulations for
+// initial testing of sub-grid closure
+// from coviariant filtering scheme
+
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "ISCE.h"
-#include "DEIFY.h"
-#include "boundaryConds.h"
-//#include "parallelBoundaryConds.h"
+#include "NS.h"
+//#include "boundaryConds.h"
+#include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 #include "RKPlus.h"
-// #include "RK2.h"
 // #include "SSP2.h"
 #include "fluxVectorSplitting.h"
-//#include "parallelEnv.h"
-#include "serialEnv.h"
-#include "serialSaveDataHDF5.h"
-//#include "parallelSaveDataHDF5.h"
-//#include "serialSaveData.h"
+#include "parallelEnv.h"
+//#include "serialEnv.h"
+//#include "serialSaveDataHDF5.h"
+#include "parallelSaveDataHDF5.h"
 #include "weno.h"
 #include <cstring>
 
@@ -29,15 +29,15 @@ int main(int argc, char *argv[]) {
   // int nx(65536);
   // int nx(32768);
   int nx(200);
-  int ny(400);
+  int ny(200);
   int nz(0);
-  double xmin(-0.5);
-  double xmax(0.5);
-  double ymin(-1.0);
+  double xmin(0.0);
+  double xmax(1.0);
+  double ymin(0.0);
   double ymax(1.0);
   double zmin(-0.1);
   double zmax(0.1);
-  double endTime(6.25);
+  double endTime(20.0);
   double cfl(0.4);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -54,17 +54,18 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(5);
+  int nreports(10);
 
-  //ParallelEnv env(&argc, &argv, 8, 5, 1);
-  SerialEnv env(&argc, &argv, 1, 1, 1);
+  ParallelEnv env(&argc, &argv, 8, 5, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 4.0/3.0;
   data_args.reportItersPeriod = 2000;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-15,  1.0e-15, 1.0e-15,  5e-5, 1.0e-15} };
+  // These of course should no longer be used, but can leave them for now as 'scaling parameters'
+  // Perhaps to control the filtering length effect!
+  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  5.0e-3, 5.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -72,41 +73,34 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  ISCE model(&data);
+  NS model(&data, false);
 
-  Weno5 weno(&data);
+  Weno3 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
 
-  DEIFY ModelExtension(&data, &fluxMethod);
-
-//  ParallelOutflow bcs(&data, &env);
-//  ParallelPeriodic bcs(&data, &env);
-  Periodic bcs(&data);
+  ParallelPeriodic bcs(&data, &env);
 
   Simulation sim(&data, &env);
 
-  KHInstability init(&data);
-//  ISKHInstabilitySingleFluid init(&data);
-//  ISKHInstabilityTIIdeal init(&data);
+  //ISKHInstabilitySingleFluid init(&data, 1);
+  KHRandomInstabilitySingleFluid init(&data); // optional:magnetic fields, seed
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
-  // RK2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
-  // RKPlus timeInt(&data, &model, &bcs, &fluxMethod);
+  RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  SerialSaveDataHDF5 save(&data, &env, "2d/5em5/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  ParallelSaveDataHDF5 save(&data, &env, "2d/KHRandom/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
-  sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, nullptr);
+  sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
 
   save.saveAll();
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "2d/5em5/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, "2d/KHRandom/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

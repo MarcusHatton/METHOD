@@ -614,7 +614,7 @@ KHRandomInstabilitySingleFluid::KHRandomInstabilitySingleFluid(Data * data, int 
   // Syntax
   Data * d(data);
 
-  if (d->Nprims > 15) throw std::invalid_argument("Trying to implement a single fluid initial state on incorrect model.\n\tModel has wrong number of primitive variables to be single fluid model.");
+  //if (d->Nprims > 15) throw std::invalid_argument("Trying to implement a single fluid initial state on incorrect model.\n\tModel has wrong number of primitive variables to be single fluid model.");
   if (d->gamma != 4.0/3.0) throw std::invalid_argument("Expected the index gamma = 4/3\n");
   if (d->xmin != 0.0 || d->xmax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected x E [0.0, 1.0]\n");
   if (d->ymin != 0.0 || d->ymax != 1.0) throw std::invalid_argument("Domain has incorrect values. Expected y E [0.0, 1.0]\n");
@@ -659,18 +659,18 @@ KHRandomInstabilitySingleFluid::KHRandomInstabilitySingleFluid(Data * data, int 
     for (int j(0); j < d->Ny; j++) {
       for (int k(0); k < d->Nz; k++) {
 
-        d->prims[ID(4, i, j, k)] = 1.0;
+        d->prims[ID(3, i, j, k)] = 1.0;
 
         // Magnetic Fields
         if (mag) d->prims[ID(7, i, j, k)] = 0.1;
 
         if (d->y[j] < interface_y_lower || d->y[j] > interface_y_upper ) {
-          d->prims[ID(0, i, j, k)] = rho0;
-          d->prims[ID(1, i, j, k)] = vShear;
+          d->prims[ID(5, i, j, k)] = rho0;
+          d->prims[ID(0, i, j, k)] = vShear;
         }
         else {
-          d->prims[ID(0, i, j, k)] = rho1;
-          d->prims[ID(1, i, j, k)] = - vShear;
+          d->prims[ID(5, i, j, k)] = rho1;
+          d->prims[ID(0, i, j, k)] = - vShear;
         }
       }
     }
