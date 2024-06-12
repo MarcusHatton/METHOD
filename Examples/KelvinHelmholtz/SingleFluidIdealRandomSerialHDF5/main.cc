@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
 
   // Set up domain
   int Ng(4);
-  int nx(64);
-  int ny(64);
-  int nz(0);
+  int nx(20);
+  int ny(20);
+  int nz(20);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);

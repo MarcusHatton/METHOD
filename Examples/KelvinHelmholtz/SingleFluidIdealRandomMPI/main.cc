@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   int nx(64);
   int ny(64);
-  int nz(0);
+  int nz(64);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 
   double nxRanks(2);
   double nyRanks(2);
-  double nzRanks(1);
+  double nzRanks(2);
 
   ParallelEnv env(&argc, &argv, nxRanks, nyRanks, nzRanks);
 
