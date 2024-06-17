@@ -2,20 +2,19 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-//#include "ISCE.h"
-#include "IS.h"
-//#include "DEIFY.h"
-//#include "boundaryConds.h"
-#include "parallelBoundaryConds.h"
+#include "ISCE.h"
+#include "DEIFY.h"
+#include "boundaryConds.h"
+//#include "parallelBoundaryConds.h"
 #include "rkSplit.h"
 #include "backwardsRK.h"
 #include "RKPlus.h"
-#include "SSP2.h"
+//#include "SSP2.h"
 #include "fluxVectorSplitting.h"
-//#include "serialEnv.h"
-#include "parallelEnv.h"
-//#include "serialSaveDataHDF5.h"
-#include "parallelSaveDataHDF5.h"
+#include "serialEnv.h"
+//#include "parallelEnv.h"
+#include "serialSaveDataHDF5.h"
+//#include "parallelSaveDataHDF5.h"
 #include "weno.h"
 #include <cstring>
 #include <stdexcept>
@@ -25,20 +24,19 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  std::vector<float> tau_pis = {1e-2,1e-1,1,1e-3,1e-4};
-  float tau_pi = 0;
+  //std::vector<int> nxs = {25, 50, 100, 200, 400, 800};
+  std::vector<int> nxs = {200, 400, 800};
+  int nx = 0;
 
-  for(int i=0; i<tau_pis.size(); i++) {
-    tau_pi = tau_pis[i];
-    cout << tau_pi << std::endl;
-    //std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/1em3_1em1/MIS/"+std::to_string(nx);
-    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/Shear/MIS/tau_scaling/"+std::to_string(tau_pi);
-    //std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/SinWave/t_50/Ideal/Euler/"+std::to_string(nx);
+  for(int i=0; i<nxs.size(); i++) {
+    nx = nxs[i];
+    cout << nx << std::endl;
+    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/ErfTest/Shear/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
   int Ng(4);
-  int nx(1600);
+  // int nx(1200);
   //if(argc>=2) { nx=atoi(argv[1]); }
   int ny(0);
   int nz(0);
@@ -48,7 +46,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(50.0);
+  double endTime(10.0);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -65,17 +63,16 @@ int main(int argc, char *argv[]) {
   // effects, but even at crazy resolutions (65k) these are small provided
   // the CFL limit is met.
   bool output(false);
-  int nreports(50);
+  int nreports(10);
 
-  //SerialEnv env(&argc, &argv, 1, 1, 1);
-  ParallelEnv env(&argc, &argv, 40, 1, 1);
+  SerialEnv env(&argc, &argv, 1, 1, 1);
+  //ParallelEnv env(&argc, &argv, 40, 1, 1);
 
   DataArgs data_args(nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, endTime);
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  //const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12} };
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-3, tau_pi}};
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  2.0e-4, 1.0e-12} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -83,15 +80,17 @@ int main(int argc, char *argv[]) {
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  IS model(&data);
+  ISCE model(&data);
 
   Weno5 weno(&data);
 
   FVS fluxMethod(&data, &weno, &model);
 
-  //Outflow bcs(&data);
+  DEIFY modelExtension(&data, &fluxMethod);
+
+  Outflow bcs(&data);
   //Periodic bcs(&data);
-  ParallelPeriodic bcs(&data, &env);
+  //ParallelPeriodic bcs(&data, &env);
 
   Simulation sim(&data, &env);
 
@@ -99,17 +98,17 @@ int main(int argc, char *argv[]) {
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
-  //Erf_ShearTest init(&data);
+  Erf_ShearTest init(&data);
   //StillShock_BulkHeatTest init(&data);
-  SinWave_ShearTest init(&data);
+  //SinWave_ShearTest init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  //RK4 timeInt(&data, &model, &bcs, &fluxMethod);
+  // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
+  RK4 timeInt(&data, &model, &bcs, &fluxMethod, &modelExtension);
 
-  //SerialSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
-  ParallelSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  //ParallelSaveDataHDF5 save(&data, &env, dirpath+"/ds_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -118,8 +117,8 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    //SerialSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    //ParallelSaveDataHDF5 save_in_loop(&data, &env, dirpath+"/ds_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }
