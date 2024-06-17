@@ -33,9 +33,6 @@ NS::NS(Data * data, bool alt_C2P=false) : Model(data)
   smartGuesses = 0;
   
   alternative_C2P = alt_C2P;
-
-  // Hypothetical ratio of micro:meso-scale
-  double scale_ratio = data->optionalSimArgs[0];
   
   this->data->consLabels.push_back("D");   this->data->consLabels.push_back("S1");
   this->data->consLabels.push_back("S2");  this->data->consLabels.push_back("S3");
@@ -70,20 +67,22 @@ NS::NS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
   this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
-  // 20 - Shear
+  // 20 - for fitting
+  // Shear
   this->data->auxLabels.push_back("sigma11");  this->data->auxLabels.push_back("sigma12");
   this->data->auxLabels.push_back("sigma13");  this->data->auxLabels.push_back("sigma22");
   this->data->auxLabels.push_back("sigma23");  this->data->auxLabels.push_back("sigma33");  
   this->data->auxLabels.push_back("sigmasqrd");
-  // 27 - Vorticity
+    
+  // Vorticity
   this->data->auxLabels.push_back("omega11");  this->data->auxLabels.push_back("omega12");
   this->data->auxLabels.push_back("omega13");  this->data->auxLabels.push_back("omega22");
   this->data->auxLabels.push_back("omega23");  this->data->auxLabels.push_back("omega33");
   this->data->auxLabels.push_back("omegasqrd"); 
-  // 30 - Coefficients
-  this->data->auxLabels.push_back("zeta");  this->data->auxLabels.push_back("kappa");
-  this->data->auxLabels.push_back("eta");
- 
+  
+  // Acceleration
+  this->data->auxLabels.push_back("accsqrd"); 
+  
 }
 
 NS::~NS()
@@ -112,24 +111,6 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
   } else {
     return abs(FDGrad) < abs(BDGrad) ? FDGrad : BDGrad;
   }
-}
-
-void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
-{
-  Data * d(this->data);
-
-  scale_ratio = this->scale_ratio;
-
-  for (int i(0); i < this->data->Nx; i++) {
-    for (int j(0); j < this->data->Ny; j++) {
-      for (int k(0); k < this->data->Nz; k++) {
-            aux[ID(Aux::zeta, i, j, k)] = 
-            aux[ID(Aux::kappa, i, j, k)] = 
-            aux[ID(Aux::eta, i, j, k)] = 
-      }
-    }
-  }
-
 }
 
 void NS::sourceTermSingleCell(double *cons, double *prims, double *aux, double *source, int i, int j, int k)
@@ -998,13 +979,6 @@ void NS::primsToAll(double *cons, double *prims, double *aux)
         dzuy = minmodGradFO(aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v2, i, j, k-1)],  aux[ID(Aux::W, i, j, k)]*prims[ID(Prims::v2, i, j, k)],
                             aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v2, i, j, k+1)], d->dz);  
         */
-        
-        aux[ID(Aux::omega11, i, j, k)] = 0;
-        aux[ID(Aux::omega12, i, j, k)] = dxuy - dyux;
-        aux[ID(Aux::omega13, i, j, k)] = dxuz - dzux;
-        aux[ID(Aux::omega22, i, j, k)] = 0;
-        aux[ID(Aux::omega23, i, j, k)] = dyuz - dzuy;
-        aux[ID(Aux::omega33, i, j, k)] = 0;
 
         aux[ID(Aux::a1, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] 
           + prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*dxux
