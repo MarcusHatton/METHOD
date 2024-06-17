@@ -11,10 +11,13 @@ This is the human readable description of this models variables.
     D, Sx, Sy, Sz, tau
   16 primitive variables:
     v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
-  30 auxiliary variables:
+  37 auxiliary variables:
     h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
     pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p 
+    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p, 
+    sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd,
+    omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
+    zeta, kappa, eta
 */
 
 class NS : public Model
@@ -25,8 +28,12 @@ class NS : public Model
     // enums to save looking up numbering of C/P/As when using ID accessor.
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
-    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, Theta, dv1dt, 
-               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p };
+    enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, theta, dv1dt, 
+               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p,
+               sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd, detsigma,
+               omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
+               Theta,
+               zeta, kappa, eta };
 
 
     int smartGuesses;     //!< Number of smart guess required
@@ -36,6 +43,9 @@ class NS : public Model
     double * prev_vars;   //!< Store variable at previous time-step for time derivatives' calculations
     
     bool alternative_C2P; //!< Sets whether or not to use the newer, alternative Reprimand C2P scheme 
+    
+    //!< Hypothetical ratio of micro:meso-scale for SubGrid modelling
+    double scale_ratio; // 
 
     NS();     //!< Default constructor
 
@@ -48,6 +58,8 @@ class NS : public Model
 
     virtual ~NS();     //!< Destructor
 
+
+    void calculateDissipativeCoefficients(double *cons, double *prims, double *aux);
 
     //! Single cell source term contribution
     /*!
