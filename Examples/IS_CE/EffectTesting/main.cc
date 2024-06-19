@@ -24,14 +24,14 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  //std::vector<int> nxs = {25, 50, 100, 200, 400, 800};
-  std::vector<int> nxs = {200, 400, 800};
+  std::vector<int> nxs = {25, 50, 100, 200, 400, 800, 1600};
+  //std::vector<int> nxs = {200, 400, 800};
   int nx = 0;
 
   for(int i=0; i<nxs.size(); i++) {
     nx = nxs[i];
     cout << nx << std::endl;
-    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/ErfTest/Shear/"+std::to_string(nx);
+    std::string dirpath = "../../../../../../scratch/mjh1n20/PureShear/StepFunc/Ideal/"+std::to_string(nx);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  2.0e-4, 1.0e-12} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12,  1.0e-15, 1.0e-12} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -98,9 +98,10 @@ int main(int argc, char *argv[]) {
   // Blob2dToyQ init(&data);
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
-  Erf_ShearTest init(&data);
+  //Erf_ShearTest init(&data);
   //StillShock_BulkHeatTest init(&data);
   //SinWave_ShearTest init(&data);
+  ShearTest_StepFunction init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);

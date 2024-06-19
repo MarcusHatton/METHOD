@@ -571,4 +571,18 @@ class Smeared_Shocktube_1D_Para : public InitialFunc
     virtual ~Smeared_Shocktube_1D_Para() { }     //!< Destructor
 };
 
+class ShearTest_StepFunction : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @sa InitialFunc
+    */
+    ShearTest_StepFunction(Data * data);
+
+    virtual ~ShearTest_StepFunction() { }     //!< Destructor
+};
+
+
+
 #endif
