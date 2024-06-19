@@ -197,7 +197,7 @@ void SRMHD::fluxVector(double *cons, double *prims, double *aux, double *f, cons
           // Bz
           f[ID(7, i, j, k)] = cons[ID(8, i, j, k)];
           // Phi
-          f[ID(8, i, j, k)] = prims[ID(6, i, j, k)];
+          f[ID(8, i, j, k)] = prims[ID(7, i, j, k)];
 
         }
       } // End k loop
