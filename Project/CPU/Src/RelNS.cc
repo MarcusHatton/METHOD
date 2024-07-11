@@ -67,21 +67,6 @@ NS::NS(Data * data, bool alt_C2P=false) : Model(data)
   this->data->auxLabels.push_back("a1");     this->data->auxLabels.push_back("a2");   
   this->data->auxLabels.push_back("a3");     this->data->auxLabels.push_back("vsqrd");
   this->data->auxLabels.push_back("dWdt");   this->data->auxLabels.push_back("rho_plus_p");
-  // 20 - for fitting
-  // Shear
-  this->data->auxLabels.push_back("sigma11");  this->data->auxLabels.push_back("sigma12");
-  this->data->auxLabels.push_back("sigma13");  this->data->auxLabels.push_back("sigma22");
-  this->data->auxLabels.push_back("sigma23");  this->data->auxLabels.push_back("sigma33");  
-  this->data->auxLabels.push_back("sigmasqrd");
-    
-  // Vorticity
-  this->data->auxLabels.push_back("omega11");  this->data->auxLabels.push_back("omega12");
-  this->data->auxLabels.push_back("omega13");  this->data->auxLabels.push_back("omega22");
-  this->data->auxLabels.push_back("omega23");  this->data->auxLabels.push_back("omega33");
-  this->data->auxLabels.push_back("omegasqrd"); 
-  
-  // Acceleration
-  this->data->auxLabels.push_back("accsqrd"); 
   
 }
 

@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(40);
-  int ny(40);
+  int nx(200);
+  int ny(200);
   int nz(0);
   double xmin(0.0);
   double xmax(1.0);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(10.0);
+  double endTime(20.0);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   data_args.reportItersPeriod = 2000;
   // These of course should no longer be used, but can leave them for now as 'scaling parameters'
   // Perhaps to control the filtering length effect!
-  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1, 1.0} };
+  const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1, 4.0} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi", "scale_ratio"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);

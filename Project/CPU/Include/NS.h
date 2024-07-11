@@ -15,8 +15,9 @@ This is the human readable description of this models variables.
     h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
     pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
     dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p, 
-    sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd,
+    sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd, detsigma,
     omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
+    Theta0, Theta1, Theta2, Theta3,
     zeta, kappa, eta
 */
 
@@ -29,10 +30,10 @@ class NS : public Model
     enum Cons { D, S1, S2, S3, Tau };
     enum Prims { v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33 };
     enum Aux { h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, theta, dv1dt, 
-               dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p,
-               sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd, detsigma,
-               omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
-               Theta,
+               dv2dt, dv3dt, a0, a1, a2, a3, vsqrd, dWdt, dTdt, rho_plus_p,
+               sigma00, sigma01, sigma02, sigma03, sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd, detsigma,
+               omega00, omega01, omega02, omega03, omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
+               Theta0, Theta1, Theta2, Theta3,
                zeta, kappa, eta };
 
 
@@ -60,6 +61,8 @@ class NS : public Model
 
 
     void calculateDissipativeCoefficients(double *cons, double *prims, double *aux);
+
+    void calculateDissipativeCoefficientsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k);
 
     //! Single cell source term contribution
     /*!
@@ -192,11 +195,13 @@ class NS : public Model
             aux[ID(Aux::dv1dt, i, j, k)] = (prims[ID(Prims::v1, i, j, k)] - prev_vars[ID(1, i, j, k)])/dt;
             aux[ID(Aux::dv2dt, i, j, k)] = (prims[ID(Prims::v2, i, j, k)] - prev_vars[ID(2, i, j, k)])/dt;
             aux[ID(Aux::dv3dt, i, j, k)] = (prims[ID(Prims::v3, i, j, k)] - prev_vars[ID(3, i, j, k)])/dt;
+            aux[ID(Aux::dTdt, i, j, k)] = (aux[ID(Aux::T, i, j, k)] - prev_vars[ID(4, i, j, k)])/dt;
             // Update previous values
             prev_vars[ID(0, i, j, k)] = aux[ID(Aux::W, i, j, k)]; 
             prev_vars[ID(1, i, j, k)] = prims[ID(Prims::v1, i, j, k)]; 
             prev_vars[ID(2, i, j, k)] = prims[ID(Prims::v2, i, j, k)];
             prev_vars[ID(3, i, j, k)] = prims[ID(Prims::v3, i, j, k)]; 
+            prev_vars[ID(4, i, j, k)] = aux[ID(Aux::T, i, j, k)]; 
           } // End k-loop
         } // End j-loop
       } // End i-loop
