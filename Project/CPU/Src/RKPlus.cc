@@ -37,7 +37,6 @@ void RKPlus::rhs(double * cons, double * prims, double * aux, double * rhsVec)
         }
       }
     }
-    //exit 0;
   }
 
   // Sum the contributions

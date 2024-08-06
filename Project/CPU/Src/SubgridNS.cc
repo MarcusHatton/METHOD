@@ -1,4 +1,4 @@
-#include "NS.h"
+#include "SubgridNS.h"
 #include "cminpack.h"
 #include <cmath>
 #include <cstdlib>
@@ -30,7 +30,7 @@ NS::NS(Data * data, bool alt_C2P=false) : Model(data)
   // the 4 here is for the 4 time-deriv variables currently needed... should be automated really not hard-set
   prev_vars = (double *) malloc(sizeof(double)*5*data->Nx*data->Ny*data->Nz); 
 
-  smartGuesses = 0;
+  smartGuesses = 4;
   
   alternative_C2P = alt_C2P;
 
@@ -121,6 +121,145 @@ double minmodGradSO(double im2, double im1, double i, double ip1, double ip2, do
   }
 }
 
+double CalcDeterminant(std::vector<std::vector<double>> Matrix)
+{
+  //this function is written in c++ to calculate the determinant of matrix
+  // it's a recursive function that can handle matrix of any dimension
+  double det = 0; // the determinant value will be stored here
+  if (Matrix.size() == 1)
+  {
+      return Matrix[0][0]; // no calculation needed
+  }
+  else if (Matrix.size() == 2)
+  {
+      //in this case we calculate the determinant of a 2-dimensional matrix in a 
+      //default procedure
+      det = (Matrix[0][0] * Matrix[1][1] - Matrix[0][1] * Matrix[1][0]);
+      return det;
+  }
+  else
+  {
+      //in this case we calculate the determinant of a squared matrix that have 
+      // for example 3x3 order greater than 2
+      for (int p = 0; p < Matrix[0].size(); p++)
+      {
+          //this loop iterate on each elements of the first row in the matrix.
+          //at each element we cancel the row and column it exist in
+          //and form a matrix from the rest of the elements in the matrix
+          std::vector<std::vector<double>> TempMatrix; // to hold the shaped matrix;
+          for (int i = 1; i < Matrix.size(); i++)
+          {
+              // iteration will start from row one cancelling the first row values
+              std::vector<double> TempRow;
+              for (int j = 0; j < Matrix[i].size(); j++)
+              {
+                  // iteration will pass all cells of the i row excluding the j 
+                  //value that match p column
+                  if (j != p)
+                  {
+                     TempRow.push_back(Matrix[i][j]);//add current cell to TempRow 
+                  }
+              }
+              if (TempRow.size() > 0)
+                  TempMatrix.push_back(TempRow);
+              //after adding each row of the new matrix to the vector tempx
+              //we add it to the vector temp which is the vector where the new 
+              //matrix will be formed
+          }
+          det = det + Matrix[0][p] * pow(-1, p) * CalcDeterminant(TempMatrix);
+          //then we calculate the value of determinant by using a recursive way
+          //where we re-call the function by passing to it the new formed matrix
+          //we keep doing this until we get our determinant
+      }
+//      for (int i = 0; i < Matrix.size(); i++) {
+//        for (int j = 0; j < Matrix.size(); j++) {
+//          if (Matrix[i][j] != 0.0) {
+//          printf("(%i, %i, %g) i, j, k: \n", i, j, Matrix[i][j]);
+//          printf("(%g) det:\n", det);
+//          exit(0);
+//          }
+//        }
+//      }
+      return det;
+  }
+};
+
+double calculate4Determinant(double** matrix) {
+
+  double a = matrix[0][0];
+  double b = matrix[0][1];
+  double c = matrix[0][2];
+  double d = matrix[0][3];
+  double e = matrix[1][1];
+  double f = matrix[1][2];
+  double g = matrix[1][3];
+  double h = matrix[2][2];
+  double i = matrix[2][3];
+  double j = matrix[3][3];
+
+  double det = a*e*h*j - (a*e*i*i + a*h*g*g + a*j*f*f + e*h*d*d + e*j*c*c + h*j*b*b)
+  + 2*(a*f*g*i * e*c*d*i + h*b*d*g + j*b*c*f) - 2*(b*f*i*d + b*c*g*i + c*g*f*d)
+  + (b*i)*(b*i) + (c*g)*(c*g) + (d*f)*(d*f);
+  
+  return det;
+
+}
+
+
+// Function to calculate the determinant
+// of a matrix
+double calculateDeterminant(double** matrix, int size)
+{
+    double det = 0;
+    int sign = 1;
+ 
+    // Base Case
+    if (size == 1) {
+        det = matrix[0][0];
+    }
+    else if (size == 2) {
+        det = (matrix[0][0] * matrix[1][1])
+              - (matrix[0][1] * matrix[1][0]);
+    }
+ 
+    // Perform the Laplace Expansion
+    else {
+        for (int i = 0; i < size; i++) {
+ 
+            // Stores the cofactor matrix
+            double** cofactor = new double*[size - 1];
+            for (int j = 0; j < size - 1; j++) {
+                cofactor[j] = new double[size - 1];
+            }
+            int sub_i = 0, sub_j = 0;
+            for (int j = 1; j < size; j++) {
+                for (int k = 0; k < size; k++) {
+                    if (k == i) {
+                        continue;
+                    }
+                    cofactor[sub_i][sub_j] = matrix[j][k];
+                    sub_j++;
+                }
+                sub_i++;
+                sub_j = 0;
+            }
+ 
+            // Update the determinant value
+            det += sign * matrix[0][i]
+                   * calculateDeterminant(cofactor, size - 1);
+            sign = -sign;
+            for (int j = 0; j < size - 1; j++) {
+                delete[] cofactor[j];
+            }
+            delete[] cofactor;
+        }
+    }
+ 
+    // Return the final determinant value
+    return det;
+}
+
+
 void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *aux)
 {
   Data * d(this->data);
@@ -132,11 +271,11 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
-            aux[ID(Aux::zeta, i, j, k)] = pow(this->scale_ratio -1, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
+            aux[ID(Aux::zeta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
                                           *  pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.46) * pow(abs(aux[ID(Aux::theta, i, j, k)]), -0.85);
-            aux[ID(Aux::kappa, i, j, k)] = pow(this->scale_ratio -1, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
+            aux[ID(Aux::kappa, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
                                           * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.23); // * ...
-            aux[ID(Aux::eta, i, j, k)] = pow(this->scale_ratio -1, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
+            aux[ID(Aux::eta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
                                           * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045)
                                           * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13);
 
@@ -173,15 +312,21 @@ void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims,
   
   scale_ratio = 800 / this->data->nx; // should be using this as calibrated on 800x800
 
-  aux[ID(Aux::zeta, i, j, k)] = pow(this->scale_ratio -1, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
+  aux[ID(Aux::zeta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
                                 *  pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.46) * pow(abs(aux[ID(Aux::theta, i, j, k)]), -0.85);
-  aux[ID(Aux::kappa, i, j, k)] = pow(this->scale_ratio -1, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
+  aux[ID(Aux::kappa, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.23); // * ...
-  aux[ID(Aux::eta, i, j, k)] = pow(this->scale_ratio -1, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
+  aux[ID(Aux::eta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13);
 
-  //printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+  // printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+    //printf("(%d, %d, %d) i, j, k\n", i, j, k);
+    //printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+    //printf("(%g, %g, %g, %g) omegasqrd, sigmasqrd, theta, detsigma \n", aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)], aux[ID(Aux::detsigma, i, j, k)]);
+    //printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::detsigma, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+
+    //exit(0);
 
   // Check for nan values - from fractional powers of terms that are negative
   if( isnan(aux[ID(Aux::zeta, i, j, k)]) ) {
@@ -484,7 +629,7 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1e-6;          // Tolerance of rootfinder
+  const double tol = 1e-4;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
   std::vector<Failed> fails;          // Vector of failed structs. Stores location of failed cons2prims cells.
@@ -776,10 +921,17 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double dzux;
   double dzuy;
   double dzuz;
+  
+  // double a,b,c,d,e,f,g,h,l,m;
 
   double kappa = this->data->optionalSimArgs[0];
   double zeta = this->data->optionalSimArgs[2];
   double eta = this->data->optionalSimArgs[4];
+
+  double** sigmatensor = new double*[4];
+  for (int i = 0; i < 4; i++) {
+      sigmatensor[i] = new double[4];
+  }
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -851,14 +1003,14 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::omega23, i, j, k)] = dyuz - dzuy;
         aux[ID(Aux::omega33, i, j, k)] = 0.0;
         aux[ID(Aux::omegasqrd, i, j, k)] = aux[ID(Aux::omega00, i, j, k)] * aux[ID(Aux::omega00, i, j, k)]
+                                         + 2*aux[ID(Aux::omega01, i, j, k)] * aux[ID(Aux::omega01, i, j, k)]  
+                                         + 2*aux[ID(Aux::omega02, i, j, k)] * aux[ID(Aux::omega02, i, j, k)]  
+                                         + 2*aux[ID(Aux::omega03, i, j, k)] * aux[ID(Aux::omega03, i, j, k)]  
                                          + aux[ID(Aux::omega11, i, j, k)] * aux[ID(Aux::omega11, i, j, k)]  
-                                         + aux[ID(Aux::omega12, i, j, k)] * aux[ID(Aux::omega12, i, j, k)]
-                                         + aux[ID(Aux::omega13, i, j, k)] * aux[ID(Aux::omega13, i, j, k)]
-                                         + aux[ID(Aux::omega12, i, j, k)] * aux[ID(Aux::omega12, i, j, k)] // equiv 21
+                                         + 2*aux[ID(Aux::omega12, i, j, k)] * aux[ID(Aux::omega12, i, j, k)]
+                                         + 2*aux[ID(Aux::omega13, i, j, k)] * aux[ID(Aux::omega13, i, j, k)]
                                          + aux[ID(Aux::omega22, i, j, k)] * aux[ID(Aux::omega22, i, j, k)]
-                                         + aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)]
-                                         + aux[ID(Aux::omega13, i, j, k)] * aux[ID(Aux::omega13, i, j, k)] // equiv 31
-                                         + aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)] // equiv 32
+                                         + 2*aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)]
                                          + aux[ID(Aux::omega33, i, j, k)] * aux[ID(Aux::omega33, i, j, k)];
 
         // Shear
@@ -896,10 +1048,63 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                          + 2*aux[ID(Aux::sigma23, i, j, k)] * aux[ID(Aux::sigma23, i, j, k)]
                                          + aux[ID(Aux::sigma33, i, j, k)] * aux[ID(Aux::sigma33, i, j, k)];
 
-        // Only a 3-determinant now on spatial parts...
-        aux[ID(Aux::detsigma, i, j, k)] = aux[ID(Aux::sigma11, i, j, k)]*(aux[ID(Aux::sigma22, i, j, k)]*aux[ID(Aux::sigma33, i, j, k)] - aux[ID(Aux::sigma23, i, j, k)]*aux[ID(Aux::sigma23, i, j, k)]) 
-                                          - aux[ID(Aux::sigma12, i, j, k)]*(aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma33, i, j, k)] - aux[ID(Aux::sigma23, i, j, k)]*aux[ID(Aux::sigma13, i, j, k)]) 
-                                          + aux[ID(Aux::sigma13, i, j, k)]*(aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma23, i, j, k)] - aux[ID(Aux::sigma22, i, j, k)]*aux[ID(Aux::sigma13, i, j, k)]);
+        /*
+        std::vector<std::vector<double>> sigmatensor{ {aux[ID(Aux::sigma00, i, j, k)], aux[ID(Aux::sigma01, i, j, k)], aux[ID(Aux::sigma02, i, j, k)], aux[ID(Aux::sigma03, i, j, k)]},
+                                                      {aux[ID(Aux::sigma01, i, j, k)], aux[ID(Aux::sigma11, i, j, k)], aux[ID(Aux::sigma12, i, j, k)], aux[ID(Aux::sigma13, i, j, k)]},
+                                                      {aux[ID(Aux::sigma02, i, j, k)], aux[ID(Aux::sigma12, i, j, k)], aux[ID(Aux::sigma22, i, j, k)], aux[ID(Aux::sigma23, i, j, k)]},
+                                                      {aux[ID(Aux::sigma03, i, j, k)], aux[ID(Aux::sigma13, i, j, k)], aux[ID(Aux::sigma23, i, j, k)], aux[ID(Aux::sigma33, i, j, k)]} };
+
+        
+        sigmatensor[0][0] = aux[ID(Aux::sigma00, i, j, k)];
+        sigmatensor[0][1] = aux[ID(Aux::sigma01, i, j, k)];
+        sigmatensor[0][2] = aux[ID(Aux::sigma02, i, j, k)];
+        sigmatensor[0][3] = aux[ID(Aux::sigma03, i, j, k)];
+        sigmatensor[1][0] = aux[ID(Aux::sigma01, i, j, k)];
+        sigmatensor[1][1] = aux[ID(Aux::sigma11, i, j, k)];
+        sigmatensor[1][2] = aux[ID(Aux::sigma12, i, j, k)];
+        sigmatensor[1][3] = aux[ID(Aux::sigma13, i, j, k)];
+        sigmatensor[2][0] = aux[ID(Aux::sigma02, i, j, k)];
+        sigmatensor[2][1] = aux[ID(Aux::sigma12, i, j, k)];
+        sigmatensor[2][2] = aux[ID(Aux::sigma22, i, j, k)];
+        sigmatensor[2][3] = aux[ID(Aux::sigma23, i, j, k)];
+        sigmatensor[3][0] = aux[ID(Aux::sigma03, i, j, k)];
+        sigmatensor[3][1] = aux[ID(Aux::sigma13, i, j, k)];
+        sigmatensor[3][2] = aux[ID(Aux::sigma23, i, j, k)];
+        sigmatensor[3][3] = aux[ID(Aux::sigma33, i, j, k)];
+        */
+        
+        // aux[ID(Aux::detsigma, i, j, k)] = calculateDeterminant(sigmatensor, 4);
+        // aux[ID(Aux::detsigma, i, j, k)] = calculate4Determinant(sigmatensor);
+        // aux[ID(Aux::detsigma, i, j, k)] = CalcDeterminant(sigmatensor);
+
+        // Manual calculation of sigma 3-determinant
+        aux[ID(Aux::detsigma, i, j, k)] = aux[ID(Aux::sigma00, i, j, k)]*(aux[ID(Aux::sigma11, i, j, k)]*aux[ID(Aux::sigma22, i, j, k)] - aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma12, i, j, k)]) 
+                                          - aux[ID(Aux::sigma01, i, j, k)]*(aux[ID(Aux::sigma01, i, j, k)]*aux[ID(Aux::sigma22, i, j, k)] - aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)]) 
+                                          + aux[ID(Aux::sigma02, i, j, k)]*(aux[ID(Aux::sigma01, i, j, k)]*aux[ID(Aux::sigma12, i, j, k)] - aux[ID(Aux::sigma11, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)]);
+        
+        
+        /*
+        double a = aux[ID(Aux::sigma00, i, j, k)];
+        double b = aux[ID(Aux::sigma01, i, j, k)];
+        double c = aux[ID(Aux::sigma02, i, j, k)];
+        double n = aux[ID(Aux::sigma03, i, j, k)];
+        double e = aux[ID(Aux::sigma11, i, j, k)];
+        double f = aux[ID(Aux::sigma12, i, j, k)];
+        double g = aux[ID(Aux::sigma13, i, j, k)];
+        double h = aux[ID(Aux::sigma22, i, j, k)];
+        double l = aux[ID(Aux::sigma23, i, j, k)];
+        double m = aux[ID(Aux::sigma33, i, j, k)];
+      
+        aux[ID(Aux::detsigma, i, j, k)] = a*e*h*m - (a*e*l*l + a*h*g*g + a*m*f*f + e*h*n*n + e*m*c*c + h*m*b*b)
+        + 2*(a*f*g*l * e*c*n*l + h*b*n*g + m*b*c*f) - 2*(b*f*l*n + b*c*g*l + c*g*f*n)
+        + (b*l)*(b*l) + (c*g)*(c*g) + (n*f)*(n*f);
+        
+        if (a != 0.0) {
+        printf("(%g,%g,%g,%g,%g,%g,%g,%g,%g,%g) a,b,c,n,e,f,g,h,l,m\n", a,b,c,n,e,f,g,h,l,m);
+        printf("(%g) detsigma\n", aux[ID(Aux::detsigma, i, j, k)]);
+        exit(0);
+        }
+        */
 
         aux[ID(Aux::a0, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( dtW + prims[ID(Prims::v1, i, j, k)]*dxW
           + prims[ID(Prims::v2, i, j, k)]*dyW + prims[ID(Prims::v3, i, j, k)]*dzW );
@@ -953,21 +1158,21 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
         prims[ID(Prims::pi22, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma22, i, j, k)];
         prims[ID(Prims::pi23, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma23, i, j, k)];
         prims[ID(Prims::pi33, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma33, i, j, k)];
-//        prims[ID(Prims::pi00, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma00, i, j, k)];
-//        prims[ID(Prims::pi01, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma01, i, j, k)];
-//        prims[ID(Prims::pi02, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)];
-//        prims[ID(Prims::pi03, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma03, i, j, k)];
+        aux[ID(Aux::pi00, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma00, i, j, k)];
+        aux[ID(Aux::pi01, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma01, i, j, k)];
+        aux[ID(Aux::pi02, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)];
+        aux[ID(Aux::pi03, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma03, i, j, k)];
 
       }
     }
   }
 
 //  // pi^0_mu, qv
-//  for (int i(0); i < d->Nx; i++) {
-//    for (int j(0); j < d->Ny; j++) {
-//      for (int k(0); k < d->Nz; k++) { // Minus signs here (?)
-//        aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
-//                               + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) { // Minus signs here (?)
+        aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
+                               + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
 //        aux[ID(Aux::pi00, i, j, k)] = prims[ID(Prims::pi11, i, j, k)] + prims[ID(Prims::pi22, i, j, k)] + prims[ID(Prims::pi33, i, j, k)];
 //
 //        aux[ID(Aux::pi01, i, j, k)] = prims[ID(Prims::pi11, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
@@ -979,9 +1184,9 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
 //        aux[ID(Aux::pi03, i, j, k)] = prims[ID(Prims::pi13, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
 //                                + prims[ID(Prims::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
 //                                + prims[ID(Prims::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
-//      }
-//    }
-//  }
+      }
+    }
+  }
 
 //  int i = 100;
 //  int j = 100;
@@ -1063,6 +1268,12 @@ void NS::primsToAll(double *cons, double *prims, double *aux)
   double dzux;
   double dzuy;
   double dzuz;
+  
+  double** sigmatensor = new double*[4];
+  for (int i = 0; i < 4; i++) {
+      sigmatensor[i] = new double[4];
+  }
+
 
   for (int i(d->is); i < d->ie; i++) {
     for (int j(d->js); j < d->je; j++) {
@@ -1133,14 +1344,14 @@ void NS::primsToAll(double *cons, double *prims, double *aux)
         aux[ID(Aux::omega23, i, j, k)] = dyuz - dzuy;
         aux[ID(Aux::omega33, i, j, k)] = 0.0;
         aux[ID(Aux::omegasqrd, i, j, k)] = aux[ID(Aux::omega00, i, j, k)] * aux[ID(Aux::omega00, i, j, k)]
+                                         + 2*aux[ID(Aux::omega01, i, j, k)] * aux[ID(Aux::omega01, i, j, k)]  
+                                         + 2*aux[ID(Aux::omega02, i, j, k)] * aux[ID(Aux::omega02, i, j, k)]  
+                                         + 2*aux[ID(Aux::omega03, i, j, k)] * aux[ID(Aux::omega03, i, j, k)]  
                                          + aux[ID(Aux::omega11, i, j, k)] * aux[ID(Aux::omega11, i, j, k)]  
-                                         + aux[ID(Aux::omega12, i, j, k)] * aux[ID(Aux::omega12, i, j, k)]
-                                         + aux[ID(Aux::omega13, i, j, k)] * aux[ID(Aux::omega13, i, j, k)]
-                                         + aux[ID(Aux::omega12, i, j, k)] * aux[ID(Aux::omega12, i, j, k)] // equiv 21
+                                         + 2*aux[ID(Aux::omega12, i, j, k)] * aux[ID(Aux::omega12, i, j, k)]
+                                         + 2*aux[ID(Aux::omega13, i, j, k)] * aux[ID(Aux::omega13, i, j, k)]
                                          + aux[ID(Aux::omega22, i, j, k)] * aux[ID(Aux::omega22, i, j, k)]
-                                         + aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)]
-                                         + aux[ID(Aux::omega13, i, j, k)] * aux[ID(Aux::omega13, i, j, k)] // equiv 31
-                                         + aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)] // equiv 32
+                                         + 2*aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)]
                                          + aux[ID(Aux::omega33, i, j, k)] * aux[ID(Aux::omega33, i, j, k)];
 
         // Shear
@@ -1177,10 +1388,63 @@ void NS::primsToAll(double *cons, double *prims, double *aux)
                                          + aux[ID(Aux::sigma22, i, j, k)] * aux[ID(Aux::sigma22, i, j, k)]
                                          + 2*aux[ID(Aux::sigma23, i, j, k)] * aux[ID(Aux::sigma23, i, j, k)]
                                          + aux[ID(Aux::sigma33, i, j, k)] * aux[ID(Aux::sigma33, i, j, k)];
+         /*
+        std::vector<std::vector<double>> sigmatensor{ {aux[ID(Aux::sigma00, i, j, k)], aux[ID(Aux::sigma01, i, j, k)], aux[ID(Aux::sigma02, i, j, k)], aux[ID(Aux::sigma03, i, j, k)]},
+                                                      {aux[ID(Aux::sigma01, i, j, k)], aux[ID(Aux::sigma11, i, j, k)], aux[ID(Aux::sigma12, i, j, k)], aux[ID(Aux::sigma13, i, j, k)]},
+                                                      {aux[ID(Aux::sigma02, i, j, k)], aux[ID(Aux::sigma12, i, j, k)], aux[ID(Aux::sigma22, i, j, k)], aux[ID(Aux::sigma23, i, j, k)]},
+                                                      {aux[ID(Aux::sigma03, i, j, k)], aux[ID(Aux::sigma13, i, j, k)], aux[ID(Aux::sigma23, i, j, k)], aux[ID(Aux::sigma33, i, j, k)]} };
 
-        aux[ID(Aux::detsigma, i, j, k)] = aux[ID(Aux::sigma11, i, j, k)]*(aux[ID(Aux::sigma22, i, j, k)]*aux[ID(Aux::sigma33, i, j, k)] - aux[ID(Aux::sigma23, i, j, k)]*aux[ID(Aux::sigma23, i, j, k)]) 
-                                          - aux[ID(Aux::sigma12, i, j, k)]*(aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma33, i, j, k)] - aux[ID(Aux::sigma23, i, j, k)]*aux[ID(Aux::sigma13, i, j, k)]) 
-                                          + aux[ID(Aux::sigma13, i, j, k)]*(aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma23, i, j, k)] - aux[ID(Aux::sigma22, i, j, k)]*aux[ID(Aux::sigma13, i, j, k)]);
+       
+        sigmatensor[0][0] = aux[ID(Aux::sigma00, i, j, k)];
+        sigmatensor[0][1] = aux[ID(Aux::sigma01, i, j, k)];
+        sigmatensor[0][2] = aux[ID(Aux::sigma02, i, j, k)];
+        sigmatensor[0][3] = aux[ID(Aux::sigma03, i, j, k)];
+        sigmatensor[1][0] = aux[ID(Aux::sigma01, i, j, k)];
+        sigmatensor[1][1] = aux[ID(Aux::sigma11, i, j, k)];
+        sigmatensor[1][2] = aux[ID(Aux::sigma12, i, j, k)];
+        sigmatensor[1][3] = aux[ID(Aux::sigma13, i, j, k)];
+        sigmatensor[2][0] = aux[ID(Aux::sigma02, i, j, k)];
+        sigmatensor[2][1] = aux[ID(Aux::sigma12, i, j, k)];
+        sigmatensor[2][2] = aux[ID(Aux::sigma22, i, j, k)];
+        sigmatensor[2][3] = aux[ID(Aux::sigma23, i, j, k)];
+        sigmatensor[3][0] = aux[ID(Aux::sigma03, i, j, k)];
+        sigmatensor[3][1] = aux[ID(Aux::sigma13, i, j, k)];
+        sigmatensor[3][2] = aux[ID(Aux::sigma23, i, j, k)];
+        sigmatensor[3][3] = aux[ID(Aux::sigma33, i, j, k)];
+        */
+        
+        // aux[ID(Aux::detsigma, i, j, k)] = calculateDeterminant(sigmatensor, 4);
+        // aux[ID(Aux::detsigma, i, j, k)] = calculate4Determinant(sigmatensor);
+        // aux[ID(Aux::detsigma, i, j, k)] = CalcDeterminant(sigmatensor);
+
+        // Manual calculation of sigma 3-determinant
+        aux[ID(Aux::detsigma, i, j, k)] = aux[ID(Aux::sigma00, i, j, k)]*(aux[ID(Aux::sigma11, i, j, k)]*aux[ID(Aux::sigma22, i, j, k)] - aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma12, i, j, k)]) 
+                                          - aux[ID(Aux::sigma01, i, j, k)]*(aux[ID(Aux::sigma01, i, j, k)]*aux[ID(Aux::sigma22, i, j, k)] - aux[ID(Aux::sigma12, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)]) 
+                                          + aux[ID(Aux::sigma02, i, j, k)]*(aux[ID(Aux::sigma01, i, j, k)]*aux[ID(Aux::sigma12, i, j, k)] - aux[ID(Aux::sigma11, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)]);
+        
+        
+        /*
+        double a = aux[ID(Aux::sigma00, i, j, k)];
+        double b = aux[ID(Aux::sigma01, i, j, k)];
+        double c = aux[ID(Aux::sigma02, i, j, k)];
+        double n = aux[ID(Aux::sigma03, i, j, k)];
+        double e = aux[ID(Aux::sigma11, i, j, k)];
+        double f = aux[ID(Aux::sigma12, i, j, k)];
+        double g = aux[ID(Aux::sigma13, i, j, k)];
+        double h = aux[ID(Aux::sigma22, i, j, k)];
+        double l = aux[ID(Aux::sigma23, i, j, k)];
+        double m = aux[ID(Aux::sigma33, i, j, k)];
+      
+        aux[ID(Aux::detsigma, i, j, k)] = a*e*h*m - (a*e*l*l + a*h*g*g + a*m*f*f + e*h*n*n + e*m*c*c + h*m*b*b)
+        + 2*(a*f*g*l * e*c*n*l + h*b*n*g + m*b*c*f) - 2*(b*f*l*n + b*c*g*l + c*g*f*n)
+        + (b*l)*(b*l) + (c*g)*(c*g) + (n*f)*(n*f);
+        
+        if (a != 0.0) {
+        printf("(%g,%g,%g,%g,%g,%g,%g,%g,%g,%g) a,b,c,n,e,f,g,h,l,m\n", a,b,c,n,e,f,g,h,l,m);
+        printf("(%g) detsigma\n", aux[ID(Aux::detsigma, i, j, k)]);
+        exit(0);
+        }
+        */
 
         aux[ID(Aux::a0, i, j, k)] = aux[ID(Aux::W, i, j, k)] * ( dtW + prims[ID(Prims::v1, i, j, k)]*dxW
           + prims[ID(Prims::v2, i, j, k)]*dyW + prims[ID(Prims::v3, i, j, k)]*dzW );
@@ -1231,21 +1495,21 @@ void NS::primsToAll(double *cons, double *prims, double *aux)
         prims[ID(Prims::pi22, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma22, i, j, k)];
         prims[ID(Prims::pi23, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma23, i, j, k)];
         prims[ID(Prims::pi33, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma33, i, j, k)];
-//        prims[ID(Prims::pi00, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma00, i, j, k)];
-//        prims[ID(Prims::pi01, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma01, i, j, k)];
-//        prims[ID(Prims::pi02, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)];
-//        prims[ID(Prims::pi03, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma03, i, j, k)];
+        aux[ID(Aux::pi00, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma00, i, j, k)];
+        aux[ID(Aux::pi01, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma01, i, j, k)];
+        aux[ID(Aux::pi02, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma02, i, j, k)];
+        aux[ID(Aux::pi03, i, j, k)] = -2*eta*aux[ID(Aux::eta, i, j, k)]*aux[ID(Aux::sigma03, i, j, k)];
 
       }
     }
   }
 
 //  // pi^0_mu, qv
-//  for (int i(0); i < d->Nx; i++) {
-//    for (int j(0); j < d->Ny; j++) {
-//      for (int k(0); k < d->Nz; k++) { // Minus signs here (?)
-//        aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
-//                               + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
+  for (int i(0); i < d->Nx; i++) {
+    for (int j(0); j < d->Ny; j++) {
+      for (int k(0); k < d->Nz; k++) { // Minus signs here (?)
+        aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
+                               + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
 //        aux[ID(Aux::pi00, i, j, k)] = prims[ID(Prims::pi11, i, j, k)] + prims[ID(Prims::pi22, i, j, k)] + prims[ID(Prims::pi33, i, j, k)];
 //
 //        aux[ID(Aux::pi01, i, j, k)] = prims[ID(Prims::pi11, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
@@ -1257,9 +1521,9 @@ void NS::primsToAll(double *cons, double *prims, double *aux)
 //        aux[ID(Aux::pi03, i, j, k)] = prims[ID(Prims::pi13, i, j, k)]*prims[ID(Prims::v1, i, j, k)] 
 //                                + prims[ID(Prims::pi23, i, j, k)]*prims[ID(Prims::v2, i, j, k)] 
 //                                + prims[ID(Prims::pi33, i, j, k)]*prims[ID(Prims::v3, i, j, k)];
-//      }
-//    }
-//  }
+      }
+    }
+  }
 
   for (int i(0); i < d->Nx; i++) {
     for (int j(0); j < d->Ny; j++) {

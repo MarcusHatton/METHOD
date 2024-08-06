@@ -35,7 +35,7 @@ CXXFLAGS = -Wall -std=c++11 -O0 $(OMP_FLAGS) -Wno-unknown-pragmas -g
 
 # Sources
 SRCS = simulation.cc \
-			 NS.cc \
+			 SubgridNS.cc \
 			 initFunc.cc \
 			 simData.cc \
 			 wenoUpwinds.cc 				\
@@ -142,7 +142,7 @@ simData.o : $(MODULE_DIR)/simData.cc $(INC_DIR)/simData.h
 initFunc.o : $(MODULE_DIR)/initFunc.cc $(INC_DIR)/initFunc.h	$(INC_DIR)/simData.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR)
 
-NS.o : $(MODULE_DIR)/NS.cc $(INC_DIR)/NS.h
+SubgridNS.o : $(MODULE_DIR)/SubgridNS.cc $(INC_DIR)/SubgridNS.h
 	$(CC)	$<	-c	$(CXXFLAGS) -I$(INC_DIR) -I$(RTFIND_INC_DIR)
 
 simulation.o : $(MODULE_DIR)/simulation.cc	$(INC_DIR)/simulation.h $(INC_DIR)/model.h	$(INC_DIR)/simData.h $(INC_DIR)/saveData.h
