@@ -27,17 +27,22 @@ MMMMMMMM               MMMMMMMMEEEEEEEEEEEEEEEEEEEEEE      TTTTTTTTTTT      HHHH
 
 # Multifluid Electromagneto-HydroDynamics
 
-This is METHOD, a relativistic multi-dimensional, multi-fluid ElectroMagnetoHydroDynamic
-solver built and maintained by [Alex Wright](http://cmg.soton.ac.uk/people/ajw1e16/)
-under the guidance of [Dr Ian Hawke](https://www.southampton.ac.uk/maths/about/staff/ih3.page).
-METHOD is being developed as a result of a PhD project investigating the models of
+This is METHOD, a relativistic multi-dimensional, multi-fluid DissipativeElectroMagnetoHydroDynamic
+solver originally built by [Alex Wright](http://cmg.soton.ac.uk/people/ajw1e16/)
+and extended considerably by [Marcus Hatton](https://www.southampton.ac.uk/people/5y8l7z/mr-marcus-hatton),
+both working under the guidance of [Dr Ian Hawke](https://www.southampton.ac.uk/maths/about/staff/ih3.page).
+METHOD was started as a result of a PhD project investigating the models of
 MHD used to model neutron star mergers. As a result, ideal and resistive single
-fluid models exist that are conventional in numerical astrophysics, and a two-fluid
-model adapted from Amano 2016.
+fluid models exist that are conventional in numerical astrophysics, as well as a
+two-fluid model. Now, a number of models of dissipative hydrodynamics are also included,
+in particular those of Navier & Stokes (NS, a relativistic version),
+Muller, Israel & Stewart (MIS) and Bemfica, Disconzi, Noronha \& Kovtun (BDNK).
 
-It also includes the REGIME extension (Wright & Hawke 2019) to ideal MHD. REGIME
-allow ideal MHD simulations to capture resistive phenomena by including an
-additional source term into the equations of motion.
+It also includes both the REGIME extension (Wright & Hawke 2019) to ideal (infinite conductivity) MHD
+and the DEIFY extension (Hatton & Hawke 2024) to ideal (non-dissipative) HD. 
+REGIME allows ideal MHD simulations to capture resistive phenomena by including an
+additional source term into the equations of motion, whilst DEIFY allows an ideal HD
+simulation to capture dissipative phenomena through a series of additinal source terms.
 
 ---------------------------------------------
 ---------------------------------------------
@@ -47,7 +52,7 @@ additional source term into the equations of motion.
 ## Getting started
 To begin using METHOD, first clone the repository
 
-    git clone https://github.com/AlexJamesWright/METHOD.git
+    git clone https://github.com/MarcusHatton/METHOD.git
 
 To set up the correct directories for storing data, run the provided shell script from the project root,
 
@@ -61,7 +66,7 @@ Next, you will need to ensure the Makefiles are valid for your system, changing 
 
 
 ## Note
-METHOD is currently going through a revamp, with a number of additions and changes to its functionality. The CPU code (METHOD/Project/CPU/) can be run using a single process, openMP, or openMP/MPI, The Makefile will build the executable according to the `USE_MPI` and `USE_OMP` definitions (generally OMP is only faster for very high reslution runs). The GPU code (METHOD/Project/CPU/) should work, but has not been tested in a long time and has a reduced functionality compared to the CPU. This may change soon.
+The CPU code (METHOD/Project/CPU/) can be run using a single process, openMP, or openMP/MPI, The Makefile will build the executable according to the `USE_MPI` and `USE_OMP` definitions (generally OMP is only faster for very high reslution runs). The GPU code (METHOD/Project/CPU/) should work, but has not undergone much testing and has a reduced functionality compared to the CPU version. This may change soon.
 
 ## Testing
 Once METHOD is installed, check the latest build is working by running the unit tests.
@@ -231,6 +236,7 @@ NOTE: The second variable must be included and be the number of variables you wi
 ## Authors
 
 [Alex Wright](http://cmg.soton.ac.uk/people/ajw1e16/)  Email: a.j.wright@soton.ac.uk <br>
+[Marcus Hatton](https://www.southampton.ac.uk/people/5y8l7z/mr-marcus-hatton) Email: mjh1n20@soton.ac.uk <br>
 [Ania Brown](https://github.com/aniabrown) <br>
 [Ian Hawke](https://cmg.soton.ac.uk/people/ih3/)
 ---------------------------------------------
