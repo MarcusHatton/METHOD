@@ -14,14 +14,14 @@ NS::NS() : Model()
 {
   this->Ncons = 5;
   this->Nprims = 16;
-  this->Naux = 52;
+  this->Naux = 55;
 }
 
 NS::NS(Data * data, bool alt_C2P=false) : Model(data)
 {
   this->Ncons = (this->data)->Ncons = 5;
   this->Nprims = (this->data)->Nprims = 16;
-  this->Naux = (this->data)->Naux = 52;
+  this->Naux = (this->data)->Naux = 55;
 
   // Solutions for C2P all cells
   solution = (double *) malloc(sizeof(double)*4*data->Nx*data->Ny*data->Nz);
@@ -90,6 +90,9 @@ NS::NS(Data * data, bool alt_C2P=false) : Model(data)
   // 49 - Coefficients
   this->data->auxLabels.push_back("zeta");  this->data->auxLabels.push_back("kappa");
   this->data->auxLabels.push_back("eta");
+  // 52 - Beta-terms in dissipation/timescale relations for ideal rel. gas
+  this->data->auxLabels.push_back("beta0");  this->data->auxLabels.push_back("beta1");
+  this->data->auxLabels.push_back("beta2");
  
 }
 
@@ -268,14 +271,18 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
   
   scale_ratio = 800 / this->data->nx; // should be using this as calibrated on 800x800
 
+  double kappa = this->data->optionalSimArgs[0];
+  double zeta = this->data->optionalSimArgs[2];
+  double eta = this->data->optionalSimArgs[4];
+
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
-            aux[ID(Aux::zeta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
+            aux[ID(Aux::zeta, i, j, k)] = zeta * pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
                                           *  pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.46) * pow(abs(aux[ID(Aux::theta, i, j, k)]), -0.85);
-            aux[ID(Aux::kappa, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
+            aux[ID(Aux::kappa, i, j, k)] = kappa * pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
                                           * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.23); // * ...
-            aux[ID(Aux::eta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
+            aux[ID(Aux::eta, i, j, k)] = eta * pow(this->scale_ratio, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
                                           * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045)
                                           * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13);
 
@@ -302,6 +309,35 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
     }
   }
 
+  float gamma = d->gamma;  
+
+  double beta;
+  double Omega;
+  double OmegaStar;
+  
+  double h;
+  double T;
+  double p;
+
+  for (int i(0); i < this->data->Nx; i++) {
+   for (int j(0); j < this->data->Ny; j++) {
+    for (int k(0); k < this->data->Nz; k++) {
+      h = aux[ID(Aux::h, i, j, k)];
+      T = aux[ID(Aux::T, i, j, k)];
+      beta = 1/T;
+      p = prims[ID(Prims::p, i, j, k)];
+      Omega = 3*gamma - 5 + ((3*gamma)/(h*beta));
+      OmegaStar = 5 - 3*gamma +3*(10 - 7*gamma)*(h/beta);
+      aux[ID(Aux::beta0, i, j, k)] = (3*OmegaStar)/(sqr(h) * sqr(Omega) * p);
+      aux[ID(Aux::beta1, i, j, k)] = sqr((gamma-1)/gamma) * (beta/(h*p)) * (5*sqr(h) - (gamma/(gamma-1)));
+      aux[ID(Aux::beta2, i, j, k)] = ((1 + 6*h*(1/beta))/(2*sqr(h)*p));
+      //tau_q = kappa*T*beta1;
+      //tau_Pi = zeta*beta0;
+      //tau_pi = 2*eta*beta2;
+      }
+    }
+  }
+
 }
 
 void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
@@ -309,14 +345,18 @@ void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims,
   Data * d(this->data);
 
   // scale_ratio = this->scale_ratio;
+
+  double kappa = this->data->optionalSimArgs[0];
+  double zeta = this->data->optionalSimArgs[2];
+  double eta = this->data->optionalSimArgs[4];
   
   scale_ratio = 800 / this->data->nx; // should be using this as calibrated on 800x800
 
-  aux[ID(Aux::zeta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
+  aux[ID(Aux::zeta, i, j, k)] = zeta * pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
                                 *  pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.46) * pow(abs(aux[ID(Aux::theta, i, j, k)]), -0.85);
-  aux[ID(Aux::kappa, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
+  aux[ID(Aux::kappa, i, j, k)] = kappa * pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.23); // * ...
-  aux[ID(Aux::eta, i, j, k)] = pow(this->scale_ratio, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
+  aux[ID(Aux::eta, i, j, k)] = eta * pow(this->scale_ratio, 2) * pow(10,-3.4) * pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13);
 
@@ -848,7 +888,7 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
           
           aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
           aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
-  
+          aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];  
         } // End k-loop
       } // End j-loop
     } // End i-loop    
@@ -894,7 +934,7 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
           
           aux[ID(Aux::e, i, j, k)] = prims[ID(Prims::p, i, j, k)] / (prims[ID(Prims::n, i, j, k)]*(d->gamma-1));
           aux[ID(Aux::T, i, j, k)] = prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];
-  
+          aux[ID(Aux::h, i, j, k)] = 1 + aux[ID(Aux::e, i, j, k)] + prims[ID(Prims::p, i, j, k)] / prims[ID(Prims::n, i, j, k)];    
         } // End k-loop
       } // End j-loop
     } // End i-loop  

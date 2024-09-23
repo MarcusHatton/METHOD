@@ -15,14 +15,14 @@ T pow(T x, int N) {
 /*
 This is the human readable description of this models variables.
 
-  BDNK has 15 conserved variables:
-    D, Sx, Sy, Sz, tau, Y1, Y2, Y3, U, Z11, Z12, Z13, Z22, Z23, Z33
-  16 primitive variables:
-    v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
+  BDNK has 5 conserved variables:
+    D, S1, S2, S3, Tau
+  6 primitive variables:
+     v1, v2, v3, p, rho, n
   30 auxiliary variables:
-    h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
-    pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
-    dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p 
+    A, Theta, Pi, q0, q1, q2, q3, qv, pi11, pi12, pi13, pi22, pi23, pi33, 
+    pi00, pi01, pi02, pi03, h, T, e, W,  dpdt, drhodt, dndt, dv1dt, dv2dt, dv3dt, dWdt,
+    a1, a2, a3, vsqrd, rho_plus_p, dtp, dtrho, dtv1, dtv2, dtv3
 */
 
 class BDNK : public Model

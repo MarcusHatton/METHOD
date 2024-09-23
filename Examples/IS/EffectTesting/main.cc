@@ -20,13 +20,13 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 
-  float taus[] = {1.0, 1e-1, 1e-2, 1e-3};
+  float taus[] = {5.0e-4, 8.0e-5};
   float tau = 0;
 
   for(int i=0; i<4; i++) {
     tau = taus[i];
     cout << tau << std::endl;
-    std::string dirpath = "./1d/StillShock/All/tau_scaling/weak/"+std::to_string(tau);
+    std::string dirpath = "./1d/StillShock/HeatBulk/tau_scaling/"+std::to_string(tau);
     mkdir(dirpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   // Set up domain
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-4, tau,  1.0e-2, tau,  1.0e-3, tau} };
+  const std::vector<double> toy_params           { {5.0e-3, tau,  5.0e-2, tau,  1.0e-15, tau} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
   //ISKHInstabilitySingleFluid init(&data, 1);
   //Shocktube_Chab21 init(&data);  
   //IS_ShearTest init(&data);
-  IS_BulkHeatTest init(&data);
+  StillShock_BulkHeatTest init(&data);
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);

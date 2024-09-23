@@ -9,7 +9,7 @@ DEIFY::DEIFY()
   sourceExists = true;
 }
 
-DEIFY::DEIFY(Data * data, FluxMethod * fluxMethod) : ModelExtension(data), fluxMethod(fluxMethod)
+DEIFY::DEIFY(Data * data, FluxMethod * fluxMethod, bool NLO_Contribution) : ModelExtension(data), fluxMethod(fluxMethod)
 {
   //  Syntax
   Data * d(this->data);

@@ -167,7 +167,7 @@ class DEIFY : public ModelExtension
     DEIFY();
 
     //! Constructor
-    DEIFY(Data * data, FluxMethod * fluxMethod);
+    DEIFY(Data * data, FluxMethod * fluxMethod, bool NLO_Contribution=false);
 
     //! Destructor
     virtual ~DEIFY();

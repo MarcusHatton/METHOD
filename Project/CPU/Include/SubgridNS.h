@@ -18,7 +18,8 @@ This is the human readable description of this models variables.
     sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd, detsigma,
     omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
     Theta0, Theta1, Theta2, Theta3,
-    zeta, kappa, eta
+    zeta, kappa, eta,
+    beta0, beta1, beta2
 */
 
 class NS : public Model
@@ -34,7 +35,8 @@ class NS : public Model
                sigma00, sigma01, sigma02, sigma03, sigma11, sigma12, sigma13, sigma22, sigma23, sigma33, sigmasqrd, detsigma,
                omega00, omega01, omega02, omega03, omega11, omega12, omega13, omega22, omega23, omega33, omegasqrd,
                Theta0, Theta1, Theta2, Theta3,
-               zeta, kappa, eta };
+               zeta, kappa, eta,
+               beta0, beta1, beta2 };
 
 
     int smartGuesses;     //!< Number of smart guess required
