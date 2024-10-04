@@ -75,7 +75,7 @@ class DEIFY : public ModelExtension
 
     // Bool controlling whether to add NLO contributions from the
     // CE-expanded fluxes (state vector contribution not yet implemented anyway)
-    bool NLO = false;
+    bool NLO_Contribution = true;
 
     // Whether to use simple central differencing for gradients.
     // When false, used a MinMod slope-limiting scheme.

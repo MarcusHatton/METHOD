@@ -1,4 +1,4 @@
-#include "NS.h"
+#include "RelNS.h"
 #include "cminpack.h"
 #include <cmath>
 #include <cstdlib>
@@ -438,7 +438,7 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
   double sol[sys_size];                      // Guess and solution vector
   double res[sys_size];                      // Residual/fvec vector
   int info;                           // Rootfinder flag
-  const double tol = 1e-6;          // Tolerance of rootfinder
+  const double tol = 1e-4;          // Tolerance of rootfinder
   const int lwa = 50;                 // Length of work array = n * (3*n + 13) / 2
   double wa[lwa];                     // Work array
   std::vector<Failed> fails;          // Vector of failed structs. Stores location of failed cons2prims cells.

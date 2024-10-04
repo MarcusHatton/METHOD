@@ -7,7 +7,7 @@
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 #include "RKPlus.h"
-// #include "SSP2.h"
+#include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "DEIFY.h"
 #include "serialEnv.h"
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   data_args.sCfl(cfl);
   data_args.sNg(Ng);
   data_args.gamma = 5.0/3.0;
-  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-2, 1.0e-15,  1.0e-15, 1.0e-1} };
+  const std::vector<double> toy_params           { {1.0e-15, 1.0e-1,  1.0e-2, 1.0e-2,  1.0e-15, 1.0e-1} };
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi"};
   const int n_toy_params(6);
   data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
   FVS fluxMethod(&data, &weno, &model);
 
-  DEIFY ModelExtension(&data, &fluxMethod);
+  DEIFY ModelExtension(&data, &fluxMethod, true);
 
   Outflow bcs(&data);
   // Periodic bcs(&data);
@@ -90,10 +90,10 @@ int main(int argc, char *argv[]) {
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  SSP2 timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
+  //RK2B timeInt(&data, &model, &bcs, &fluxMethod, &ModelExtension);
 
-  SerialSaveDataHDF5 save(&data, &env, "1d/Bulk/1em2/ds_"+std::to_string(nx)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
+  SerialSaveDataHDF5 save(&data, &env, "1d/Bulk/1em2_1em2_IMEX/ds_"+std::to_string(nx)+"_0", SerialSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/Bulk/1em2/ds_"+std::to_string(nx)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
+    SerialSaveDataHDF5 save_in_loop(&data, &env, "1d/Bulk/1em2_1em2_IMEX/ds_"+std::to_string(nx)+"_"+std::to_string(n+1), SerialSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

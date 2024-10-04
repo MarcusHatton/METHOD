@@ -10,8 +10,8 @@ int IMEX2Residual1(void *p, int n, const double *x, double *fvec, int iflag);
 int IMEX2Residual2(void *p, int n, const double *x, double *fvec, int iflag);
 
 //! SSP2(222) parameterized constructor
-SSP2::SSP2(Data * data, Model * model, Bcs * bc, FluxMethod * fluxMethod) :
-              TimeIntegrator(data, model, bc, fluxMethod)
+SSP2::SSP2(Data * data, Model * model, Bcs * bc, FluxMethod * fluxMethod, ModelExtension * modelExtension) :
+              TimeIntegrator(data, model, bc, fluxMethod, modelExtension)
 
 {
   Data * d(this->data);
@@ -103,6 +103,24 @@ void SSP2::step(double * cons, double * prims, double * aux, double dt)
 
   finalise(U1, prims, aux);
   model->sourceTerm(U1, prims, aux, source1);
+
+  // If there is a subgrid model, add that contribution
+  if (modelExtension != NULL && modelExtension->sourceExists) {
+    modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
+
+    for (int var(0); var < d->Ncons; var++) {
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {
+            source1[ID(var, i, j, k)] += d->sourceExtension[ID(var, i, j, k)];
+            //printf('var: %d, i: %d, source: %g', var, i, d->sourceExtension[ID(var, i, j, k)]);
+          }
+        }
+      }
+    }
+  }
+
+
   fluxMethod->F(U1, prims, aux, d->f, flux1);
 
 
@@ -150,8 +168,25 @@ void SSP2::step(double * cons, double * prims, double * aux, double dt)
 
   finalise(U2, prims, aux);
   model->sourceTerm(U2, prims, aux, source2);
-  fluxMethod->F(U2, prims, aux, d->f, flux2);
 
+  // If there is a subgrid model, add that contribution
+  if (modelExtension != NULL && modelExtension->sourceExists) {
+    modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
+
+    for (int var(0); var < d->Ncons; var++) {
+      for (int i(d->is); i < d->ie; i++) {
+        for (int j(d->js); j < d->je; j++) {
+          for (int k(d->ks); k < d->ke; k++) {
+            source2[ID(var, i, j, k)] += d->sourceExtension[ID(var, i, j, k)];
+            //printf('var: %d, i: %d, source: %g', var, i, d->sourceExtension[ID(var, i, j, k)]);
+          }
+        }
+      }
+    }
+  }
+
+
+  fluxMethod->F(U2, prims, aux, d->f, flux2);
 
   // Prediction correction
   for (int var(0); var < d->Ncons; var++) {

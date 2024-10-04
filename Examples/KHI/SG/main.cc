@@ -5,14 +5,13 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "RelNS.h"
-//#include "SubgridNS.h"
+#include "SubgridNS.h"
 //#include "boundaryConds.h"
 #include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
-#include "RKPlus.h"
-// #include "SSP2.h"
+// #include "RKPlus.h"
+#include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "parallelEnv.h"
 //#include "serialEnv.h"
@@ -29,8 +28,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
-  int ny(800);
+  int nx(200);
+  int ny(200);
   int nz(0);
   double xmin(0.0);
   double xmax(1.0);
@@ -56,7 +55,7 @@ int main(int argc, char *argv[]) {
   // the CFL limit is met.
   bool output(false);
   int nreports(10);
-  std::string output_dir = "2d/KHRandom/Ideal/";
+  std::string output_dir = "SubGrid/2d/KHRandom/";
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
 
@@ -67,7 +66,7 @@ int main(int argc, char *argv[]) {
   data_args.reportItersPeriod = 2000;
   // These of course should no longer be used, but can leave them for now as 'scaling parameters'
   // Perhaps to control the filtering length effect!
-  const std::vector<double> toy_params           { {0.0, 5.0e-1,  0.0, 5.0e-1,  0.0, 5.0e-1, 4.0} }; 
+  const std::vector<double> toy_params           { {1.0, 5.0e-1,  1.0, 5.0e-1,  1.0, 5.0e-1, 1.0} }; 
   // scale ratio currently does nothing - it is set from the ratio of resolutions to the 800x800 calibration one. e.g. s_r=4.0 for 200x200 subgrid sim
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi", "scale_ratio"};
   const int n_toy_params(6);
@@ -91,8 +90,8 @@ int main(int argc, char *argv[]) {
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
-  // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
-  RK4 timeInt(&data, &model, &bcs, &fluxMethod);
+  SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
+  // RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
   ParallelSaveDataHDF5 save(&data, &env, output_dir+"dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 

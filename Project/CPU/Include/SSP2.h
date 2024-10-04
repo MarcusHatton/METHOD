@@ -59,7 +59,7 @@ class SSP2 : public TimeIntegrator
       @param *fluxMethod pointer to FluxMethod object
       @sa TimeIntegrator::TimeIntegrator
     */
-    SSP2(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod);
+    SSP2(Data * data, Model * model, Bcs * bcs, FluxMethod * fluxMethod, ModelExtension * modelExtension = NULL);
 
     //! Destructor
     virtual ~SSP2();

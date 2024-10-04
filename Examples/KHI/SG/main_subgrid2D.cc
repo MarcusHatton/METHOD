@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
   int Ng(4);
   // int nx(65536);
   // int nx(32768);
-  int nx(800);
-  int ny(800);
+  int nx(400);
+  int ny(400);
   int nz(0);
   double xmin(0.0);
   double xmax(1.0);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   data_args.reportItersPeriod = 2000;
   // These of course should no longer be used, but can leave them for now as 'scaling parameters'
   // Perhaps to control the filtering length effect!
-  const std::vector<double> toy_params           { {1.0, 5.0e-1,  1.0, 5.0e-1,  1.0, 5.0e-1, 4.0} }; 
+  const std::vector<double> toy_params           { {1.0, 5.0e-1,  1.0, 5.0e-1,  1.0, 5.0e-1, 1.0} }; 
   // scale ratio currently does nothing - it is set from the ratio of resolutions to the 800x800 calibration one. e.g. s_r=4.0 for 200x200 subgrid sim
   const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi", "scale_ratio"};
   const int n_toy_params(6);

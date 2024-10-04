@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     # Create and setup micromodel
 
-    hr_pickle_dirs = ['./SubGrid/']
+    hr_pickle_dirs = ['./Output/t_998_1002/800x1600/Pickles/', './Output/t_1998_2002/800x1600/Pickles/', './Output/t_2998_3002/800x1600/Pickles/']
     lr_pickle_dirs = ['./Output/t_998_1002/400x800/Pickles/', './Output/t_1998_2002/400x800/Pickles/', './Output/t_2998_3002/400x800/Pickles/']
     HRKESpecs = []
     LRKESpecs = []
