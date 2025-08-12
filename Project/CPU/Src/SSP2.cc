@@ -108,6 +108,8 @@ void SSP2::step(double * cons, double * prims, double * aux, double dt)
   if (modelExtension != NULL && modelExtension->sourceExists) {
     modelExtension->sourceExtension(cons, prims, aux, d->sourceExtension);
 
+    printf("modelExtension Running");
+
     for (int var(0); var < d->Ncons; var++) {
       for (int i(d->is); i < d->ie; i++) {
         for (int j(d->js); j < d->je; j++) {

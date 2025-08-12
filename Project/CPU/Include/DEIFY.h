@@ -6,9 +6,9 @@
 
 //! <b> DEIFY: // Dissipative Extension for Ideal Fluid dYnamics </b>
 /*!
-    This class represents the implementation of DEIFY, a resistive extension
-  to the special relativistic, ideal MHD equations. Details can be found in
-  Wright & Hawke 2019 `A resistive extension to ideal MHD`.
+    This class represents the implementation of DEIFY, a dissipative extension
+  to the special relativistic, ideal hydrodynamic equations. Details can be found in
+  Hatton & Hawke 2024 `A dissipative extension to ideal hydrodynamics`.
 
     DEIFY extends the equations of ideal MHD by means of an additional, diffusive
   source term. The new system has the following form:

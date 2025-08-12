@@ -5,13 +5,13 @@
 #include "simData.h"
 #include "simulation.h"
 #include "initFunc.h"
-#include "SubgridNS.h"
+#include "srmhd.h"
 //#include "boundaryConds.h"
 #include "parallelBoundaryConds.h"
 // #include "rkSplit.h"
 // #include "backwardsRK.h"
 #include "RKPlus.h"
-//#include "SSP2.h"
+// #include "SSP2.h"
 #include "fluxVectorSplitting.h"
 #include "parallelEnv.h"
 //#include "serialEnv.h"
@@ -30,14 +30,14 @@ int main(int argc, char *argv[]) {
   // int nx(32768);
   int nx(200);
   int ny(200);
-  int nz(0);
+  int nz(200);
   double xmin(0.0);
   double xmax(1.0);
   double ymin(0.0);
   double ymax(1.0);
   double zmin(0.0);
   double zmax(1.0);
-  double endTime(20.0);
+  double endTime(30.0);
   double cfl(0.1);
   // double gamma(0.001);
   // double sigma(0.001);
@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
   // the CFL limit is met.
   bool output(false);
   int nreports(10);
-  std::string output_dir = "SubGrid/2d/KHRandom/";
 
   ParallelEnv env(&argc, &argv, 8, 5, 1);
 
@@ -66,16 +65,15 @@ int main(int argc, char *argv[]) {
   data_args.reportItersPeriod = 2000;
   // These of course should no longer be used, but can leave them for now as 'scaling parameters'
   // Perhaps to control the filtering length effect!
-  const std::vector<double> toy_params           { {1.0, 5.0e-1,  1.0, 5.0e-1,  1.0, 5.0e-1, 1.0} }; 
-  // scale ratio currently does nothing - it is set from the ratio of resolutions to the 800x800 calibration one. e.g. s_r=4.0 for 200x200 subgrid sim
-  const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi", "scale_ratio"};
-  const int n_toy_params(7);
-  data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
+  //const std::vector<double> toy_params           { {1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1,  1.0e-15, 5.0e-1, 1.0} };
+  //const std::vector<std::string> toy_param_names = {"kappa", "tau_q", "zeta", "tau_Pi", "eta", "tau_pi", "scale_ratio"};
+  //const int n_toy_params(6);
+  //data_args.sOptionalSimArgs(toy_params, toy_param_names, n_toy_params);
 
   Data data(data_args, &env);
 
   // Choose particulars of simulation
-  NS model(&data, false);
+  SRMHD model(&data);
 
   Weno3 weno(&data);
 
@@ -86,14 +84,14 @@ int main(int argc, char *argv[]) {
   Simulation sim(&data, &env);
 
   //ISKHInstabilitySingleFluid init(&data, 1);
-  KHRandomInstabilitySingleFluid init(&data); // optional:magnetic fields, seed
+  KHRandomInstabilitySingleFluid3D init(&data, 1); // optional:magnetic fields, seed
 
   // RKSplit timeInt(&data, &model, &bcs, &fluxMethod);
   // BackwardsRK2 timeInt(&data, &model, &bcs, &fluxMethod);
   // SSP2 timeInt(&data, &model, &bcs, &fluxMethod);
   RK2B timeInt(&data, &model, &bcs, &fluxMethod);
 
-  ParallelSaveDataHDF5 save(&data, &env, output_dir+"dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
+  ParallelSaveDataHDF5 save(&data, &env, "3d/KHI/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_0", ParallelSaveDataHDF5::OUTPUT_ALL);
 
   // Now objects have been created, set up the simulation
   sim.set(&init, &model, &timeInt, &bcs, &fluxMethod, &save);
@@ -102,7 +100,7 @@ int main(int argc, char *argv[]) {
 
   for (int n(0); n<nreports; n++) {
     data.endTime = (n+1)*endTime/(nreports);
-    ParallelSaveDataHDF5 save_in_loop(&data, &env, output_dir+"dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
+    ParallelSaveDataHDF5 save_in_loop(&data, &env, "3d/KHI/dp_"+std::to_string(nx)+"x"+std::to_string(ny)+"x"+std::to_string(nz)+"_"+std::to_string(n+1), ParallelSaveDataHDF5::OUTPUT_ALL);
     sim.evolve(output);
     save_in_loop.saveAll();
   }

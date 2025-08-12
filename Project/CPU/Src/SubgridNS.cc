@@ -267,7 +267,7 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
 {
   Data * d(this->data);
 
-  // scale_ratio = this->scale_ratio;
+  // scaling_prefactor = this->scaling_prefactor;
   
   scale_ratio = 800 / this->data->nx; // should be using this as calibrated on 800x800
 
@@ -278,6 +278,19 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
   for (int i(0); i < this->data->Nx; i++) {
     for (int j(0); j < this->data->Ny; j++) {
       for (int k(0); k < this->data->Nz; k++) {
+            if( aux[ID(Aux::omegasqrd, i, j, k)] == 0.0) {
+              aux[ID(Aux::omegasqrd, i, j, k)] = 1.0;
+            }
+            if( aux[ID(Aux::sigmasqrd, i, j, k)] == 0.0) {
+              aux[ID(Aux::sigmasqrd, i, j, k)] = 1.0;
+            }
+            if( aux[ID(Aux::theta, i, j, k)] == 0.0) {
+              aux[ID(Aux::theta, i, j, k)] = 1.0;
+            }
+            if( aux[ID(Aux::detsigma, i, j, k)] == 0.0) {
+              aux[ID(Aux::detsigma, i, j, k)] = 1.0;
+            }
+
             aux[ID(Aux::zeta, i, j, k)] = zeta * pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
                                           *  pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.46) * pow(abs(aux[ID(Aux::theta, i, j, k)]), -0.85);
             aux[ID(Aux::kappa, i, j, k)] = kappa * pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
@@ -289,25 +302,41 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
             //printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
 
             if( isnan(aux[ID(Aux::zeta, i, j, k)]) ) {
+              printf("EEK EEK");
+              printf("Zeta nan");
+              //printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+              //printf("(%g, %g, %g) sigmasqrd, omegasqrd, theta \n", aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)]);
               aux[ID(Aux::zeta, i, j, k)] = 0.0;
             } if( isnan(aux[ID(Aux::kappa, i, j, k)]) ) {
+              printf("EEK EEK");
+              printf("Kappa nan");
               aux[ID(Aux::kappa, i, j, k)] = 0.0;
             } if( isnan(aux[ID(Aux::eta, i, j, k)]) ) {
+              printf("EEK EEK");
+              printf("Eta nan");
               aux[ID(Aux::eta, i, j, k)] = 0.0;
             } 
 
             // Check for infinities - from negative powers of terms that are 0
             if( isinf(aux[ID(Aux::zeta, i, j, k)]) ) {
+              printf("EEK EEK");
+              printf("Zeta inf");
               aux[ID(Aux::zeta, i, j, k)] = 0.0; // Should probably have a better solution than setting them to zero...
             } if( isinf(aux[ID(Aux::kappa, i, j, k)]) ) {
+              printf("EEK EEK");
+              printf("Kappa inf");
               aux[ID(Aux::kappa, i, j, k)] = 0.0;
             } if( isinf(aux[ID(Aux::eta, i, j, k)]) ) {
+              printf("EEK EEK");
+              printf("Eta inf");
               aux[ID(Aux::eta, i, j, k)] = 0.0;
             } 
 
       }
     }
   }
+
+  /*
 
   float gamma = d->gamma;  
 
@@ -338,6 +367,8 @@ void NS::calculateDissipativeCoefficients(double *cons, double *prims, double *a
     }
   }
 
+  */
+
 }
 
 void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims, double *aux, int i, int j, int k)
@@ -352,6 +383,19 @@ void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims,
   
   scale_ratio = 800 / this->data->nx; // should be using this as calibrated on 800x800
 
+  if( aux[ID(Aux::omegasqrd, i, j, k)] == 0.0) {
+    aux[ID(Aux::omegasqrd, i, j, k)] = 1.0;
+  }
+  if( aux[ID(Aux::sigmasqrd, i, j, k)] == 0.0) {
+    aux[ID(Aux::sigmasqrd, i, j, k)] = 1.0;
+  }
+  if( aux[ID(Aux::theta, i, j, k)] == 0.0) {
+    aux[ID(Aux::theta, i, j, k)] = 1.0;
+  }
+  if( aux[ID(Aux::detsigma, i, j, k)] == 0.0) {
+    aux[ID(Aux::detsigma, i, j, k)] = 1.0;
+  }
+
   aux[ID(Aux::zeta, i, j, k)] = zeta * pow(this->scale_ratio, 2) * pow(10,-5.7) * pow(abs(aux[ID(Aux::omegasqrd, i, j, k)]), 0.1) * pow(aux[ID(Aux::T, i, j, k)], 0.4) * pow(prims[ID(Prims::n, i, j, k)], 0.5)
                                 *  pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.46) * pow(abs(aux[ID(Aux::theta, i, j, k)]), -0.85);
   aux[ID(Aux::kappa, i, j, k)] = kappa * pow(this->scale_ratio, 2) * pow(10,-6.3) * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)]), 0.15) * pow(prims[ID(Prims::n, i, j, k)], 0.3)
@@ -360,7 +404,7 @@ void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims,
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045)
                                 * pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13);
 
-  // printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+    // printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
     //printf("(%d, %d, %d) i, j, k\n", i, j, k);
     //printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
     //printf("(%g, %g, %g, %g) omegasqrd, sigmasqrd, theta, detsigma \n", aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)], aux[ID(Aux::detsigma, i, j, k)]);
@@ -370,19 +414,44 @@ void NS::calculateDissipativeCoefficientsSingleCell(double *cons, double *prims,
 
   // Check for nan values - from fractional powers of terms that are negative
   if( isnan(aux[ID(Aux::zeta, i, j, k)]) ) {
+    // printf("EEK EEK");
+    printf("Zeta nan");
+    printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+    printf("(%g, %g, %g, %g) sigmasqrd, omegasqrd, theta, detsigma \n", aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)], aux[ID(Aux::detsigma, i, j, k)]);
+    printf("(%g, %g, %g) terms\n", pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13));
     aux[ID(Aux::zeta, i, j, k)] = 0.0;
   } if( isnan(aux[ID(Aux::kappa, i, j, k)]) ) {
+    printf("EEK EEK");
+    printf("Kappa nan");
     aux[ID(Aux::kappa, i, j, k)] = 0.0;
   } if( isnan(aux[ID(Aux::eta, i, j, k)]) ) {
+    //printf("EEK EEK");
+    printf("Eta nan\n");
+    printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+    printf("(%g, %g, %g, %g) sigmasqrd, omegasqrd, theta, detsigma \n", aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)], aux[ID(Aux::detsigma, i, j, k)]);
+    printf("(%g, %g, %g) terms\n", pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13));
     aux[ID(Aux::eta, i, j, k)] = 0.0;
   } 
 
   // Check for infinities - from negative powers of terms that are 0
   if( isinf(aux[ID(Aux::zeta, i, j, k)]) ) {
+    // printf("EEK EEK");
+    printf("Zeta inf");
+    printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+    printf("(%g, %g, %g, %g) sigmasqrd, omegasqrd, theta, detsigma \n", aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)], aux[ID(Aux::detsigma, i, j, k)]);
+    printf("(%g, %g, %g) terms\n", pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13));
     aux[ID(Aux::zeta, i, j, k)] = 0.0; // Should probably have a better solution than setting them to zero...
   } if( isinf(aux[ID(Aux::kappa, i, j, k)]) ) {
+    printf("EEK EEK");
+    printf("Kappa inf");
     aux[ID(Aux::kappa, i, j, k)] = 0.0;
   } if( isinf(aux[ID(Aux::eta, i, j, k)]) ) {
+    //printf("EEK EEK");
+    printf("Eta inf");
+    printf("(%g, %g, %g) zeta, kappa, eta\n", aux[ID(Aux::zeta, i, j, k)], aux[ID(Aux::kappa, i, j, k)], aux[ID(Aux::eta, i, j, k)]);
+
+    printf("(%g, %g, %g, %g) sigmasqrd, omegasqrd, theta, detsigma \n", aux[ID(Aux::sigmasqrd, i, j, k)], aux[ID(Aux::omegasqrd, i, j, k)], aux[ID(Aux::theta, i, j, k)], aux[ID(Aux::detsigma, i, j, k)]);
+    printf("(%g, %g, %g) terms\n", pow(abs(aux[ID(Aux::detsigma, i, j, k)]), 0.15), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] - aux[ID(Aux::omegasqrd, i, j, k)]), 0.045), pow(abs(aux[ID(Aux::sigmasqrd, i, j, k)] / aux[ID(Aux::omegasqrd, i, j, k)]), -0.13));
     aux[ID(Aux::eta, i, j, k)] = 0.0;
   } 
 
@@ -990,12 +1059,12 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
        
         // Chain rule for time derivs
         dtux = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)];
-        dtuy = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)];
-        dtuz = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv1dt, i, j, k)] + prims[ID(Prims::v1, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)];
+        dtuy = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv2dt, i, j, k)] + prims[ID(Prims::v2, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)];
+        dtuz = aux[ID(Aux::W, i, j, k)]*aux[ID(Aux::dv3dt, i, j, k)] + prims[ID(Prims::v3, i, j, k)]*aux[ID(Aux::dWdt, i, j, k)];
         
         dxux = (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v1, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v1, i-1, j, k)])/(2*d->dx);
-        dyuy = (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v1, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v1, i, j-1, k)])/(2*d->dy);
-        dzuz = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v1, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v1, i, j, k-1)])/(2*d->dz);
+        dyuy = (aux[ID(Aux::W, i, j+1, k)]*prims[ID(Prims::v2, i, j+1, k)] - aux[ID(Aux::W, i, j-1, k)]*prims[ID(Prims::v2, i, j-1, k)])/(2*d->dy);
+        dzuz = (aux[ID(Aux::W, i, j, k+1)]*prims[ID(Prims::v3, i, j, k+1)] - aux[ID(Aux::W, i, j, k-1)]*prims[ID(Prims::v3, i, j, k-1)])/(2*d->dz);
 
         dxuy = (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v2, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v2, i-1, j, k)])/(2*d->dx);
         dxuz = (aux[ID(Aux::W, i+1, j, k)]*prims[ID(Prims::v3, i+1, j, k)] - aux[ID(Aux::W, i-1, j, k)]*prims[ID(Prims::v3, i-1, j, k)])/(2*d->dx);
@@ -1042,6 +1111,7 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::omega22, i, j, k)] = 0.0;
         aux[ID(Aux::omega23, i, j, k)] = dyuz - dzuy;
         aux[ID(Aux::omega33, i, j, k)] = 0.0;
+        // Should some of these be minus signs? ie contracted with Mink metric
         aux[ID(Aux::omegasqrd, i, j, k)] = aux[ID(Aux::omega00, i, j, k)] * aux[ID(Aux::omega00, i, j, k)]
                                          + 2*aux[ID(Aux::omega01, i, j, k)] * aux[ID(Aux::omega01, i, j, k)]  
                                          + 2*aux[ID(Aux::omega02, i, j, k)] * aux[ID(Aux::omega02, i, j, k)]  
@@ -1052,6 +1122,8 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
                                          + aux[ID(Aux::omega22, i, j, k)] * aux[ID(Aux::omega22, i, j, k)]
                                          + 2*aux[ID(Aux::omega23, i, j, k)] * aux[ID(Aux::omega23, i, j, k)]
                                          + aux[ID(Aux::omega33, i, j, k)] * aux[ID(Aux::omega33, i, j, k)];
+        // theta 20 then Pi,NS 13 
+        aux[ID(Aux::theta, i, j, k)] = dtW + dxux + dyuy + dzuz; // minus sign on dtW here??
 
         // Shear
         aux[ID(Aux::sigma11, i, j, k)] = 2*dxux 
@@ -1186,8 +1258,6 @@ void NS::getPrimitiveVars(double *cons, double *prims, double *aux)
         aux[ID(Aux::qv, i, j, k)] = (prims[ID(Prims::q1, i, j, k)] * prims[ID(Prims::v1, i, j, k)]) + (prims[ID(Prims::q2, i, j, k)] * prims[ID(Prims::v2, i, j, k)]) 
                                + (prims[ID(Prims::q3, i, j, k)] * prims[ID(Prims::v3, i, j, k)]);
 
-        // theta 20 then Pi,NS 13 
-        aux[ID(Aux::theta, i, j, k)] = dtW + dxux + dyuy + dzuz; // minus sign on dtW here??
         // Pi,NS = -zeta*theta
         prims[ID(Prims::Pi, i, j, k)] = -zeta*aux[ID(Aux::zeta, i, j, k)] * aux[ID(Aux::theta, i, j, k)];
   

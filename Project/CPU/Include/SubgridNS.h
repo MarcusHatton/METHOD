@@ -7,11 +7,11 @@
 /*
 This is the human readable description of this models variables.
 
-  NS has 15 conserved variables:
+  NS has 5 conserved variables:
     D, Sx, Sy, Sz, tau
   16 primitive variables:
     v1, v2, v3, p, rho, n, q1, q2, q3, Pi, pi11, pi12, pi13, pi22, pi23, pi33
-  37 auxiliary variables:
+  55 auxiliary variables:
     h, T, e, W, q0, qv, pi00, pi01, pi02, pi03, q1NS, q2NS, q3NS, PiNS, 
     pi11NS, pi12NS, pi13NS, pi22NS, pi23NS, pi33NS, Theta, dv1dt, 
     dv2dt, dv3dt, a1, a2, a3, vsqrd, dWdt, rho_plus_p, 

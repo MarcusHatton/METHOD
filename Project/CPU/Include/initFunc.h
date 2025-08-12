@@ -234,6 +234,27 @@ class KHRandomInstabilitySingleFluid : public InitialFunc
     virtual ~KHRandomInstabilitySingleFluid() { }     //!< Destructor
 };
 
+//! <b> Single-fluid Kelvin-Helmholtz instability with random interface </b>
+/*!
+      Modified from Fjordholm et al. This is a two-dimensional
+    test
+*/
+class KHRandomInstabilitySingleFluid3D : public InitialFunc
+{
+  public:
+    /*! Constructor
+      @param[in] *data Pointer to Data class containing global simulation data
+      @param[in] mag Flag for seed magnetic field of B_z = 0.1. Switch 0 for
+      off, or 1 for on.
+      @param[in] seed Seed for random number generator
+      @param[in] perturb_z Bool for switching on z-perturbation for 3D
+      @sa InitialFunc
+    */
+    KHRandomInstabilitySingleFluid3D(Data * data, int mag=0, int seed=1234, bool perturb_z=true);
+
+    virtual ~KHRandomInstabilitySingleFluid3D() { }     //!< Destructor
+};
+
 //! <b> Two-fluid Kelvin-Helmholtz instability </b>
 /*!
       Adapted from Mignone 2009 `A five wave HLL....` for the two fluid set-up.

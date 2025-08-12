@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#SBATCH --ntasks-per-node=40
+#SBATCH --nodes=1
+#SBATCH --time=20:00:00          # walltime
+
+module load qt/5.13.1
+
+##conda init
+##conda activate first_try
+##export QT_DEBUG_PLUGINS=1
+
+##source activate first_try
+
+python3 ./GPTKaznatsevModified.py
+#python3 ./KolmogorovAnalysisPseudo3D.py

@@ -677,6 +677,80 @@ KHRandomInstabilitySingleFluid::KHRandomInstabilitySingleFluid(Data * data, int 
   }
 }
 
+KHRandomInstabilitySingleFluid3D::KHRandomInstabilitySingleFluid3D(Data * data, int mag, int seed, bool perturb_z)
+  : InitialFunc(data)
+{
+  Data * d(data);
+
+  if (d->Nprims > 15) throw std::invalid_argument("Expected single-fluid model with <= 15 primitives.");
+  if (d->gamma != 4.0/3.0) throw std::invalid_argument("Expected gamma = 4/3");
+  if (d->xmin != 0.0 || d->xmax != 1.0 || d->ymin != 0.0 || d->ymax != 1.0 || d->zmin != 0.0 || d->zmax != 1.0)
+    throw std::invalid_argument("Expected domain [0,1]^3");
+
+  double vShear = 0.5;
+  double rho0 = 1.0, rho1 = 0.1;
+  double epsilon = 0.01;
+
+  const int NMODES = 10;
+  std::vector<double> a_lower(NMODES), a_upper(NMODES), b_lower(NMODES), b_upper(NMODES);
+  double sum_a_lower = 0.0, sum_a_upper = 0.0;
+
+  std::mt19937 gen(seed);
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+
+  for (int i = 0; i < NMODES; ++i) {
+    a_lower[i] = dis(gen); sum_a_lower += a_lower[i];
+    a_upper[i] = dis(gen); sum_a_upper += a_upper[i];
+    b_lower[i] = -PI + 2.0*PI*dis(gen);
+    b_upper[i] = -PI + 2.0*PI*dis(gen);
+  }
+
+  for (int i = 0; i < NMODES; ++i) {
+    a_lower[i] /= sum_a_lower;
+    a_upper[i] /= sum_a_upper;
+    printf("Random coeffs, %d: %g, %g, %g, %g\n", i, a_lower[i], a_upper[i], b_lower[i], b_upper[i]);
+  }
+
+  for (int i = 0; i < d->Nx; ++i) {
+    for (int k = 0; k < d->Nz; ++k) {
+      double x = d->x[i];
+      double z = d->z[k];
+
+      double interface_y_lower = 0.25;
+      double interface_y_upper = 0.75;
+
+      for (int n = 0; n < NMODES; ++n) {
+        double phase = 2.0 * n * PI * x;
+        if (perturb_z) phase += 2.0 * n * PI * z;
+
+        interface_y_lower += epsilon * a_lower[n] * cos(b_lower[n] + phase);
+        interface_y_upper += epsilon * a_upper[n] * cos(b_upper[n] + phase);
+      }
+
+      for (int j = 0; j < d->Ny; ++j) {
+        double y = d->y[j];
+
+        d->prims[ID(4, i, j, k)] = 1.0;  // Pressure
+
+        if (mag) d->prims[ID(7, i, j, k)] = 0.1; // B^x
+
+        if (y < interface_y_lower || y > interface_y_upper) {
+          d->prims[ID(0, i, j, k)] = rho0;
+          d->prims[ID(1, i, j, k)] = vShear;
+        } else {
+          d->prims[ID(0, i, j, k)] = rho1;
+          d->prims[ID(1, i, j, k)] = -vShear;
+        }
+
+        // Optional: add a small vz perturbation
+        if (perturb_z) {
+          d->prims[ID(3, i, j, k)] = 0.01 * sin(2.0 * PI * z);
+        }
+      }
+    }
+  }
+}
+
 
 FieldLoopAdvectionSingleFluid::FieldLoopAdvectionSingleFluid(Data * data) : InitialFunc(data)
 {
